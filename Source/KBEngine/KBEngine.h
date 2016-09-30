@@ -23,6 +23,8 @@ public:
 	virtual ~KBEngineApp();
 
 public:
+	KBEngineArgs args;
+	
 	FString username;
 	FString password;
 
@@ -43,7 +45,12 @@ public:
 	int32 entity_id;
 	FString entity_type;
 
-	// 所有服务端错误码对应的错误描述
+	// space的数据，具体看API手册关于spaceData
+	// https://github.com/kbengine/kbengine/tree/master/docs/api
+	TMap<FString, FString> _spacedatas;
+	
+	// 所有实体都保存于这里， 请参看API手册关于entities部分
+	// https://github.com/kbengine/kbengine/tree/master/docs/api
 	TMap<int32, Entity> entities;
 
 	// 所有服务端错误码对应的错误描述
