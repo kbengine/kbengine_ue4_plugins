@@ -16,7 +16,7 @@ http://www.kbengine.org/docs/programming/kbe_message_format.html
 http://www.kbengine.org/cn/docs/programming/clientsdkprogramming.html
 http://www.kbengine.org/cn/docs/programming/kbe_message_format.html
 */
-class KBEngineApp
+class KBENGINEPLUGINS_API KBEngineApp
 {
 public:
 	KBEngineApp();
@@ -42,6 +42,12 @@ public:
 	uint64 entity_uuid;
 	int32 entity_id;
 	FString entity_type;
+
+	// 所有服务端错误码对应的错误描述
+	TMap<int32, Entity> entities;
+
+	// 所有服务端错误码对应的错误描述
+	TMap<uint16, FKServerErr> serverErrs;
 
 	// 玩家当前所在空间的id， 以及空间对应的资源
 	uint32 spaceID;
