@@ -1,6 +1,8 @@
 
 #include "KBEnginePluginsPrivatePCH.h"
 #include "KBEngine.h"
+#include "KBEngineArgs.h"
+#include "Entity.h"
 
 KBEngineApp::KBEngineApp()
 {
@@ -26,6 +28,8 @@ KBEngineApp::KBEngineApp()
 	isLoadedGeometry = false;
 
 	component = "client";
+
+	pArgs = new KBEngineArgs();
 }
 
 KBEngineApp::~KBEngineApp()

@@ -2,10 +2,10 @@
 #include "KBEnginePluginsPrivatePCH.h"
 #include "KBEngineArgs.h"
 
-KBEngineAppArgs::KBEngineAppArgs()
+KBEngineArgs::KBEngineArgs()
 {
 }
 
-KBEngineAppArgs::~KBEngineAppArgs()
+KBEngineArgs::~KBEngineArgs()
 {
 }

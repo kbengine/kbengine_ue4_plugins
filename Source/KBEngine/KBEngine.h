@@ -4,6 +4,8 @@
 
 #include "KBECommon.h"
 
+class KBEngineArgs;
+class Entity;
 
 /*
 这是KBEngine插件的核心模块
@@ -23,7 +25,7 @@ public:
 	virtual ~KBEngineApp();
 
 public:
-	KBEngineArgs args;
+	KBEngineArgs* pArgs;
 	
 	FString username;
 	FString password;
@@ -51,7 +53,7 @@ public:
 	
 	// 所有实体都保存于这里， 请参看API手册关于entities部分
 	// https://github.com/kbengine/kbengine/tree/master/docs/api
-	TMap<int32, Entity> entities;
+	TMap<int32, Entity*> entities;
 
 	// 所有服务端错误码对应的错误描述
 	TMap<uint16, FKServerErr> serverErrs;

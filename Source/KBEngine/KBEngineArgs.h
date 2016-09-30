@@ -8,11 +8,11 @@
 /*
 初始化KBEngine的参数类
 */
-class KBENGINEPLUGINS_API KBEngineAppArgs
+class KBENGINEPLUGINS_API KBEngineArgs
 {
 public:
-	KBEngineAppArgs();
-	virtual ~KBEngineAppArgs();
+	KBEngineArgs();
+	virtual ~KBEngineArgs();
 
 public:
 
