@@ -3,6 +3,9 @@
 #include "KBEnginePluginsPrivatePCH.h"
 #include "KBEMain.h"
 #include "KBEngine.h"
+#include "KBEngineArgs.h"
+
+DEFINE_LOG_CATEGORY(LogKBEngine);
 
 KBEngineApp* UKBEMain::pApp = NULL;
 
@@ -40,9 +43,17 @@ void UKBEMain::BeginPlay()
 {
 	Super::BeginPlay();
 
+	KBEngineArgs* pArgs = new KBEngineArgs();
+	pArgs->ip = ip;
+	pArgs->port = port;
+	pArgs->syncPlayer = syncPlayer;
+	pArgs->useAliasEntityID = useAliasEntityID;
+	pArgs->isOnInitCallPropertysSetMethods = isOnInitCallPropertysSetMethods;
+	pArgs->clientType = clientType;
+
 	// ...
 	if (UKBEMain::pApp == NULL)
-		UKBEMain::pApp = new KBEngineApp();
+		UKBEMain::pApp = new KBEngineApp(pArgs);
 }
 
 void UKBEMain::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -56,6 +67,10 @@ void UKBEMain::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
 	// ...
+	if (UKBEMain::pApp)
+	{
+		UKBEMain::pApp->process();
+	}
 }
 
 bool UKBEMain::destroyKBEngine()
@@ -69,4 +84,10 @@ bool UKBEMain::destroyKBEngine()
 	return true;
 }
 
+bool UKBEMain::login(FString username, FString password, FString datas)
+{
+	if (!UKBEMain::pApp)
+		return false;
 
+	return UKBEMain::pApp->login(username, password, datas);
+}

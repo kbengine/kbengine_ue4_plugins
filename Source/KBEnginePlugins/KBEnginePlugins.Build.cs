@@ -2,14 +2,14 @@
 
 using UnrealBuildTool;
 
-public class KBEngine : ModuleRules
+public class KBEnginePlugins : ModuleRules
 {
-	public KBEngine(TargetInfo Target)
+	public KBEnginePlugins(TargetInfo Target)
 	{
 		
 		PublicIncludePaths.AddRange(
 			new string[] {
-				"KBEngine/Public"
+				"KBEnginePlugins/Public"
 				// ... add public include paths required here ...
 			}
 			);
@@ -17,7 +17,7 @@ public class KBEngine : ModuleRules
 		
 		PrivateIncludePaths.AddRange(
 			new string[] {
-				"KBEngine/Private",
+				"KBEnginePlugins/Private",
 				// ... add other private include paths required here ...
 			}
 			);
@@ -39,6 +39,8 @@ public class KBEngine : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+                "Networking",
+                "Sockets",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

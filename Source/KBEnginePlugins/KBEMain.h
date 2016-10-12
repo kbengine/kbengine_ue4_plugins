@@ -5,6 +5,9 @@
 #include "Components/ActorComponent.h"
 #include "KBEMain.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogKBEngine, Log, All);
+
+
 /*
 可以理解为插件的入口模块
 在这个入口中安装了需要监听的事件(installEvents)，同时初始化KBEngine(initKBEngine)
@@ -46,8 +49,14 @@ public:
 	// Called every frame
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
+	/**
+		在程序关闭时需要主动调用, 彻底销毁KBEngine
+	*/
 	UFUNCTION(BlueprintCallable, Category = "KBEngine")
 	bool destroyKBEngine();
+
+	UFUNCTION(BlueprintCallable, Category = "KBEngine")
+	bool login(FString username, FString password, FString datas);
 
 	UPROPERTY(EditAnywhere, Category = KBEngine)
 	FString ip;

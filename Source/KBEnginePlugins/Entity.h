@@ -4,6 +4,7 @@
 
 #include "KBECommon.h"
 
+class Mailbox;
 
 /*
 KBEngine逻辑层的实体基础类
@@ -19,5 +20,16 @@ public:
 	
 
 protected:
+	int32 id_;
+	FString className_;
 
+	FVector position_;
+	FVector direction_;
+
+	bool isOnGround_;
+
+	Mailbox* base_;
+	Mailbox* cell_;
+
+	bool inited_;
 };

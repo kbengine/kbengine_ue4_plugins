@@ -1,16 +1,11 @@
 // Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
+#include "Engine.h"
+#include "KBEnginePlugins.h"
 
-#pragma once
+// You should place include statements to your module's private header files here.  You only need to
+// add includes for headers that are used in most of your module's source files though.
 
-#include "ModuleManager.h"
-
-DECLARE_LOG_CATEGORY_EXTERN(KBEngine, Log, All);
-
-#define NETMODE_WORLD (((GEngine == nullptr) || (GetWorld() == nullptr)) ? TEXT("") \
-	: (GEngine->GetNetMode(GetWorld()) == NM_Client) ? TEXT("[Client] ") \
-	: (GEngine->GetNetMode(GetWorld()) == NM_ListenServer) ? TEXT("[ListenServer] ") \
-	: (GEngine->GetNetMode(GetWorld()) == NM_DedicatedServer) ? TEXT("[DedicatedServer] ") \
-	: TEXT("[Standalone] "))
+#define NETMODE_WORLD TEXT("")
 
 #define FUNC_NAME TEXT(__func__)
 
@@ -28,11 +23,11 @@ DECLARE_LOG_CATEGORY_EXTERN(KBEngine, Log, All);
 	const FString Msg = FString::Printf(TEXT(Format), ##__VA_ARGS__); \
 	if (Msg == "") \
 	{ \
-		UE_LOG(KBEngine, Log, TEXT("%s%s() : %s"), NETMODE_WORLD, FUNC_NAME, *GetNameSafe(this)); \
+		UE_LOG(LogKBEngine, Log, TEXT("%s%s()"), NETMODE_WORLD, FUNC_NAME); \
 	} \
 		else \
 	{ \
-		UE_LOG(KBEngine, Log, TEXT("%s%s() : %s"), NETMODE_WORLD, FUNC_NAME, *Msg); \
+		UE_LOG(LogKBEngine, Log, TEXT("%s%s() : %s"), NETMODE_WORLD, FUNC_NAME, *Msg); \
 	} \
 	CLEAR_WARN_COLOR(); \
 }
@@ -41,15 +36,15 @@ DECLARE_LOG_CATEGORY_EXTERN(KBEngine, Log, All);
 { \
 	SET_WARN_COLOR(COLOR_CYAN); \
 	const FString Msg = FString::Printf(TEXT(Format), ##__VA_ARGS__); \
-	UE_LOG(KBEngine, Log, TEXT("%s() : %s"), FUNC_NAME, *Msg); \
-	CLEAN_WARN_COLOR(); \
+	UE_LOG(LogKBEngine, Log, TEXT("%s() : %s"), FUNC_NAME, *Msg); \
+	CLEAR_WARN_COLOR(); \
 }
 
 #define TRACEWARN(Format, ...) \
 { \
 	SET_WARN_COLOR(COLOR_YELLOW); \
 	const FString Msg = FString::Printf(TEXT(Format), ##__VA_ARGS__); \
-	UE_LOG(KBEngine, Log, TEXT("**WARNING** %s%s() : %s"), NETMODE_WORLD, FUNC_NAME, *Msg); \
+	UE_LOG(LogKBEngine, Log, TEXT("**WARNING** %s%s() : %s"), NETMODE_WORLD, FUNC_NAME, *Msg); \
 	CLEAR_WARN_COLOR(); \
 }
 
@@ -57,7 +52,7 @@ DECLARE_LOG_CATEGORY_EXTERN(KBEngine, Log, All);
 { \
 	SET_WARN_COLOR(COLOR_RED); \
 	const FString Msg = FString::Printf(TEXT(Format), ##__VA_ARGS__); \
-	UE_LOG(KBEngine, Log, TEXT("**ERROR** %s%s() : %s"), NETMODE_WORLD, FUNC_NAME, *Msg); \
+	UE_LOG(LogKBEngine, Log, TEXT("**ERROR** %s%s() : %s"), NETMODE_WORLD, FUNC_NAME, *Msg); \
 	CLEAR_WARN_COLOR(); \
 }
 
@@ -68,7 +63,7 @@ DECLARE_LOG_CATEGORY_EXTERN(KBEngine, Log, All);
 	if (Msg == "") \
 	{ \
 		TCHAR StdMsg[MAX_SPRINTF] = TEXT(""); \
-		FCString::Sprintf(StdMsg, TEXT("%s%s() : %s"), NETMODE_WORLD, FUNC_NAME, *GetNameSafe(this)); \
+		FCString::Sprintf(StdMsg, TEXT("%s%s()"), NETMODE_WORLD, FUNC_NAME); \
 		GEngine->AddOnScreenDebugMessage(-1, 10000.f, FColor::White, StdMsg); \
 	} \
 	else \
@@ -76,13 +71,3 @@ DECLARE_LOG_CATEGORY_EXTERN(KBEngine, Log, All);
 		GEngine->AddOnScreenDebugMessage(-1, 10000.f, FColor::White, Msg); \
 	} \
 }
-
-class FKBEnginePluginsModule : public IModuleInterface
-{
-public:
-
-	/** IModuleInterface implementation */
-	virtual void StartupModule() override;
-	virtual void ShutdownModule() override;
-};
-
