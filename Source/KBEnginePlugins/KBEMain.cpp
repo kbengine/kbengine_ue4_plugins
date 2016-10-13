@@ -4,6 +4,7 @@
 #include "KBEMain.h"
 #include "KBEngine.h"
 #include "KBEngineArgs.h"
+#include "MemoryStream.h"
 
 DEFINE_LOG_CATEGORY(LogKBEngine);
 
@@ -51,6 +52,10 @@ void UKBEMain::BeginPlay()
 	pArgs->isOnInitCallPropertysSetMethods = isOnInitCallPropertysSetMethods;
 	pArgs->clientType = clientType;
 
+	MemoryStream s;
+	s << (uint8)3;
+	s << (uint8)4;
+	s << (uint8)5;
 	// ...
 	if (UKBEMain::pApp == NULL)
 		UKBEMain::pApp = new KBEngineApp(pArgs);

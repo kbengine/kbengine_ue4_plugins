@@ -5,6 +5,23 @@
 #include "GameFramework/Actor.h"
 #include "KBECommon.generated.h"
 
+#define KBE_ASSERT check
+
+/** 安全的释放一个指针内存 */
+#define SAFE_RELEASE(i)										\
+	if (i)													\
+		{													\
+			delete i;										\
+			i = NULL;										\
+		}
+
+/** 安全的释放一个指针数组内存 */
+#define SAFE_RELEASE_ARRAY(i)								\
+	if (i)													\
+		{													\
+			delete[] i;										\
+			i = NULL;										\
+		}
 
 USTRUCT(BlueprintType)
 struct FKServerErr

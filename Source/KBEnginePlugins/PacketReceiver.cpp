@@ -17,7 +17,7 @@ void PacketReceiver::process()
 	
 	FSocket *socket = pNetworkInterface_->socket();
 	uint32 DataSize = 0;
-	while (socket->HasPendingData(DataSize))
+//	while (socket->HasPendingData(DataSize))
 	{
 		FArrayReaderPtr Datagram = MakeShareable(new FArrayReader(true));
 		Datagram->SetNumUninitialized(FMath::Min(DataSize, 65507u));

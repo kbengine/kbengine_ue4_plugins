@@ -5,7 +5,9 @@
 #include "PacketSender.h"
 
 NetworkInterface::NetworkInterface():
-	socket_(NULL)
+	socket_(NULL),
+	pPacketSender_(NULL),
+	pPacketReceiver_(NULL)
 {
 }
 
