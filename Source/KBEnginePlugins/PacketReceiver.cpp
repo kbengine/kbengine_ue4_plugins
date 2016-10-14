@@ -14,22 +14,17 @@ PacketReceiver::~PacketReceiver()
 
 void PacketReceiver::process()
 {
-	
 	FSocket *socket = pNetworkInterface_->socket();
 	uint32 DataSize = 0;
-//	while (socket->HasPendingData(DataSize))
+
+	while (socket->HasPendingData(DataSize))
 	{
-		FArrayReaderPtr Datagram = MakeShareable(new FArrayReader(true));
-		Datagram->SetNumUninitialized(FMath::Min(DataSize, 65507u));
+		MemoryStream* s = new MemoryStream();
+		s->resize(FMath::Min(DataSize, 65507u));
 
 		int32 BytesRead = 0;
-		if (socket->Recv(Datagram->GetData(), Datagram->Num(), BytesRead))
+		if (socket->Recv(s->data(), s->size(), BytesRead))
 		{
-			//nLiveEditorListenServer::FNetworkMessage Message;
-			//*Datagram << Message;
-
-			//ReplicateChanges(Message);
-			//TransactionHistory->AppendTransaction(Message.Payload.ClassName, Message.Payload.PropertyName, Message.Payload.PropertyValue);
 		}
 	}
 }

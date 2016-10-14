@@ -31,6 +31,9 @@ void NetworkInterface::close()
 	}
 
 	socket_ = NULL;
+
+	SAFE_RELEASE(pPacketSender_);
+	SAFE_RELEASE(pPacketReceiver_);
 }
 
 bool NetworkInterface::valid()
@@ -73,6 +76,8 @@ void NetworkInterface::process()
 	if (!valid())
 		return;
 
-	if (pPacketReceiver_)
-		pPacketReceiver_->process();
+	if (!pPacketReceiver_)
+		pPacketReceiver_ = new PacketReceiver(this);
+
+	pPacketReceiver_->process();
 }
