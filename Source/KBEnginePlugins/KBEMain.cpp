@@ -85,7 +85,7 @@ bool UKBEMain::destroyKBEngine()
 	return true;
 }
 
-bool UKBEMain::login(FString username, FString password, FString datas)
+bool UKBEMain::login(FString& username, FString& password, TArray<uint8>& datas)
 {
 	if (!UKBEMain::pApp)
 		return false;

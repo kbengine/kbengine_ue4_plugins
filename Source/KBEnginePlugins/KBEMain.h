@@ -56,7 +56,7 @@ public:
 	bool destroyKBEngine();
 
 	UFUNCTION(BlueprintCallable, Category = "KBEngine")
-	bool login(FString username, FString password, FString datas);
+	bool login(FString& username, FString& password, TArray<uint8>& datas);
 
 	UPROPERTY(EditAnywhere, Category = KBEngine)
 	FString ip;

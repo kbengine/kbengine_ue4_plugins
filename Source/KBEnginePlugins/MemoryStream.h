@@ -65,6 +65,14 @@ inline void EndianConvertReverse(int8&) { }
 class KBENGINEPLUGINS_API MemoryStream
 {
 public:
+	union PackFloatXType
+	{
+		float	fv;
+		uint32	uv;
+		int		iv;
+	};
+
+public:
 	const static size_t DEFAULT_SIZE = 0;
 
 	MemoryStream() :
@@ -80,6 +88,9 @@ public:
 		clear(false);
 	}
 
+	static MemoryStream* createObject();
+	static void reclaimObject(MemoryStream* obj);
+
 public:
 	uint8* data() {
 		return data_.GetData();
@@ -94,27 +105,27 @@ public:
 	}
 
 	// array的大小
-	virtual size_t size() const { return data_.Num(); }
+	virtual uint32 size() const { return data_.Num(); }
 
 	// array是否为空
 	virtual bool empty() const { return data_.Num() == 0; }
 
 	// 读索引到与写索引之间的长度
-	virtual size_t length() const { return rpos() >= wpos() ? 0 : wpos() - rpos(); }
+	virtual uint32 length() const { return rpos() >= wpos() ? 0 : wpos() - rpos(); }
 
 	// 剩余可填充的大小
-	virtual size_t space() const { return wpos() >= size() ? 0 : size() - wpos(); }
+	virtual uint32 space() const { return wpos() >= size() ? 0 : size() - wpos(); }
 
 	// 将读索引强制设置到写索引，表示操作结束
 	void done() { read_skip(length()); }
 
-	void data_resize(size_t newsize)
+	void data_resize(uint32 newsize)
 	{
 		KBE_ASSERT(newsize <= 1310700);
 		data_.SetNumUninitialized(newsize);
 	}
 
-	void resize(size_t newsize)
+	void resize(uint32 newsize)
 	{
 		KBE_ASSERT(newsize <= 1310700);
 		data_.SetNumUninitialized(newsize);
@@ -122,7 +133,7 @@ public:
 		wpos_ = size();
 	}
 
-	void reserve(size_t ressize)
+	void reserve(uint32 ressize)
 	{
 		KBE_ASSERT(ressize <= 1310700);
 
@@ -217,14 +228,15 @@ public:
 		return *this;
 	}
 
-	/*
-	MemoryStream &operator<<(const std::string &value)
+	MemoryStream &operator<<(const FString &value)
 	{
-		append((uint8 const *)value.c_str(), value.length());
+		const TCHAR *serializedChar = value.GetCharArray().GetData();
+		uint32 size = FCString::Strlen(serializedChar);
+
+		append(((uint8*)TCHAR_TO_UTF8(serializedChar)), size);
 		append((uint8)0);
 		return *this;
 	}
-	*/
 
 	MemoryStream &operator<<(const char *str)
 	{
@@ -305,22 +317,20 @@ public:
 		return *this;
 	}
 
-	/*
-	MemoryStream &operator>>(std::string& value)
+	MemoryStream &operator>>(FString& value)
 	{
-		value.clear();
+		value = TEXT("");
 		while (length() > 0)
 		{
 			char c = read<char>();
 			if (c == 0 || !isascii(c))
 				break;
 
-			value += c;
+			value += UTF8_TO_TCHAR(c);
 		}
 
 		return *this;
 	}
-	*/
 
 	MemoryStream &operator>>(char *value)
 	{
@@ -370,18 +380,97 @@ public:
 		rpos_ += len;
 	}
 
+	uint32 readBlob(TArray<uint8>& datas)
+	{
+		if (length() <= 0)
+			return 0;
+
+		uint32 rsize = 0;
+		(*this) >> rsize;
+		if ((uint32)rsize > length())
+			return 0;
+
+		if (rsize > 0)
+		{
+			datas.SetNumUninitialized(rsize);
+			memcpy(datas.GetData(), data() + rpos(), rsize);
+			read_skip(rsize);
+		}
+
+		return rsize;
+	}
+
+	void readPackXYZ(float& x, float&y, float& z, float minf = -256.f)
+	{
+		uint32 packed = 0;
+		(*this) >> packed;
+		x = ((packed & 0x7FF) << 21 >> 21) * 0.25f;
+		z = ((((packed >> 11) & 0x7FF) << 21) >> 21) * 0.25f;
+		y = ((packed >> 22 << 22) >> 22) * 0.25f;
+
+		x += minf;
+		y += minf / 2.f;
+		z += minf;
+	}
+
+	void readPackXZ(float& x, float& z)
+	{
+		PackFloatXType & xPackData = (PackFloatXType&)x;
+		PackFloatXType & zPackData = (PackFloatXType&)z;
+
+		// 0x40000000 = 1000000000000000000000000000000.
+		xPackData.uv = 0x40000000;
+		zPackData.uv = 0x40000000;
+
+		uint8 tv;
+		uint32 data = 0;
+
+		(*this) >> tv;
+		data |= (tv << 16);
+
+		(*this) >> tv;
+		data |= (tv << 8);
+
+		(*this) >> tv;
+		data |= tv;
+
+		// 复制指数和尾数
+		xPackData.uv |= (data & 0x7ff000) << 3;
+		zPackData.uv |= (data & 0x0007ff) << 15;
+
+		xPackData.fv -= 2.0f;
+		zPackData.fv -= 2.0f;
+
+		// 设置标记位
+		xPackData.uv |= (data & 0x800000) << 8;
+		zPackData.uv |= (data & 0x000800) << 20;
+	}
+
+	void readPackY(float& y)
+	{
+		PackFloatXType yPackData;
+		yPackData.uv = 0x40000000;
+
+		uint16 data = 0;
+		(*this) >> data;
+		yPackData.uv |= (data & 0x7fff) << 12;
+		yPackData.fv -= 2.f;
+		yPackData.uv |= (data & 0x8000) << 16;
+		y = yPackData.fv;
+	}
+
 	template <typename T> void append(T value)
 	{
 		EndianConvert(value);
 		append((uint8 *)&value, sizeof(value));
 	}
 
-	template<class T> void append(const T *src, size_t cnt)
+	template<class T> void append(const T *src, uint32 cnt)
 	{
 		return append((const uint8 *)src, cnt * sizeof(T));
 	}
 
-	void append(const uint8 *src, size_t cnt)
+	void append(const uint8 *src, uint32 cnt)
 	{
 		if (!cnt)
 			return;
@@ -394,6 +483,124 @@ public:
 		memcpy((void*)&data()[wpos_], src, cnt);
 		wpos_ += cnt;
 	}
+
+	void appendBlob(const TArray<uint8>& datas)
+	{
+		uint32 len = (uint32)datas.Num();
+		(*this) << len;
+
+		if (len > 0)
+			append(datas.GetData(), len);
+	}
+
+	void appendPackAnyXYZ(float x, float y, float z, const float epsilon = 0.5f)
+	{
+		if (epsilon > 0.f)
+		{
+			x = floorf(x + epsilon);
+			y = floorf(y + epsilon);
+			z = floorf(z + epsilon);
+		}
+
+		*this << x << y << z;
+	}
+
+	void appendPackAnyXZ(float x, float z, const float epsilon = 0.5f)
+	{
+		if (epsilon > 0.f)
+		{
+			x = floorf(x + epsilon);
+			z = floorf(z + epsilon);
+		}
+
+		*this << x << z;
+	}
+
+	void appendPackXYZ(float x, float y, float z, float minf = -256.f)
+	{
+		x -= minf;
+		y -= minf / 2.f;
+		z -= minf;
+
+		// 最大值不要超过-256~256
+		// y 不要超过-128~128
+		uint32 packed = 0;
+		packed |= ((int)(x / 0.25f) & 0x7FF);
+		packed |= ((int)(z / 0.25f) & 0x7FF) << 11;
+		packed |= ((int)(y / 0.25f) & 0x3FF) << 22;
+		*this << packed;
+	}
+
+	void appendPackXZ(float x, float z)
+	{
+		PackFloatXType xPackData;
+		xPackData.fv = x;
+
+		PackFloatXType zPackData;
+		zPackData.fv = z;
+
+		// 0-7位存放尾数, 8-10位存放指数, 11位存放标志
+		// 由于使用了24位来存储2个float， 并且要求能够达到-512~512之间的数
+		// 8位尾数只能放最大值256, 指数只有3位(决定浮点数最大值为2^(2^3)=256) 
+		// 我们舍去第一位使范围达到(-512~-2), (2~512)之间
+		// 因此这里我们保证最小数为-2.f或者2.f
+		xPackData.fv += xPackData.iv < 0 ? -2.f : 2.f;
+		zPackData.fv += zPackData.iv < 0 ? -2.f : 2.f;
+
+		uint32 data = 0;
+
+		// 0x7ff000 = 11111111111000000000000
+		// 0x0007ff = 00000000000011111111111
+		const uint32 xCeilingValues[] = { 0, 0x7ff000 };
+		const uint32 zCeilingValues[] = { 0, 0x0007ff };
+
+		// 这里如果这个浮点数溢出了则设置浮点数为最大数
+		// 这里检查了指数高4位和标记位， 如果高四位不为0则肯定溢出， 如果低4位和8位尾数不为0则溢出
+		// 0x7c000000 = 1111100000000000000000000000000
+		// 0x40000000 = 1000000000000000000000000000000
+		// 0x3ffc000  = 0000011111111111100000000000000
+		data |= xCeilingValues[((xPackData.uv & 0x7c000000) != 0x40000000) || ((xPackData.uv & 0x3ffc000) == 0x3ffc000)];
+		data |= zCeilingValues[((zPackData.uv & 0x7c000000) != 0x40000000) || ((zPackData.uv & 0x3ffc000) == 0x3ffc000)];
+
+		// 复制8位尾数和3位指数， 如果浮点数剩余尾数最高位是1则+1四舍五入, 并且存放到data中
+		// 0x7ff000 = 11111111111000000000000
+		// 0x0007ff = 00000000000011111111111
+		// 0x4000	= 00000000100000000000000
+		data |= ((xPackData.uv >> 3) & 0x7ff000) + ((xPackData.uv & 0x4000) >> 2);
+		data |= ((zPackData.uv >> 15) & 0x0007ff) + ((zPackData.uv & 0x4000) >> 14);
+
+		// 确保值在范围内
+		// 0x7ff7ff = 11111111111011111111111
+		data &= 0x7ff7ff;
+
+		// 复制标记位
+		// 0x800000 = 100000000000000000000000
+		// 0x000800 = 000000000000100000000000
+		data |= (xPackData.uv >> 8) & 0x800000;
+		data |= (zPackData.uv >> 20) & 0x000800;
+
+		uint8 packs[3];
+		packs[0] = (uint8)(data >> 16);
+		packs[1] = (uint8)(data >> 8);
+		packs[2] = (uint8)data;
+		(*this).append(packs, 3);
+	}
+
+	void appendPackY(float y)
+	{
+		PackFloatXType yPackData;
+		yPackData.fv = y;
+
+		yPackData.fv += yPackData.iv < 0 ? -2.f : 2.f;
+		uint16 data = 0;
+		data = (yPackData.uv >> 12) & 0x7fff;
+		data |= ((yPackData.uv >> 16) & 0x8000);
+
+		(*this) << data;
+	}
+
+	/** 输出流数据 */
+	void print_storage();
 
 protected:
 	uint32 rpos_;

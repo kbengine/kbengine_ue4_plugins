@@ -53,7 +53,7 @@ public:
 	/**
 		登录到服务端，必须登录完成loginapp与网关(baseapp)，登录流程才算完毕
 	*/
-	bool login(FString username, FString password, FString datas);
+	bool login(FString& username, FString& password, TArray<uint8>& datas);
 
 private:
 	bool initNetwork();
@@ -71,8 +71,8 @@ protected:
 
 	// 服务端下行以及客户端上行用于登录时处理的账号绑定的二进制信息
 	// 该信息由用户自己进行扩展
-	FString serverdatas_;
-	FString clientdatas_;
+	TArray<uint8> serverdatas_;
+	TArray<uint8> clientdatas_;
 
 	// 通信协议加密，blowfish协议
 	FString encryptedKey_;

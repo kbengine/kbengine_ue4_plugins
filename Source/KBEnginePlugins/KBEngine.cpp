@@ -12,8 +12,8 @@ KBEngineApp::KBEngineApp() :
 	password_(""),
 	baseappIP_(""),
 	baseappPort_(0),
-	serverdatas_(""),
-	clientdatas_(""),
+	serverdatas_(),
+	clientdatas_(),
 	encryptedKey_(""),
 	serverVersion_(""),
 	clientVersion_(""),
@@ -42,8 +42,8 @@ KBEngineApp::KBEngineApp(KBEngineArgs* pArgs):
 	password_(""),
 	baseappIP_(""),
 	baseappPort_(0),
-	serverdatas_(""),
-	clientdatas_(""),
+	serverdatas_(),
+	clientdatas_(),
 	encryptedKey_(""),
 	serverVersion_(""),
 	clientVersion_(""),
@@ -94,7 +94,7 @@ void KBEngineApp::reset()
 	baseappIP_ = "";
 	baseappPort_ = 0;
 
-	serverdatas_ = "";
+	serverdatas_.Empty();
 
 	serverVersion_ = "";
 	clientVersion_ = "0.9.0";
@@ -151,7 +151,7 @@ void KBEngineApp::sendTick()
 		return;
 }
 
-bool KBEngineApp::login(FString username, FString password, FString datas)
+bool KBEngineApp::login(FString& username, FString& password, TArray<uint8>& datas)
 {
 	username_ = username;
 	password_ = password;
