@@ -6,20 +6,20 @@
 #include "NetworkInterface.h"
 
 Bundle::Bundle():
-	pCurrStream_(NULL),
+	pCurrPacket_(NULL),
 	streams_(),
 	numMessage_(0),
 	messageLength_(0),
 	pMsgtype_(NULL),
 	curMsgStreamIndex_(0)
 {
-	pCurrStream_ = MemoryStream::createObject();
+	pCurrPacket_ = MemoryStream::createObject();
 }
 
 Bundle::~Bundle()
 {
-	MemoryStream::reclaimObject(pCurrStream_);
-	pCurrStream_ = NULL;
+	MemoryStream::reclaimObject(pCurrPacket_);
+	pCurrPacket_ = NULL;
 }
 
 Bundle* Bundle::createObject()
@@ -39,11 +39,12 @@ void Bundle::newMessage(Message* pMsg)
 	pMsgtype_ = pMsg;
 	numMessage_ += 1;
 
-//	writeUint16(msgtype.id);
+	(*this) << pMsgtype_->id;
 
-//	if (pMsgtype_->msglen == -1)
+	if (pMsgtype_->msglen == -1)
 	{
-//		writeUint16(0);
+		uint16 lengseat = 0;
+		(*this) << lengseat;
 		messageLength_ = 0;
 	}
 
@@ -56,8 +57,8 @@ void Bundle::fini(bool issend)
 	{
 		writeMsgLength();
 
-		streams_.Add(pCurrStream_);
-		pCurrStream_ = MemoryStream::createObject();
+		streams_.Add(pCurrPacket_);
+		pCurrPacket_ = MemoryStream::createObject();
 	}
 
 	if (issend)
@@ -69,29 +70,156 @@ void Bundle::fini(bool issend)
 	curMsgStreamIndex_ = 0;
 }
 
+void Bundle::send(NetworkInterface* pNetworkInterface)
+{
+	fini(true);
+
+	if (pNetworkInterface->valid())
+	{
+		for (int i = 0; i<streams_.Num(); ++i)
+		{
+			MemoryStream* stream = streams_[i];
+			pNetworkInterface->send(stream);
+		}
+	}
+	else
+	{
+		TRACEERROR("networkInterface invalid!");
+	}
+
+	// 把不用的MemoryStream放回缓冲池，以减少垃圾回收的消耗
+	for (int i = 0; i < streams_.Num(); ++i)
+	{
+		MemoryStream::reclaimObject(streams_[i]);
+	}
+
+	streams_.Empty();
+
+	if(pCurrPacket_)
+		pCurrPacket_->clear(true);
+}
+
 void Bundle::writeMsgLength()
 {
-	//if (pMsgtype_->msglen != -1)
-	//	return;
+	if (pMsgtype_->msglen != -1)
+		return;
 
 	if (curMsgStreamIndex_ > 0)
 	{
-		pCurrStream_ = streams_[streams_.Num() - curMsgStreamIndex_];
+		pCurrPacket_ = streams_[streams_.Num() - curMsgStreamIndex_];
 	}
 
-	uint8* data = pCurrStream_->data();
+	uint8* data = pCurrPacket_->data();
 	data[2] = (uint8)(messageLength_ & 0xff);
 	data[3] = (uint8)(messageLength_ >> 8 & 0xff);
 }
 
 void Bundle::checkStream(uint32 v)
 {
-	if (v > pCurrStream_->space())
+	if (v > pCurrPacket_->space())
 	{
-		streams_.Add(pCurrStream_);
-		pCurrStream_ = MemoryStream::createObject();
+		streams_.Add(pCurrPacket_);
+		pCurrPacket_ = MemoryStream::createObject();
 		++curMsgStreamIndex_;
 	}
 
 	messageLength_ += v;
+}
+
+Bundle &Bundle::operator<<(uint8 value)
+{
+	checkStream(sizeof(uint8));
+	(*pCurrPacket_) << value;
+	return *this;
+}
+
+Bundle &Bundle::operator<<(uint16 value)
+{
+	checkStream(sizeof(uint16));
+	(*pCurrPacket_) << value;
+	return *this;
+}
+
+Bundle &Bundle::operator<<(uint32 value)
+{
+	checkStream(sizeof(uint32));
+	(*pCurrPacket_) << value;
+	return *this;
+}
+
+Bundle &Bundle::operator<<(uint64 value)
+{
+	checkStream(sizeof(uint64));
+	(*pCurrPacket_) << value;
+	return *this;
+}
+
+Bundle &Bundle::operator<<(int8 value)
+{
+	checkStream(sizeof(int8));
+	(*pCurrPacket_) << value;
+	return *this;
+}
+
+Bundle &Bundle::operator<<(int16 value)
+{
+	checkStream(sizeof(int16));
+	(*pCurrPacket_) << value;
+	return *this;
+}
+
+Bundle &Bundle::operator<<(int32 value)
+{
+	checkStream(sizeof(int32));
+	(*pCurrPacket_) << value;
+	return *this;
+}
+
+Bundle &Bundle::operator<<(int64 value)
+{
+	checkStream(sizeof(int64));
+	(*pCurrPacket_) << value;
+	return *this;
+}
+
+Bundle &Bundle::operator<<(float value)
+{
+	checkStream(sizeof(float));
+	(*pCurrPacket_) << value;
+	return *this;
+}
+
+Bundle &Bundle::operator<<(double value)
+{
+	checkStream(sizeof(double));
+	(*pCurrPacket_) << value;
+	return *this;
+}
+
+Bundle &Bundle::operator<<(bool value)
+{
+	checkStream(sizeof(int8));
+	(*pCurrPacket_) << value;
+	return *this;
+}
+
+Bundle &Bundle::operator<<(const FString &value)
+{
+	const TCHAR *serializedChar = value.GetCharArray().GetData();
+	uint32 len = FCString::Strlen(serializedChar);
+
+	// +1为字符串尾部的0位置
+	checkStream(len + 1);
+	(*pCurrPacket_) << value;
+	return *this;
+}
+
+Bundle &Bundle::operator<<(const char *str)
+{
+	// +1为字符串尾部的0位置
+	uint32 len = (uint32)strlen(str) + 1; 
+
+	checkStream(len);
+	(*pCurrPacket_) << str;
+	return *this;
 }

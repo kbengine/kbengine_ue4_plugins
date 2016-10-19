@@ -17,6 +17,11 @@ public:
 public:
 	
 
-protected:
-
+public:
+	MessageID id;
+	FString name;
+	int16 msglen;
+	//public System.Reflection.MethodInfo handler = null;
+	//public KBEDATATYPE_BASE[] argtypes = null;
+	uint8 argsType;
 };

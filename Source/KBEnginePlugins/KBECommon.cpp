@@ -3,6 +3,7 @@
 #include "KBEnginePluginsPrivatePCH.h"
 #include "KBECommon.h"
 
+DEFINE_LOG_CATEGORY(LogKBEngine);
 
 // Sets default values
 AKBECommon::AKBECommon()

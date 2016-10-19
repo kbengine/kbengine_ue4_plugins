@@ -1,6 +1,7 @@
 
 #include "KBEnginePluginsPrivatePCH.h"
 #include "PacketSender.h"
+#include "MemoryStream.h"
 
 PacketSender::PacketSender(NetworkInterface* pNetworkInterface) :
 	pNetworkInterface_(pNetworkInterface)
@@ -12,7 +13,7 @@ PacketSender::~PacketSender()
 }
 
 
-bool PacketSender::send(FString datas)
+bool PacketSender::send(MemoryStream* pMemoryStream)
 {
 	FString serialized = TEXT("loadPlayer|1");
 	TCHAR *serializedChar = serialized.GetCharArray().GetData();

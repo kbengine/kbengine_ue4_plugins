@@ -5,8 +5,7 @@
 #include "KBEngine.h"
 #include "KBEngineArgs.h"
 #include "MemoryStream.h"
-
-DEFINE_LOG_CATEGORY(LogKBEngine);
+#include "Bundle.h"
 
 KBEngineApp* UKBEMain::pApp = NULL;
 

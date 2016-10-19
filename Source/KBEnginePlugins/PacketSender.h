@@ -5,6 +5,7 @@
 #include "KBECommon.h"
 
 class NetworkInterface;
+class MemoryStream;
 
 /*
 	包发送模块(与服务端网络部分的名称对应)
@@ -17,7 +18,7 @@ public:
 	virtual ~PacketSender();
 
 public:
-	bool send(FString datas);
+	bool send(MemoryStream* pMemoryStream);
 
 protected:
 	NetworkInterface* pNetworkInterface_;

@@ -5,7 +5,12 @@
 #include "GameFramework/Actor.h"
 #include "KBECommon.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogKBEngine, Log, All);
+
 #define KBE_ASSERT check
+
+typedef uint16 MessageID;
+typedef uint16 MessageLength;
 
 /** 安全的释放一个指针内存 */
 #define SAFE_RELEASE(i)										\

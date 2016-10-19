@@ -32,9 +32,23 @@ public:
 	void checkStream(uint32 v);
 
 public:
+	Bundle &operator<<(uint8 value);
+	Bundle &operator<<(uint16 value);
+	Bundle &operator<<(uint32 value);
+	Bundle &operator<<(uint64 value);
+	Bundle &operator<<(int8 value);
+	Bundle &operator<<(int16 value);
+	Bundle &operator<<(int32 value);
+	Bundle &operator<<(int64 value);
+	Bundle &operator<<(float value);
+	Bundle &operator<<(double value);
+	Bundle &operator<<(bool value);
+
+	Bundle &operator<<(const FString &value);
+	Bundle &operator<<(const char *str);
 
 protected:
-	MemoryStream* pCurrStream_;
+	MemoryStream* pCurrPacket_;
 	TArray<MemoryStream*> streams_;
 
 	int numMessage_;

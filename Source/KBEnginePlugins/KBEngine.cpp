@@ -4,6 +4,8 @@
 #include "KBEngineArgs.h"
 #include "Entity.h"
 #include "NetworkInterface.h"
+#include "Bundle.h"
+#include "MemoryStream.h"
 
 KBEngineApp::KBEngineApp() :
 	pArgs_(NULL),

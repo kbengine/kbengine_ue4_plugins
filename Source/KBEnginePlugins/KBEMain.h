@@ -5,9 +5,6 @@
 #include "Components/ActorComponent.h"
 #include "KBEMain.generated.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogKBEngine, Log, All);
-
-
 /*
 可以理解为插件的入口模块
 在这个入口中安装了需要监听的事件(installEvents)，同时初始化KBEngine(initKBEngine)

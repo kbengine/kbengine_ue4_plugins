@@ -2,7 +2,11 @@
 #include "KBEnginePluginsPrivatePCH.h"
 #include "Message.h"
 
-Message::Message()
+Message::Message():
+	id(0),
+	name(""),
+	msglen(-1),
+	argsType(0)
 {
 }
 
