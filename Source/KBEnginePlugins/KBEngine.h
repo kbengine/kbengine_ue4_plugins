@@ -7,6 +7,7 @@
 class KBEngineArgs;
 class Entity;
 class NetworkInterface;
+class MemoryStream;
 
 /*
 这是KBEngine插件的核心模块
@@ -19,13 +20,13 @@ http://www.kbengine.org/docs/programming/kbe_message_format.html
 http://www.kbengine.org/cn/docs/programming/clientsdkprogramming.html
 http://www.kbengine.org/cn/docs/programming/kbe_message_format.html
 */
-class KBENGINEPLUGINS_API KBEngineApp
+class KBENGINEPLUGINS_API KBEngineApp : public InterfaceLogin
 {
 public:
 	KBEngineApp();
 	KBEngineApp(KBEngineArgs* pArgs);
 	virtual ~KBEngineApp();
-
+	
 public:
 	bool initialize(KBEngineArgs* pArgs);
 	void destroy();
@@ -39,6 +40,8 @@ public:
 	{
 		return pArgs_;
 	}
+
+	void resetMessages();
 
 	/**
 		插件的主循环处理函数
@@ -54,9 +57,28 @@ public:
 		登录到服务端，必须登录完成loginapp与网关(baseapp)，登录流程才算完毕
 	*/
 	bool login(FString& username, FString& password, TArray<uint8>& datas);
+	virtual void onLoginCallback(FString ip, uint16 port, bool success, int userdata) override;
 
 private:
 	bool initNetwork();
+
+	void hello();
+	void Client_onHelloCB(MemoryStream& stream);
+
+	void login_loginapp(bool noconnect);
+	void onConnectTo_loginapp_callback(FString ip, uint16 port, bool success);
+	void onLogin_loginapp();
+
+	void login_baseapp(bool noconnect);
+	void onConnectTo_baseapp_callback(FString ip, uint16 port, bool success);
+	void onLogin_baseapp();
+
+
+	void clearSpace(bool isall);
+	void clearEntities(bool isall);
+
+
+	void updatePlayerToServer();
 
 protected:
 	KBEngineArgs* pArgs_;
@@ -65,9 +87,22 @@ protected:
 	FString username_;
 	FString password_;
 
+	// 是否正在加载本地消息协议
+	static bool loadingLocalMessages_;
+
+	// 消息协议是否已经导入了
+	static bool loginappMessageImported_;
+	static bool baseappMessageImported_;
+	static bool entitydefImported_;
+	static bool isImportServerErrorsDescr_;
+
 	// 服务端分配的baseapp地址
 	FString baseappIP_;
 	uint16 baseappPort_;
+
+	// 当前状态
+	FString currserver_;
+	FString currstate_;
 
 	// 服务端下行以及客户端上行用于登录时处理的账号绑定的二进制信息
 	// 该信息由用户自己进行扩展
@@ -99,7 +134,11 @@ protected:
 	TMap<int32, Entity*> entities_;
 
 	// 所有服务端错误码对应的错误描述
-	TMap<uint16, FKServerErr> serverErrs_;
+	static TMap<uint16, FKServerErr> serverErrs_;
+
+	double lastTickTime_;
+	double lastTickCBTime_;
+	double lastUpdateToServerTime_;
 
 	// 玩家当前所在空间的id， 以及空间对应的资源
 	uint32 spaceID_;

@@ -9,7 +9,11 @@ NetworkInterface::NetworkInterface():
 	socket_(NULL),
 	pPacketSender_(NULL),
 	pPacketReceiver_(NULL),
-	TickConnectingDelegateHandle()
+	connectCB_(NULL),
+	connectIP_(TEXT("")),
+	connectPort_(0),
+	connectUserdata_(0),
+	startTime_(0.0)
 {
 }
 
@@ -25,12 +29,10 @@ void NetworkInterface::reset()
 
 void NetworkInterface::close()
 {
-	FTicker::GetCoreTicker().RemoveTicker(TickConnectingDelegateHandle);
-
 	if (socket_)
 	{
 		socket_->Close();
-		TRACE("network closed!");
+		INFO_MSG("network closed!");
 		ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(socket_);
 	}
 
@@ -38,6 +40,12 @@ void NetworkInterface::close()
 
 	SAFE_RELEASE(pPacketSender_);
 	SAFE_RELEASE(pPacketReceiver_);
+
+	connectCB_ = NULL;
+	connectIP_ = TEXT("");
+	connectPort_ = 0;
+	connectUserdata_ = 0;
+	startTime_ = 0.0;
 }
 
 bool NetworkInterface::valid()
@@ -45,15 +53,14 @@ bool NetworkInterface::valid()
 	return socket_ != NULL;
 }
 
-bool NetworkInterface::connectTo(FString ip, uint16 port)
+bool NetworkInterface::connectTo(FString ip, uint16 port, InterfaceLogin* callback, int userdata)
 {
-	TRACE("will connect to %s:%d ...", *ip, port);
+	INFO_MSG("will connect to %s:%d ...", *ip, port);
 
 	reset();
 
 	FIPv4Address ip1;
 	FIPv4Address::Parse(ip, ip1);
-
 
 	TSharedRef<FInternetAddr> addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
 	addr->SetIp(ip1.Value);
@@ -63,13 +70,13 @@ bool NetworkInterface::connectTo(FString ip, uint16 port)
 
 	if (!valid())
 	{
-		TRACEERROR("socket could't be created!");
+		ERROR_MSG("socket could't be created!");
 		return false;
 	}
 	
 	if (!socket_->SetNonBlocking(true))
 	{
-		TRACEERROR("socket->SetNonBlocking error(%d)!", *ip, port,
+		ERROR_MSG("socket->SetNonBlocking error(%d)!", *ip, port,
 			(int32)ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLastErrorCode());
 	}
 
@@ -77,12 +84,18 @@ bool NetworkInterface::connectTo(FString ip, uint16 port)
 
 	if (didConnect)
 	{
-		TickConnectingDelegateHandle = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateRaw(this, &NetworkInterface::TickConnecting), 0.1f);
+		connectCB_ = callback;
+		connectIP_ = ip;
+		connectPort_ = port;
+		connectUserdata_ = userdata;
+		startTime_ = getTimeSeconds();
 	}
 	else
 	{
-		TRACEERROR("connect %s:%d error(%d)!", *ip, port, 
+		ERROR_MSG("connect %s:%d error(%d)!", *ip, port,
 			(int32)ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLastErrorCode());
+
+		callback->onLoginCallback(ip, port, false, userdata);
 	}
 
 	return didConnect;
@@ -106,13 +119,19 @@ void NetworkInterface::process()
 	if (!valid())
 		return;
 
+	if (connectCB_)
+	{
+		tickConnecting();
+		return;
+	}
+
 	if (!pPacketReceiver_)
 		pPacketReceiver_ = new PacketReceiver(this);
 
 	pPacketReceiver_->process();
 }
 
-bool NetworkInterface::TickConnecting(float InDeltaTime)
+void NetworkInterface::tickConnecting()
 {
 	ESocketConnectionState state = socket_->GetConnectionState();
 	if (state == SCS_Connected)
@@ -120,9 +139,19 @@ bool NetworkInterface::TickConnecting(float InDeltaTime)
 		TSharedRef<FInternetAddr> addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
 		socket_->GetPeerAddress(*addr);
 
-		TRACE("connect to %s success!", *addr->ToString(true));
-		FTicker::GetCoreTicker().RemoveTicker(TickConnectingDelegateHandle);
+		INFO_MSG("connect to %s success!", *addr->ToString(true));
+		connectCB_->onLoginCallback(connectIP_, connectPort_, true, connectUserdata_);
+		connectCB_ = NULL;
 	}
-
-	return true; // Tick again
+	else
+	{
+		// 如果连接超时则回调失败
+		float currTime = getTimeSeconds();
+		if (currTime - startTime_ > 3)
+		{
+			ERROR_MSG("connect to %s:%d timeout!", *connectIP_, connectPort_);
+			connectCB_->onLoginCallback(connectIP_, connectPort_, false, connectUserdata_);
+			connectCB_ = NULL;
+		}
+	}
 }

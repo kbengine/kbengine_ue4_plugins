@@ -47,6 +47,8 @@ public:
 	Bundle &operator<<(const FString &value);
 	Bundle &operator<<(const char *str);
 
+	void appendBlob(const TArray<uint8>& datas);
+
 protected:
 	MemoryStream* pCurrPacket_;
 	TArray<MemoryStream*> streams_;

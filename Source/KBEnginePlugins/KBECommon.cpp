@@ -5,6 +5,13 @@
 
 DEFINE_LOG_CATEGORY(LogKBEngine);
 
+
+float getTimeSeconds()
+{
+	return FPlatformTime::Seconds();
+}
+
+
 // Sets default values
 AKBECommon::AKBECommon()
 {
@@ -12,3 +19,4 @@ AKBECommon::AKBECommon()
 	PrimaryActorTick.bCanEverTick = true;
 
 }
+

@@ -84,7 +84,7 @@ void Bundle::send(NetworkInterface* pNetworkInterface)
 	}
 	else
 	{
-		TRACEERROR("networkInterface invalid!");
+		ERROR_MSG("networkInterface invalid!");
 	}
 
 	// 把不用的MemoryStream放回缓冲池，以减少垃圾回收的消耗
@@ -97,6 +97,13 @@ void Bundle::send(NetworkInterface* pNetworkInterface)
 
 	if(pCurrPacket_)
 		pCurrPacket_->clear(true);
+
+	// 我们认为，发送完成，就视为这个bundle不再使用了，
+	// 所以我们会把它放回对象池，以减少垃圾回收带来的消耗，
+	// 如果需要继续使用，应该重新Bundle.createObject()，
+	// 如果外面不重新createObject()而直接使用，就可能会出现莫名的问题，
+	// 仅以此备注，警示使用者。
+	Bundle::reclaimObject(this);
 }
 
 void Bundle::writeMsgLength()
@@ -222,4 +229,13 @@ Bundle &Bundle::operator<<(const char *str)
 	checkStream(len);
 	(*pCurrPacket_) << str;
 	return *this;
+}
+
+void Bundle::appendBlob(const TArray<uint8>& datas)
+{
+	uint32 len = (uint32)datas.Num() + 4/*len size*/;
+
+	checkStream(len);
+
+	(*pCurrPacket_).appendBlob(datas);
 }

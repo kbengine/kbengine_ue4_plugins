@@ -4,7 +4,7 @@
 
 Entity::Entity():
 	id_(0),
-	className_(""),
+	className_(TEXT("")),
 	position_(),
 	direction_(),
 	isOnGround_(false),

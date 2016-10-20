@@ -12,6 +12,7 @@
 class PacketSender;
 class PacketReceiver;
 class MemoryStream;
+class InterfaceLogin;
 
 /*
 	ÍøÂçÄ£¿é
@@ -34,16 +35,20 @@ public:
 	void close();
 	bool valid();
 
-	bool connectTo(FString ip, uint16 port);
+	bool connectTo(FString ip, uint16 port, InterfaceLogin* callback, int userdata);
 	bool send(MemoryStream* pMemoryStream);
 
 private:
-	bool TickConnecting(float InDeltaTime);
+	void tickConnecting();
 
 protected:
 	FSocket* socket_;
 	PacketSender* pPacketSender_;
 	PacketReceiver* pPacketReceiver_;
 
-	FDelegateHandle TickConnectingDelegateHandle;
+	InterfaceLogin* connectCB_;
+	FString connectIP_;
+	uint16 connectPort_;
+	int connectUserdata_;
+	double startTime_;
 };

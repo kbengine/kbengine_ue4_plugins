@@ -11,11 +11,15 @@
 class KBENGINEPLUGINS_API Message
 {
 public:
-	Message();
+	Message(MessageID mid, const FString& mname, int16 mmsglen, uint8 margsType);
 	virtual ~Message();
 
 public:
-	
+	static Message* getMessage(const FString& messageName);
+	static void setMessage(const FString& messageName, Message* pMessage);
+
+	static void clear();
+	static void bindFixedMessage();
 
 public:
 	MessageID id;
@@ -24,4 +28,10 @@ public:
 	//public System.Reflection.MethodInfo handler = null;
 	//public KBEDATATYPE_BASE[] argtypes = null;
 	uint8 argsType;
+
+	static TMap<MessageID, Message*> loginappMessages;
+	static TMap<MessageID, Message*> baseappMessages;
+	static TMap<MessageID, Message*> clientMessages;
+
+	static TMap<FString, Message*> messages;
 };

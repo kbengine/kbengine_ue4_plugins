@@ -20,7 +20,7 @@ UKBEMain::UKBEMain(const FObjectInitializer& ObjectInitializer) : Super(ObjectIn
 
 	// ...
 
-	ip = "127.0.0.1";
+	ip = TEXT("127.0.0.1");
 	port = 20013;
 	syncPlayer = true;
 	useAliasEntityID = true;

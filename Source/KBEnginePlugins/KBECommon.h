@@ -66,6 +66,9 @@ enum class EKCLIENT_TYPE : uint8
 	CLIENT_TYPE_MINI		UMETA(DisplayName = "Mini"),
 };
 
+float getTimeSeconds();
+
+
 UCLASS()
 class KBENGINEPLUGINS_API AKBECommon : public AActor
 {
@@ -76,3 +79,4 @@ public:
 	AKBECommon();
 	
 };
+

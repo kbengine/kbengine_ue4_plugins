@@ -17,7 +17,7 @@
 #define  FUNC_NAME __func__
 #endif
 
-#define TRACE(Format, ...) \
+#define INFO_MSG(Format, ...) \
 { \
 	SET_WARN_COLOR(COLOR_CYAN); \
 	const FString Msg = FString::Printf(TEXT(Format), ##__VA_ARGS__); \
@@ -32,15 +32,15 @@
 	CLEAR_WARN_COLOR(); \
 }
 
-#define TRACESTATIC(Format, ...) \
+#define DEBUG_MSG(Format, ...) \
 { \
 	SET_WARN_COLOR(COLOR_CYAN); \
 	const FString Msg = FString::Printf(TEXT(Format), ##__VA_ARGS__); \
-	UE_LOG(LogKBEngine, Log, TEXT("%s() : %s"), FUNC_NAME, *Msg); \
+	UE_LOG(LogKBEngine, Log, TEXT("**DEBUG** %s() : %s"), FUNC_NAME, *Msg); \
 	CLEAR_WARN_COLOR(); \
 }
 
-#define TRACEWARN(Format, ...) \
+#define WARNING_MSG(Format, ...) \
 { \
 	SET_WARN_COLOR(COLOR_YELLOW); \
 	const FString Msg = FString::Printf(TEXT(Format), ##__VA_ARGS__); \
@@ -48,7 +48,7 @@
 	CLEAR_WARN_COLOR(); \
 }
 
-#define TRACEERROR(Format, ...) \
+#define ERROR_MSG(Format, ...) \
 { \
 	SET_WARN_COLOR(COLOR_RED); \
 	const FString Msg = FString::Printf(TEXT(Format), ##__VA_ARGS__); \
