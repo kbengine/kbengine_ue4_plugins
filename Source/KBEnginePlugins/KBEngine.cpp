@@ -29,7 +29,7 @@ KBEngineApp::KBEngineApp() :
 	currstate_(TEXT("")),
 	serverdatas_(),
 	clientdatas_(),
-	encryptedKey_(TEXT("")),
+	encryptedKey_(),
 	serverVersion_(TEXT("")),
 	clientVersion_(TEXT("")),
 	serverScriptVersion_(TEXT("")),
@@ -63,7 +63,7 @@ KBEngineApp::KBEngineApp(KBEngineArgs* pArgs):
 	currstate_(TEXT("")),
 	serverdatas_(),
 	clientdatas_(),
-	encryptedKey_(TEXT("")),
+	encryptedKey_(),
 	serverVersion_(TEXT("")),
 	clientVersion_(TEXT("")),
 	serverScriptVersion_(TEXT("")),
@@ -167,6 +167,8 @@ void KBEngineApp::reset()
 
 bool KBEngineApp::initNetwork()
 {
+	Message::bindFixedMessage();
+
 	if (pNetworkInterface_)
 		delete pNetworkInterface_;
 
@@ -230,11 +232,46 @@ void KBEngineApp::updatePlayerToServer()
 
 void KBEngineApp::hello()
 {
+	Bundle* pBundle = Bundle::createObject();
+	if (currserver_ == "loginapp")
+		pBundle->newMessage(Message::messages["Loginapp_hello"]);
+	else
+		pBundle->newMessage(Message::messages["Baseapp_hello"]);
 
+	(*pBundle) << clientVersion_;
+	(*pBundle) << clientScriptVersion_;
+	pBundle->appendBlob(encryptedKey_);
+	pBundle->send(pNetworkInterface_);
 }
 
 void KBEngineApp::Client_onHelloCB(MemoryStream& stream)
 {
+	stream >> serverVersion_;
+	stream >> serverScriptVersion_;
+	stream >> serverProtocolMD5_;
+	stream >> serverEntitydefMD5_;
+
+	int32 ctype;
+	stream >> ctype;
+
+	INFO_MSG("verInfo(%s), scriptVersion(%s), srvProtocolMD5(%s), srvEntitydefMD5(%s), ctype(%d)!", 
+		*serverVersion_, *serverScriptVersion_, *serverProtocolMD5_, *serverEntitydefMD5_, ctype);
+
+	onServerDigest();
+
+	if (currserver_ == "baseapp")
+	{
+		onLogin_baseapp();
+	}
+	else
+	{
+		onLogin_loginapp();
+	}
+}
+
+void KBEngineApp::onServerDigest()
+{
+
 }
 
 bool KBEngineApp::login(FString& username, FString& password, TArray<uint8>& datas)
@@ -270,7 +307,7 @@ void KBEngineApp::login_loginapp(bool noconnect)
 	{
 		INFO_MSG("send login! username=%s", *username_);
 		Bundle* pBundle = Bundle::createObject();
-		pBundle->newMessage(Message::getMessage(TEXT("Loginapp_login")));
+		pBundle->newMessage(Message::messages[TEXT("Loginapp_login"]));
 		(*pBundle) << (uint8)pArgs_->clientType;
 		pBundle->appendBlob(clientdatas_);
 		(*pBundle) << username_;

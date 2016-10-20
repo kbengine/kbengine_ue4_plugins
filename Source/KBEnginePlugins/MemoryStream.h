@@ -73,7 +73,7 @@ public:
 	};
 
 public:
-	const static size_t DEFAULT_SIZE = 0;
+	const static size_t DEFAULT_SIZE = 0x100;
 
 	MemoryStream() :
 		rpos_(0), 
@@ -233,7 +233,7 @@ public:
 		const TCHAR *serializedChar = value.GetCharArray().GetData();
 		uint32 size = FCString::Strlen(serializedChar);
 
-		append(((uint8*)TCHAR_TO_UTF8(serializedChar)), size);
+		append(((uint8*)TCHAR_TO_ANSI(serializedChar)), size);
 		append((uint8)0);
 		return *this;
 	}
@@ -319,14 +319,18 @@ public:
 
 	MemoryStream &operator>>(FString& value)
 	{
+		char cc[2];
+		cc[0] = 0;
+		cc[1] = 0;
+
 		value = TEXT("");
 		while (length() > 0)
 		{
-			char c = read<char>();
-			if (c == 0 || !isascii(c))
+			cc[0] = read<char>();
+			if (cc[0] == 0 || !isascii(cc[0]))
 				break;
 
-			value += UTF8_TO_TCHAR(c);
+			value += ANSI_TO_TCHAR((const ANSICHAR*)&cc);
 		}
 
 		return *this;
@@ -622,10 +626,8 @@ inline void MemoryStream::read_skip<char const*>()
 	read_skip<char*>();
 }
 
-/*
 template<>
-inline void MemoryStream::read_skip<std::string>()
+inline void MemoryStream::read_skip<FString>()
 {
 	read_skip<char*>();
 }
-*/

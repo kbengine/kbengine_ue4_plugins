@@ -11,13 +11,10 @@
 class KBENGINEPLUGINS_API Message
 {
 public:
-	Message(MessageID mid, const FString& mname, int16 mmsglen, uint8 margsType);
+	Message(MessageID mid, const FString& mname, int16 mmsglen, uint8 margsType, const TArray<uint8>& msgargtypes);
 	virtual ~Message();
 
 public:
-	static Message* getMessage(const FString& messageName);
-	static void setMessage(const FString& messageName, Message* pMessage);
-
 	static void clear();
 	static void bindFixedMessage();
 

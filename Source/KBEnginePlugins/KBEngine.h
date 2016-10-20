@@ -80,6 +80,8 @@ private:
 
 	void updatePlayerToServer();
 
+	void onServerDigest();
+
 protected:
 	KBEngineArgs* pArgs_;
 	NetworkInterface* pNetworkInterface_;
@@ -110,7 +112,7 @@ protected:
 	TArray<uint8> clientdatas_;
 
 	// 通信协议加密，blowfish协议
-	FString encryptedKey_;
+	TArray<uint8> encryptedKey_;
 
 	// 服务端与客户端的版本号以及协议MD5
 	FString serverVersion_;
