@@ -59,11 +59,11 @@ public:
 	bool login(FString& username, FString& password, TArray<uint8>& datas);
 	virtual void onLoginCallback(FString ip, uint16 port, bool success, int userdata) override;
 
+	void hello();
+	void onHelloCB(MemoryStream& stream);
+
 private:
 	bool initNetwork();
-
-	void hello();
-	void Client_onHelloCB(MemoryStream& stream);
 
 	void login_loginapp(bool noconnect);
 	void onConnectTo_loginapp_callback(FString ip, uint16 port, bool success);

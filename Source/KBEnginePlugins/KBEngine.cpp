@@ -244,7 +244,7 @@ void KBEngineApp::hello()
 	pBundle->send(pNetworkInterface_);
 }
 
-void KBEngineApp::Client_onHelloCB(MemoryStream& stream)
+void KBEngineApp::onHelloCB(MemoryStream& stream)
 {
 	stream >> serverVersion_;
 	stream >> serverScriptVersion_;
