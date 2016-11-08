@@ -7,8 +7,6 @@
 #include "MemoryStream.h"
 #include "Bundle.h"
 
-KBEngineApp* UKBEMain::pApp = NULL;
-
 // Sets default values for this component's properties
 UKBEMain::UKBEMain(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -26,6 +24,8 @@ UKBEMain::UKBEMain(const FObjectInitializer& ObjectInitializer) : Super(ObjectIn
 	useAliasEntityID = true;
 	isOnInitCallPropertysSetMethods = true;
 	clientType = EKCLIENT_TYPE::CLIENT_TYPE_WIN;
+	SEND_BUFFER_MAX = TCP_PACKET_MAX;
+	RECV_BUFFER_MAX = TCP_PACKET_MAX;
 }
 
 void UKBEMain::InitializeComponent()
@@ -50,10 +50,10 @@ void UKBEMain::BeginPlay()
 	pArgs->useAliasEntityID = useAliasEntityID;
 	pArgs->isOnInitCallPropertysSetMethods = isOnInitCallPropertysSetMethods;
 	pArgs->clientType = clientType;
+	pArgs->SEND_BUFFER_MAX = SEND_BUFFER_MAX;
+	pArgs->RECV_BUFFER_MAX = RECV_BUFFER_MAX;
 
-	// ...
-	if (UKBEMain::pApp == NULL)
-		UKBEMain::pApp = new KBEngineApp(pArgs);
+	KBEngineApp::getSingleton().initialize(pArgs);
 }
 
 void UKBEMain::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -66,28 +66,23 @@ void UKBEMain::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
-	// ...
-	if (UKBEMain::pApp)
-	{
-		UKBEMain::pApp->process();
-	}
+
+	KBEngineApp::getSingleton().process();
 }
 
 bool UKBEMain::destroyKBEngine()
 {
-	if (!UKBEMain::pApp)
+	if (!KBEngineApp::getSingleton().isInitialized())
 		return false;
 
-	delete UKBEMain::pApp;
-	UKBEMain::pApp = NULL;
-
+	KBEngineApp::getSingleton().destroy();
 	return true;
 }
 
 bool UKBEMain::login(FString& username, FString& password, TArray<uint8>& datas)
 {
-	if (!UKBEMain::pApp)
+	if (!KBEngineApp::getSingleton().isInitialized())
 		return false;
 
-	return UKBEMain::pApp->login(username, password, datas);
+	return KBEngineApp::getSingleton().login(username, password, datas);
 }

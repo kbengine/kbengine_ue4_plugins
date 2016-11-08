@@ -10,15 +10,12 @@ class NetworkInterface;
 class MemoryStream;
 
 /*
-这是KBEngine插件的核心模块
-包括网络创建、持久化协议、entities的管理、以及引起对外可调用接口。
+	这是KBEngine插件的核心模块
+	包括网络创建、持久化协议、entities的管理、以及引起对外可调用接口。
 
-一些可以参考的地方:
-http://www.kbengine.org/docs/programming/clientsdkprogramming.html
-http://www.kbengine.org/docs/programming/kbe_message_format.html
-
-http://www.kbengine.org/cn/docs/programming/clientsdkprogramming.html
-http://www.kbengine.org/cn/docs/programming/kbe_message_format.html
+	一些可以参考的地方:
+	http://www.kbengine.org/docs/programming/clientsdkprogramming.html
+	http://www.kbengine.org/docs/programming/kbe_message_format.html
 */
 class KBENGINEPLUGINS_API KBEngineApp : public InterfaceLogin
 {
@@ -28,6 +25,13 @@ public:
 	virtual ~KBEngineApp();
 	
 public:
+	static KBEngineApp& getSingleton();
+
+public:
+	bool isInitialized() const {
+		return pArgs_ != NULL;
+	}
+
 	bool initialize(KBEngineArgs* pArgs);
 	void destroy();
 	void reset();
@@ -60,7 +64,25 @@ public:
 	virtual void onLoginCallback(FString ip, uint16 port, bool success, int userdata) override;
 
 	void hello();
-	void onHelloCB(MemoryStream& stream);
+	void Client_onHelloCB(MemoryStream& stream);
+
+	void Client_onVersionNotMatch(MemoryStream& stream);
+	void Client_onScriptVersionNotMatch(MemoryStream& stream);
+
+	/*
+		被服务端踢出
+	*/
+	void Client_onKicked(uint16 failedcode);
+
+	/*
+	从服务端返回的二进制流导入客户端消息协议
+	*/
+	void Client_onImportClientMessages(MemoryStream& stream);
+
+	/*
+		服务端错误描述导入了
+	*/
+	void Client_onImportServerErrorsDescr(MemoryStream& stream);
 
 private:
 	bool initNetwork();
@@ -81,6 +103,23 @@ private:
 	void updatePlayerToServer();
 
 	void onServerDigest();
+
+	/*
+		从二进制流导入消息协议完毕了
+	*/
+	void onImportClientMessagesCompleted();
+	void onImportEntityDefCompleted();
+	void onImportClientMessages(MemoryStream& stream);
+	void onImportServerErrorsDescr(MemoryStream& stream);
+
+	void createDataTypeFromStreams(MemoryStream& stream, bool canprint);
+	void createDataTypeFromStream(MemoryStream& stream, bool canprint);
+	void Client_onImportClientEntityDef(MemoryStream& stream);
+	void onImportClientEntityDef(MemoryStream& stream);
+
+	void resetpassword_loginapp(bool noconnect);
+
+	void createAccount_loginapp(bool noconnect);
 
 protected:
 	KBEngineArgs* pArgs_;
@@ -151,3 +190,4 @@ protected:
 	FString component_;
 
 };
+

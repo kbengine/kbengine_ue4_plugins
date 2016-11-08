@@ -1,0 +1,22 @@
+// Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
+
+
+
+#include "KBECommon.h"
+#include "NetworkInterfaceDef.h"
+
+
+NETWORK_INTERFACE_DECLARE_BEGIN(KBEngineApp)
+	NETWORK_MESSAGE_HANDLER_STREAM(Client_onHelloCB,									NETWORK_VARIABLE_MESSAGE)
+
+	NETWORK_MESSAGE_HANDLER_STREAM(Client_onScriptVersionNotMatch,						NETWORK_VARIABLE_MESSAGE)
+
+	NETWORK_MESSAGE_HANDLER_STREAM(Client_onVersionNotMatch,							NETWORK_VARIABLE_MESSAGE)
+
+	NETWORK_MESSAGE_HANDLER_STREAM(Client_onImportClientMessages,						NETWORK_VARIABLE_MESSAGE)
+
+	NETWORK_MESSAGE_HANDLER_STREAM(Client_onImportServerErrorsDescr,					NETWORK_VARIABLE_MESSAGE)
+	
+	NETWORK_MESSAGE_HANDLER_ARGS1(Client_onKicked,										NETWORK_FIXED_MESSAGE,
+									uint16,												failedcode)
+NETWORK_INTERFACE_DECLARE_END()

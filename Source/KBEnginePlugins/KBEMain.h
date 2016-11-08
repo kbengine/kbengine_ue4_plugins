@@ -73,5 +73,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = KBEngine)
 	bool isOnInitCallPropertysSetMethods;
 
-	static KBEngineApp* pApp;
+	UPROPERTY(EditAnywhere, Category = KBEngine)
+	uint32 SEND_BUFFER_MAX;
+
+	UPROPERTY(EditAnywhere, Category = KBEngine)
+	uint32 RECV_BUFFER_MAX;
+
 };

@@ -14,6 +14,9 @@ public:
 	KBEngineArgs();
 	virtual ~KBEngineArgs();
 
+	int getRecvBufferSize();
+	int getSendBufferSize();
+
 public:
 	FString ip;
 	int port;
@@ -25,4 +28,10 @@ public:
 	bool syncPlayer;
 	bool useAliasEntityID;
 	bool isOnInitCallPropertysSetMethods;
+
+	// 发送缓冲大小
+	MessageLengthEx SEND_BUFFER_MAX;
+
+	// 接收缓冲区大小
+	MessageLengthEx RECV_BUFFER_MAX;
 };

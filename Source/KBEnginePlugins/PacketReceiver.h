@@ -5,6 +5,7 @@
 #include "KBECommon.h"
 
 class NetworkInterface;
+class MessageReader;
 
 /*
 	包接收模块(与服务端网络部分的名称对应)
@@ -21,4 +22,6 @@ public:
 
 protected:
 	NetworkInterface* pNetworkInterface_;
+	MessageReader* pMessageReader_;
+	MemoryStream* pBuffer_;
 };

@@ -2,17 +2,17 @@
 #include "KBEnginePluginsPrivatePCH.h"
 #include "Message.h"
 
-TMap<MessageID, Message*> Message::loginappMessages;
-TMap<MessageID, Message*> Message::baseappMessages;
-TMap<MessageID, Message*> Message::clientMessages;
+Message::Message() :
+	id(0),
+	name(TEXT("")),
+	msglen(-1)
+{
+}
 
-TMap<FString, Message*> Message::messages;
-
-Message::Message(MessageID mid, const FString& mname, int16 mmsglen, uint8 margsType, const TArray<uint8>& msgargtypes):
+Message::Message(MessageID mid, const FString& mname, int16 mmsglen):
 	id(mid),
 	name(mname),
-	msglen(mmsglen),
-	argsType(margsType)
+	msglen(mmsglen)
 {
 }
 
@@ -20,45 +20,107 @@ Message::~Message()
 {
 }
 
-void Message::clear()
+FString Message::c_str()
 {
-	for (auto& Elem : Message::messages)
-		delete Elem.Value;
+	return FString::Printf(TEXT("%s id:%u, len : %d"), *name, id, msglen);
+}
 
-	Message::messages.Empty();
-
-	Message::loginappMessages.Empty();
-	Message::baseappMessages.Empty();
-	Message::clientMessages.Empty();
-
+Messages::Messages() :
+	loginappMessages(),
+	baseappMessages(),
+	clientMessages(),
+	messages(),
+	fixedMessageID()
+{
 	bindFixedMessage();
 }
 
-void Message::bindFixedMessage()
+Messages::~Messages()
 {
-	if (Message::messages.Num() > 0)
-		return;
-
-	// 引擎协议说明参见: http://www.kbengine.org/cn/docs/programming/clientsdkprogramming.html
-	Message::messages.Add(TEXT("Loginapp_importClientMessages"), new Message(5, TEXT("importClientMessages"), 0, 0, TArray<uint8>()));
-	Message::messages.Add(TEXT("Loginapp_hello"), new Message(4, TEXT("hello"), -1, -1, TArray<uint8>()));
-
-	Message::messages.Add(TEXT("Baseapp_importClientMessages"), new Message(207, TEXT("importClientMessages"), 0, 0, TArray<uint8>()));
-	Message::messages.Add(TEXT("Baseapp_importClientEntityDef"), new Message(208, TEXT("importClientMessages"), 0, 0, TArray<uint8>()));
-	Message::messages.Add(TEXT("Baseapp_hello"), new Message(200, TEXT("hello"), -1, -1, TArray<uint8>()));
-
-	Message::messages.Add(TEXT("Client_onHelloCB"), new Message(521, TEXT("Client_onHelloCB"), -1, -1, TArray<uint8>()));
-
-	Message::clientMessages.Add(Message::messages[TEXT("Client_onHelloCB")]->id, Message::messages[TEXT("Client_onHelloCB")]);
-
-	Message::messages.Add(TEXT("Client_onScriptVersionNotMatch"), new Message(522, TEXT("Client_onScriptVersionNotMatch"), -1, -1, TArray<uint8>()));
-	Message::clientMessages.Add(Message::messages[TEXT("Client_onScriptVersionNotMatch")]->id, Message::messages[TEXT("Client_onScriptVersionNotMatch")]);
-
-	Message::messages.Add(TEXT("Client_onVersionNotMatch"), new Message(523, TEXT("Client_onVersionNotMatch"), -1, -1, TArray<uint8>()));
-	Message::clientMessages.Add(Message::messages[TEXT("Client_onVersionNotMatch")]->id, Message::messages[TEXT("Client_onVersionNotMatch")]);
-
-	Message::messages.Add(TEXT("Client_onImportClientMessages"), new Message(518, TEXT("Client_onImportClientMessages"), -1, -1, TArray<uint8>()));
-	Message::clientMessages.Add(Message::messages[TEXT("Client_onImportClientMessages")]->id, Message::messages[TEXT("Client_onImportClientMessages")]);
 }
 
+Messages& Messages::getSingleton()
+{
+	return g_Messages;
+}
 
+void Messages::clear()
+{
+	/* 此处不做清理，否则KBEngine被destroy之后将无法再找回消息
+		for (auto& Elem : messages)
+			delete Elem.Value;
+
+		messages.Empty();
+
+		loginappMessages.Empty();
+		baseappMessages.Empty();
+		clientMessages.Empty();
+
+		bindFixedMessage();
+	*/
+
+	return;
+}
+
+void Messages::bindFixedMessage()
+{
+	if (messages.Num() > 0)
+		return;
+
+	// 我们需要知道与服务端握手的相关协议具体的ID，后来流程从服务端导入协议表后就可以知道所有协议了
+	// 引擎协议说明参见: http://www.kbengine.org/cn/docs/programming/clientsdkprogramming.html
+	messages.Add(TEXT("Loginapp_importClientMessages"), new Message(5, TEXT("importClientMessages"), 0));
+	messages.Add(TEXT("Loginapp_hello"), new Message(4, TEXT("hello"), -1));
+
+	messages.Add(TEXT("Baseapp_importClientMessages"), new Message(207, TEXT("importClientMessages"), 0));
+	messages.Add(TEXT("Baseapp_importClientEntityDef"), new Message(208, TEXT("importClientMessages"), 0));
+	messages.Add(TEXT("Baseapp_hello"), new Message(200, TEXT("hello"), -1));
+
+	fixedMessageID.Add(TEXT("Client_onHelloCB"), 521);
+	fixedMessageID.Add(TEXT("Client_onScriptVersionNotMatch"), 522);
+	fixedMessageID.Add(TEXT("Client_onVersionNotMatch"), 523);
+	fixedMessageID.Add(TEXT("Client_onImportClientMessages"), 518);
+}
+
+Message* Messages::add(Message* pMessage, MessageID mid, const FString& mname, int16 mmsglen)
+{
+	if (findClientMessage(mid))
+		return pMessage;
+
+	if (fixedMessageID.Contains(mname))
+	{
+		mid = fixedMessageID.FindRef(mname);
+	}
+
+	pMessage->id = mid;
+	pMessage->name = mname;
+	pMessage->msglen = mmsglen;
+
+	static int tmpID = 0;
+
+	// 避免ID重复
+	if (mid == 0)
+	{
+		--tmpID;
+		clientMessages.Add(tmpID, pMessage);
+	}
+	else
+	{
+		clientMessages.Add(pMessage->id, pMessage);
+	}
+
+	messages.Add(pMessage->name, pMessage);
+	
+	INFO_MSG("Message::add: %s", *pMessage->c_str());
+	return pMessage;
+}
+
+Message* Messages::findClientMessage(MessageID mid)
+{
+	return clientMessages.FindRef(mid);
+}
+
+Message* Messages::findMessage(const FString& mname)
+{
+	return messages.FindRef(mname);
+}

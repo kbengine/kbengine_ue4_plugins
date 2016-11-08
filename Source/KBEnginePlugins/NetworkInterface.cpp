@@ -5,6 +5,7 @@
 #include "PacketSender.h"
 #include "MemoryStream.h"
 
+
 NetworkInterface::NetworkInterface():
 	socket_(NULL),
 	pPacketSender_(NULL),

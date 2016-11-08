@@ -488,6 +488,11 @@ public:
 		wpos_ += cnt;
 	}
 
+	void append(const uint8* datas, uint32 offset, uint32 size)
+	{
+		append(datas + offset, size);
+	}
+
 	void appendBlob(const TArray<uint8>& datas)
 	{
 		uint32 len = (uint32)datas.Num();

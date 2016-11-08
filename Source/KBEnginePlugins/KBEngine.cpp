@@ -7,7 +7,6 @@
 #include "Bundle.h"
 #include "MemoryStream.h"
 
-
 TMap<uint16, FKServerErr> KBEngineApp::serverErrs_;
 
 bool KBEngineApp::loadingLocalMessages_ = false;
@@ -93,8 +92,21 @@ KBEngineApp::~KBEngineApp()
 	INFO_MSG("destructed!");
 }
 
+KBEngineApp& KBEngineApp::getSingleton() 
+{
+	static KBEngineApp* pKBEngineApp = NULL;
+
+	if (!pKBEngineApp)
+		pKBEngineApp = new KBEngineApp();
+
+	return *pKBEngineApp;
+}
+
 bool KBEngineApp::initialize(KBEngineArgs* pArgs)
 {
+	if (isInitialized())
+		return false;
+
 	pArgs_ = pArgs;
 	reset();
 	return true;
@@ -117,7 +129,7 @@ void KBEngineApp::resetMessages()
 	entitydefImported_ = false;
 	isImportServerErrorsDescr_ = false;
 	serverErrs_.Empty();
-	Message::clear();
+	Messages::getSingleton().clear();
 	//EntityDef.clear();
 	//Entity.clear();
 	INFO_MSG("KBEngine::resetMessages()");
@@ -167,8 +179,6 @@ void KBEngineApp::reset()
 
 bool KBEngineApp::initNetwork()
 {
-	Message::bindFixedMessage();
-
 	if (pNetworkInterface_)
 		delete pNetworkInterface_;
 
@@ -234,9 +244,9 @@ void KBEngineApp::hello()
 {
 	Bundle* pBundle = Bundle::createObject();
 	if (currserver_ == "loginapp")
-		pBundle->newMessage(Message::messages["Loginapp_hello"]);
+		pBundle->newMessage(Messages::getSingleton().messages["Loginapp_hello"]);
 	else
-		pBundle->newMessage(Message::messages["Baseapp_hello"]);
+		pBundle->newMessage(Messages::getSingleton().messages["Baseapp_hello"]);
 
 	(*pBundle) << clientVersion_;
 	(*pBundle) << clientScriptVersion_;
@@ -244,7 +254,7 @@ void KBEngineApp::hello()
 	pBundle->send(pNetworkInterface_);
 }
 
-void KBEngineApp::onHelloCB(MemoryStream& stream)
+void KBEngineApp::Client_onHelloCB(MemoryStream& stream)
 {
 	stream >> serverVersion_;
 	stream >> serverScriptVersion_;
@@ -269,9 +279,75 @@ void KBEngineApp::onHelloCB(MemoryStream& stream)
 	}
 }
 
+void KBEngineApp::Client_onVersionNotMatch(MemoryStream& stream)
+{
+	stream >> serverVersion_;
+
+	ERROR_MSG("verInfo=%s(server: %s)", *clientVersion_, *serverVersion_);
+	//Event.fireAll("onVersionNotMatch", new object[]{ clientVersion_, serverVersion_ });
+
+//	if (_persistentInofs != null)
+//		_persistentInofs.onVersionNotMatch(clientVersion, serverVersion);
+}
+
+void KBEngineApp::Client_onScriptVersionNotMatch(MemoryStream& stream)
+{
+	stream >> serverScriptVersion_;
+
+	ERROR_MSG("verInfo=%s(server: %s)", *clientScriptVersion_, *serverScriptVersion_);
+	//Event.fireAll("onScriptVersionNotMatch", new object[]{ clientScriptVersion, serverScriptVersion });
+
+	//if (_persistentInofs != null)
+	//	_persistentInofs.onScriptVersionNotMatch(clientScriptVersion, serverScriptVersion);
+}
+
+void KBEngineApp::Client_onKicked(uint16 failedcode)
+{
+	DEBUG_MSG("failedcode=%d", failedcode);
+	//Event.fireAll("onKicked", new object[]{ failedcode });
+}
+
+void KBEngineApp::Client_onImportServerErrorsDescr(MemoryStream& stream)
+{
+	//byte[] datas = new byte[stream.wpos - stream.rpos];
+	//Array.Copy(stream.data(), stream.rpos, datas, 0, stream.wpos - stream.rpos);
+
+	onImportServerErrorsDescr(stream);
+
+	//if (_persistentInofs != null)
+	//	_persistentInofs.onImportServerErrorsDescr(datas);
+}
+
+void KBEngineApp::onImportServerErrorsDescr(MemoryStream& stream)
+{
+	uint16 size = 0;
+	stream >> size;
+
+	while (size > 0)
+	{
+		size -= 1;
+
+		FKServerErr e;
+		stream >> e.id;
+
+		TArray<uint8> datas;
+		stream.readBlob(datas);
+		e.name = FString(UTF8_TO_TCHAR(datas.GetData()));
+
+		datas.Empty();
+		stream.readBlob(datas);
+		e.descr = FString(UTF8_TO_TCHAR(datas.GetData()));
+
+		serverErrs_.Add(e.id, e);
+
+		DEBUG_MSG("id=%d, name=%s, descr=%s", e.id, *e.name, *e.descr);
+	}
+}
+
 void KBEngineApp::onServerDigest()
 {
-
+	//if (_persistentInofs != null)
+	//	_persistentInofs.onServerDigest(currserver, serverProtocolMD5, serverEntitydefMD5);
 }
 
 bool KBEngineApp::login(FString& username, FString& password, TArray<uint8>& datas)
@@ -307,7 +383,7 @@ void KBEngineApp::login_loginapp(bool noconnect)
 	{
 		INFO_MSG("send login! username=%s", *username_);
 		Bundle* pBundle = Bundle::createObject();
-		pBundle->newMessage(Message::messages[TEXT("Loginapp_login"]));
+		pBundle->newMessage(Messages::getSingleton().messages[TEXT("Loginapp_login"]));
 		(*pBundle) << (uint8)pArgs_->clientType;
 		pBundle->appendBlob(clientdatas_);
 		(*pBundle) << username_;
@@ -334,7 +410,21 @@ void KBEngineApp::onConnectTo_loginapp_callback(FString ip, uint16 port, bool su
 
 void KBEngineApp::onLogin_loginapp()
 {
+	lastTickCBTime_ = getTimeSeconds();
 
+	if (!loginappMessageImported_)
+	{
+		Bundle* pBundle = Bundle::createObject();
+		pBundle->newMessage(Messages::getSingleton().messages[TEXT("Loginapp_importClientMessages"]));
+		pBundle->send(pNetworkInterface_);
+
+		DEBUG_MSG("send importClientMessages ...");
+	//	Event.fireOut("Loginapp_importClientMessages", new object[]{});
+	}
+	else
+	{
+		onImportClientMessagesCompleted();
+	}
 }
 
 void KBEngineApp::login_baseapp(bool noconnect)
@@ -358,6 +448,211 @@ void KBEngineApp::clearSpace(bool isall)
 }
 
 void KBEngineApp::clearEntities(bool isall)
+{
+
+}
+
+void KBEngineApp::onImportClientMessagesCompleted()
+{
+	DEBUG_MSG("successfully! currserver=%s, currstate=%s", *currserver_, *currstate_);
+
+	if (currserver_ == TEXT("loginapp"))
+	{
+		if (!isImportServerErrorsDescr_ && !loadingLocalMessages_)
+		{
+			DEBUG_MSG("send importServerErrorsDescr!");
+			isImportServerErrorsDescr_ = true;
+			Bundle* pBundle = Bundle::createObject();
+			pBundle->newMessage(Messages::getSingleton().messages[TEXT("Loginapp_importServerErrorsDescr"]));
+			pBundle->send(pNetworkInterface_);
+		}
+
+		if (currstate_ == TEXT("login"))
+		{
+			login_loginapp(false);
+		}
+		else if (currstate_ == TEXT("autoimport"))
+		{
+		}
+		else if (currstate_ == TEXT("resetpassword"))
+		{
+			resetpassword_loginapp(false);
+		}
+		else if (currstate_ == TEXT("createAccount"))
+		{
+			createAccount_loginapp(false);
+		}
+		else {
+		}
+
+		loginappMessageImported_ = true;
+	}
+	else
+	{
+		baseappMessageImported_ = true;
+
+		if (!entitydefImported_ && !loadingLocalMessages_)
+		{
+			DEBUG_MSG("send importEntityDef(%d) ...", entitydefImported_);
+			Bundle* pBundle = Bundle::createObject();
+			pBundle->newMessage(Messages::getSingleton().messages[TEXT("Baseapp_importClientEntityDef"]));
+			pBundle->send(pNetworkInterface_);
+			//Event.fireOut("Baseapp_importClientEntityDef", new object[]{});
+		}
+		else
+		{
+			onImportEntityDefCompleted();
+		}
+	}
+}
+
+void createDataTypeFromStreams(MemoryStream& stream, bool canprint)
+{
+
+}
+
+void createDataTypeFromStream(MemoryStream& stream, bool canprint)
+{
+
+}
+
+void KBEngineApp::Client_onImportClientEntityDef(MemoryStream& stream)
+{
+
+}
+
+void KBEngineApp::onImportClientEntityDef(MemoryStream& stream)
+{
+
+}
+
+void KBEngineApp::onImportEntityDefCompleted()
+{
+
+}
+
+void KBEngineApp::Client_onImportClientMessages(MemoryStream& stream)
+{
+	//byte[] datas = new byte[stream.wpos - stream.rpos];
+	//Array.Copy(stream.data(), stream.rpos, datas, 0, stream.wpos - stream.rpos);
+
+	onImportClientMessages(stream);
+
+	//if (_persistentInofs != null)
+	//	_persistentInofs.onImportClientMessages(currserver, datas);
+}
+
+void KBEngineApp::onImportClientMessages(MemoryStream& stream)
+{
+	uint16 msgcount = 0;
+	stream >> msgcount;
+
+	DEBUG_MSG("start currserver=%s(msgsize=%d)...", *currserver_, msgcount);
+
+	while (msgcount > 0)
+	{
+		msgcount--;
+
+		MessageID msgid = 0;
+		stream >> msgid;
+
+		int16 msglen = 0;
+		stream >> msglen;
+
+		FString msgname;
+		stream >> msgname;
+		
+		int8 argstype = 0;
+		stream >> argstype;
+
+		uint8 argsize = 0;
+		stream >> argsize;
+
+		TArray<uint8> argstypes;
+
+		for (uint8 i = 0; i<argsize; i++)
+		{
+			uint8 v = 0;
+			stream >> v;
+			argstypes.Add(v);
+		}
+
+		Message* handler = Messages::getSingleton().findMessage(msgname);
+		bool isClientMethod = msgname.Contains(TEXT("Client_"), ESearchCase::CaseSensitive, ESearchDir::FromEnd);
+
+		if (isClientMethod)
+		{
+			if (handler == NULL)
+			{
+				WARNING_MSG("currserver[%s]: interface(%s/%d/%d) no implement!",
+					*currserver_, *msgname, msgid, msglen);
+			}
+			else
+			{
+				DEBUG_MSG("imported(%s/%d/%d) successfully!", 
+					*msgname, msgid, msglen);
+			}
+		}
+
+		if (handler)
+		{
+			handler->id = msgid;
+			handler->msglen = msglen;
+
+			// 因为握手类ID一开始临时设置为负数， 所以需要重新以正确的ID添加到列表
+			if (isClientMethod)
+				Messages::getSingleton().add(handler, msgid, msgname, msglen);
+
+			DEBUG_MSG("currserver[%s]: refreshed(%s)!",
+				*currserver_, *handler->c_str());
+		}
+		else
+		{
+			if (msgname != TEXT(""))
+			{
+				Messages::getSingleton().messages.Add(msgname, new Message(msgid, msgname, msglen));
+
+				if(!isClientMethod)
+					DEBUG_MSG("currserver[%s]: imported(%s/%d/%d) successfully!",
+						*currserver_, *msgname, msgid, msglen);
+
+				if (isClientMethod)
+				{
+					Messages::getSingleton().clientMessages.Add(msgid, Messages::getSingleton().messages[msgname]);
+				}
+				else
+				{
+					if (currserver_ == TEXT("loginapp"))
+						Messages::getSingleton().loginappMessages.Add(msgid, Messages::getSingleton().messages[msgname]);
+					else
+						Messages::getSingleton().baseappMessages.Add(msgid, Messages::getSingleton().messages[msgname]);
+				}
+			}
+			else
+			{
+				Message* msg = new Message(msgid, msgname, msglen);
+
+				if(!isClientMethod)
+					DEBUG_MSG("currserver[%s]: imported(%s/%d/%d) successfully!",
+						*currserver_, *msgname, msgid, msglen);
+
+				if (currserver_ == TEXT("loginapp"))
+					Messages::getSingleton().loginappMessages.Add(msgid, msg);
+				else
+					Messages::getSingleton().baseappMessages.Add(msgid, msg);
+			}
+		}
+	};
+
+	onImportClientMessagesCompleted();
+}
+
+void KBEngineApp::resetpassword_loginapp(bool noconnect)
+{
+
+}
+
+void KBEngineApp::createAccount_loginapp(bool noconnect)
 {
 
 }

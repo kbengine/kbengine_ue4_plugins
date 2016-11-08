@@ -8,10 +8,22 @@ KBEngineArgs::KBEngineArgs():
 	clientType(EKCLIENT_TYPE::CLIENT_TYPE_WIN),
 	syncPlayer(true),
 	useAliasEntityID(true),
-	isOnInitCallPropertysSetMethods(true)
+	isOnInitCallPropertysSetMethods(true),
+	SEND_BUFFER_MAX(TCP_PACKET_MAX),
+	RECV_BUFFER_MAX(TCP_PACKET_MAX)
 {
 }
 
 KBEngineArgs::~KBEngineArgs()
 {
+}
+
+int KBEngineArgs::getRecvBufferSize()
+{
+	return (int)RECV_BUFFER_MAX;
+}
+
+int KBEngineArgs::getSendBufferSize()
+{
+	return (int)SEND_BUFFER_MAX;
 }

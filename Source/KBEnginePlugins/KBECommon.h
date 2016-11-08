@@ -11,6 +11,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogKBEngine, Log, All);
 
 typedef uint16 MessageID;
 typedef uint16 MessageLength;
+typedef uint32 MessageLengthEx;
 
 /** 安全的释放一个指针内存 */
 #define SAFE_RELEASE(i)										\
@@ -91,9 +92,9 @@ enum ProtocolType
 typedef uint16								PacketLength;				// 最大65535
 #define PACKET_LENGTH_SIZE					sizeof(PacketLength)
 
-#define NETWORK_MESSAGE_ID_SIZE				sizeof(Network::MessageID)
-#define NETWORK_MESSAGE_LENGTH_SIZE			sizeof(Network::MessageLength)
-#define NETWORK_MESSAGE_LENGTH1_SIZE		sizeof(Network::MessageLength1)
+#define NETWORK_MESSAGE_ID_SIZE				sizeof(MessageID)
+#define NETWORK_MESSAGE_LENGTH_SIZE			sizeof(MessageLength)
+#define NETWORK_MESSAGE_LENGTH1_SIZE		sizeof(MessageLengthEx)
 #define NETWORK_MESSAGE_MAX_SIZE			65535
 #define NETWORK_MESSAGE_MAX_SIZE1			4294967295
 
@@ -113,6 +114,14 @@ typedef uint16								PacketLength;				// 最大65535
 #define NETWORK_VARIABLE_MESSAGE -1
 #endif
 
+/*
+	网络MTU最大值
+*/
+
+#define TCP_PACKET_MAX 1460
+
+
+
 float getTimeSeconds();
 
 
@@ -126,4 +135,5 @@ public:
 	AKBECommon();
 	
 };
+
 
