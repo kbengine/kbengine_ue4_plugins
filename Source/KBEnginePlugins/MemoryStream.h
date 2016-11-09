@@ -404,6 +404,21 @@ public:
 		return rsize;
 	}
 
+	uint32 readUTF8String(FString& str)
+	{
+		if (length() <= 0)
+			return 0;
+
+		TArray<uint8> datas;
+		uint32 rsize = readBlob(datas);
+
+		// Ω·Œ≤±Í÷æ
+		datas.Add(0);
+
+		str = FString(UTF8_TO_TCHAR(datas.GetData()));
+		return rsize;
+	}
+
 	void readPackXYZ(float& x, float&y, float& z, float minf = -256.f)
 	{
 		uint32 packed = 0;

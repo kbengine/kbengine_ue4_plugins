@@ -329,14 +329,8 @@ void KBEngineApp::onImportServerErrorsDescr(MemoryStream& stream)
 
 		FKServerErr e;
 		stream >> e.id;
-
-		TArray<uint8> datas;
-		stream.readBlob(datas);
-		e.name = FString(UTF8_TO_TCHAR(datas.GetData()));
-
-		datas.Empty();
-		stream.readBlob(datas);
-		e.descr = FString(UTF8_TO_TCHAR(datas.GetData()));
+		stream.readUTF8String(e.name);
+		stream.readUTF8String(e.descr);
 
 		serverErrs_.Add(e.id, e);
 
