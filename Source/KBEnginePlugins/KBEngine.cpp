@@ -6,6 +6,7 @@
 #include "NetworkInterface.h"
 #include "Bundle.h"
 #include "MemoryStream.h"
+#include "PersistentInfos.h"
 
 TMap<uint16, FKServerErr> KBEngineApp::serverErrs_;
 
@@ -35,6 +36,7 @@ KBEngineApp::KBEngineApp() :
 	clientScriptVersion_(TEXT("")),
 	serverProtocolMD5_(TEXT("")),
 	serverEntitydefMD5_(TEXT("")),
+	persistentInfos_(NULL),
 	entity_uuid_(0),
 	entity_id_(0),
 	entity_type_(TEXT("")),
@@ -69,6 +71,7 @@ KBEngineApp::KBEngineApp(KBEngineArgs* pArgs):
 	clientScriptVersion_(TEXT("")),
 	serverProtocolMD5_(TEXT("")),
 	serverEntitydefMD5_(TEXT("")),
+	persistentInfos_(NULL),
 	entity_uuid_(0),
 	entity_id_(0),
 	entity_type_(TEXT("")),
@@ -107,9 +110,34 @@ bool KBEngineApp::initialize(KBEngineArgs* pArgs)
 	if (isInitialized())
 		return false;
 
+	// 允许持久化KBE(例如:协议，entitydef等)
+	if (pArgs->persistentDataPath != TEXT(""))
+	{
+		SAFE_RELEASE(persistentInfos_);
+		persistentInfos_ = new PersistentInfos(pArgs->persistentDataPath);
+	}
+
+	// 注册事件
+	installEvents();
+
 	pArgs_ = pArgs;
 	reset();
 	return true;
+}
+
+void KBEngineApp::installEvents()
+{
+	/*
+	Event.registerIn("createAccount", this, "createAccount");
+	Event.registerIn("login", this, "login");
+	Event.registerIn("reLoginBaseapp", this, "reLoginBaseapp");
+	Event.registerIn("resetPassword", this, "resetPassword");
+	Event.registerIn("bindAccountEmail", this, "bindAccountEmail");
+	Event.registerIn("newPassword", this, "newPassword");
+
+	// 内部事件
+	Event.registerIn("_closeNetwork", this, "_closeNetwork");
+	*/
 }
 
 void KBEngineApp::destroy()
@@ -119,6 +147,7 @@ void KBEngineApp::destroy()
 
 	SAFE_RELEASE(pArgs_);
 	SAFE_RELEASE(pNetworkInterface_);
+	SAFE_RELEASE(persistentInfos_);
 }
 
 void KBEngineApp::resetMessages()
@@ -132,7 +161,7 @@ void KBEngineApp::resetMessages()
 	Messages::getSingleton().clear();
 	//EntityDef.clear();
 	//Entity.clear();
-	INFO_MSG("KBEngine::resetMessages()");
+	INFO_MSG("done!");
 }
 
 void KBEngineApp::reset()
@@ -186,6 +215,15 @@ bool KBEngineApp::initNetwork()
 	return true;
 }
 
+bool KBEngineApp::validEmail(FString strEmail)
+{
+	/*
+	return Regex.IsMatch(strEmail, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)
+	|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$");
+	*/
+	return false;
+}
+
 void KBEngineApp::process()
 {
 	// 处理网络
@@ -226,6 +264,26 @@ void KBEngineApp::sendTick()
 	}
 }
 
+Entity* KBEngineApp::player()
+{
+	return findEntity(entity_id_);
+}
+
+Entity* KBEngineApp::findEntity(int32 entityID)
+{
+	Entity** pEntity = entities_.Find(entityID);
+	if (pEntity == nullptr)
+		return NULL;
+
+	return *pEntity;
+}
+
+FString KBEngineApp::serverErr(uint16 id)
+{
+	FKServerErr e = serverErrs_.FindRef(id);
+	return FString::Printf(TEXT("%s[%s]"), *e.name, *e.descr);
+}
+
 void KBEngineApp::updatePlayerToServer()
 {
 	if (!pArgs_->syncPlayer || spaceID_ == 0)
@@ -238,6 +296,11 @@ void KBEngineApp::updatePlayerToServer()
 		return;
 
 
+}
+
+void KBEngineApp::Client_onAppActiveTickCB()
+{
+	lastTickCBTime_ = getTimeSeconds();
 }
 
 void KBEngineApp::hello()
@@ -286,8 +349,8 @@ void KBEngineApp::Client_onVersionNotMatch(MemoryStream& stream)
 	ERROR_MSG("verInfo=%s(server: %s)", *clientVersion_, *serverVersion_);
 	//Event.fireAll("onVersionNotMatch", new object[]{ clientVersion_, serverVersion_ });
 
-//	if (_persistentInofs != null)
-//		_persistentInofs.onVersionNotMatch(clientVersion, serverVersion);
+	if (persistentInfos_)
+		persistentInfos_->onVersionNotMatch(clientVersion_, serverVersion_);
 }
 
 void KBEngineApp::Client_onScriptVersionNotMatch(MemoryStream& stream)
@@ -297,8 +360,8 @@ void KBEngineApp::Client_onScriptVersionNotMatch(MemoryStream& stream)
 	ERROR_MSG("verInfo=%s(server: %s)", *clientScriptVersion_, *serverScriptVersion_);
 	//Event.fireAll("onScriptVersionNotMatch", new object[]{ clientScriptVersion, serverScriptVersion });
 
-	//if (_persistentInofs != null)
-	//	_persistentInofs.onScriptVersionNotMatch(clientScriptVersion, serverScriptVersion);
+	if (persistentInfos_)
+		persistentInfos_->onScriptVersionNotMatch(clientScriptVersion_, serverScriptVersion_);
 }
 
 void KBEngineApp::Client_onKicked(uint16 failedcode)
@@ -309,13 +372,14 @@ void KBEngineApp::Client_onKicked(uint16 failedcode)
 
 void KBEngineApp::Client_onImportServerErrorsDescr(MemoryStream& stream)
 {
-	//byte[] datas = new byte[stream.wpos - stream.rpos];
-	//Array.Copy(stream.data(), stream.rpos, datas, 0, stream.wpos - stream.rpos);
+	TArray<uint8> datas;
+	datas.SetNumUninitialized(stream.length());
+	memcpy(datas.GetData(), stream.data() + stream.rpos(), stream.length());
 
 	onImportServerErrorsDescr(stream);
 
-	//if (_persistentInofs != null)
-	//	_persistentInofs.onImportServerErrorsDescr(datas);
+	if (persistentInfos_)
+		persistentInfos_->onImportServerErrorsDescr(datas);
 }
 
 void KBEngineApp::onImportServerErrorsDescr(MemoryStream& stream)
@@ -340,8 +404,8 @@ void KBEngineApp::onImportServerErrorsDescr(MemoryStream& stream)
 
 void KBEngineApp::onServerDigest()
 {
-	//if (_persistentInofs != null)
-	//	_persistentInofs.onServerDigest(currserver, serverProtocolMD5, serverEntitydefMD5);
+	if (persistentInfos_)
+		persistentInfos_->onServerDigest(currserver_, serverProtocolMD5_, serverEntitydefMD5_);
 }
 
 bool KBEngineApp::login(FString& username, FString& password, TArray<uint8>& datas)
@@ -421,17 +485,124 @@ void KBEngineApp::onLogin_loginapp()
 	}
 }
 
+void KBEngineApp::Client_onLoginFailed(MemoryStream& stream)
+{
+	uint16 failedcode = 0;
+	stream >> failedcode;
+	stream.readBlob(serverdatas_);
+	ERROR_MSG("failedcode(%d), datas(%d)!", failedcode, serverdatas_.Num());
+	//Event.fireAll("onLoginFailed", new object[]{ failedcode });
+}
+
+void KBEngineApp::Client_onLoginSuccessfully(MemoryStream& stream)
+{
+	FString accountName;
+	stream >> accountName;
+	username_ = accountName;
+	stream >> baseappIP_;
+	stream >> baseappPort_;
+
+	DEBUG_MSG("accountName(%s), addr("
+		 "%s:%d), datas(%d)!", *accountName, *baseappIP_, baseappPort_, serverdatas_.Num());
+
+	stream.readBlob(serverdatas_);
+	login_baseapp(true);
+}
+
 void KBEngineApp::login_baseapp(bool noconnect)
 {
+	if (noconnect)
+	{
+		//Event.fireOut("onLoginBaseapp", new object[]{});
 
+		pNetworkInterface_->destroy();
+		pNetworkInterface_ = NULL;
+		initNetwork();
+		pNetworkInterface_->connectTo(baseappIP_, baseappPort_, this, 1);
+	}
+	else
+	{
+		Bundle* pBundle = Bundle::createObject();
+		pBundle->newMessage(Messages::getSingleton().messages[TEXT("Baseapp_loginBaseapp"]));
+		(*pBundle) << username_;
+		(*pBundle) << password_;
+		pBundle->send(pNetworkInterface_);
+	}
 }
 
 void KBEngineApp::onConnectTo_baseapp_callback(FString ip, uint16 port, bool success)
 {
+	lastTickCBTime_ = getTimeSeconds();
 
+	if (!success)
+	{
+		ERROR_MSG("connect %s:%d is error!", *ip, port);
+		return;
+	}
+
+	currserver_ = TEXT("baseapp");
+	currstate_ = TEXT("");
+
+	DEBUG_MSG("connect %s:%d is successfully!", *ip, port);
+
+	hello();
 }
 
 void KBEngineApp::onLogin_baseapp()
+{
+	lastTickCBTime_ = getTimeSeconds();
+
+	if (!baseappMessageImported_)
+	{
+		Bundle* pBundle = Bundle::createObject();
+		pBundle->newMessage(Messages::getSingleton().messages[TEXT("Baseapp_importClientMessages"]));
+		pBundle->send(pNetworkInterface_);
+		DEBUG_MSG("send importClientMessages ...");
+	//	Event.fireOut("Baseapp_importClientMessages", new object[]{});
+	}
+	else
+	{
+		onImportClientMessagesCompleted();
+	}
+}
+
+void KBEngineApp::reLoginBaseapp()
+{
+	//Event.fireAll("onReLoginBaseapp", new object[]{});
+	pNetworkInterface_->connectTo(baseappIP_, baseappPort_, this, 1);
+}
+
+void KBEngineApp::Client_onLoginBaseappFailed(uint16 failedcode)
+{
+	ERROR_MSG("failedcode(%d:%s)!", failedcode, *serverErr(failedcode));
+	//Event.fireAll("onLoginBaseappFailed", new object[]{ failedcode });
+}
+
+void KBEngineApp::Client_onReLoginBaseappFailed(uint16 failedcode)
+{
+	ERROR_MSG("failedcode(%d:%s)!", failedcode, *serverErr(failedcode));
+	//Event.fireAll("onReLoginBaseappFailed", new object[]{ failedcode });
+}
+
+void KBEngineApp::Client_onReLoginBaseappSuccessfully(MemoryStream& stream)
+{
+	stream >> entity_uuid_;
+	ERROR_MSG("name(%s)!", *username_);
+	//Event.fireAll("onReLoginBaseappSuccessfully", new object[]{});
+}
+
+void KBEngineApp::Client_onCreatedProxies(uint64 rndUUID, int32 eid, FString& entityType)
+{
+	DEBUG_MSG("eid(%d), entityType(%s)!", eid, *entityType);
+
+	if (entities_.Contains(eid))
+	{
+		// WARNING_MSG("eid(%d) has exist!", eid);
+		Client_onEntityDestroyed(eid);
+	}
+}
+
+void KBEngineApp::Client_onEntityDestroyed(int32 eid)
 {
 
 }
@@ -500,40 +671,88 @@ void KBEngineApp::onImportClientMessagesCompleted()
 	}
 }
 
-void createDataTypeFromStreams(MemoryStream& stream, bool canprint)
+void KBEngineApp::createDataTypeFromStreams(MemoryStream& stream, bool canprint)
 {
+	uint16 aliassize = 0;
+	stream >> aliassize;
 
+	DEBUG_MSG("importAlias(size=%d)!", aliassize);
+
+	while (aliassize > 0)
+	{
+		aliassize--;
+		createDataTypeFromStream(stream, canprint);
+	};
+
+	//foreach(string datatype in EntityDef.datatypes.Keys)
+	{
+	//	if (EntityDef.datatypes[datatype] != null)
+		{
+	//		EntityDef.datatypes[datatype].bind();
+		}
+	}
 }
 
-void createDataTypeFromStream(MemoryStream& stream, bool canprint)
+void KBEngineApp::createDataTypeFromStream(MemoryStream& stream, bool canprint)
 {
+	uint16 utype = 0;
+	stream >> utype;
 
+	FString name;
+	stream >> name;
+
+	FString valname;
+	stream >> valname;
+
+	/* 有一些匿名类型，我们需要提供一个唯一名称放到datatypes中
+	如：
+	<onRemoveAvatar>
+	<Arg>	ARRAY <of> INT8 </of>		</Arg>
+	</onRemoveAvatar>
+	*/
+	if (valname == "")
+		valname = FString::Printf(TEXT("Null_%d"), utype);
+
+	if (canprint)
+		DEBUG_MSG("importAlias(%s:%s:%d)!", *name, *valname, utype);
 }
 
 void KBEngineApp::Client_onImportClientEntityDef(MemoryStream& stream)
 {
+	TArray<uint8> datas;
+	datas.SetNumUninitialized(stream.length());
+	memcpy(datas.GetData(), stream.data() + stream.rpos(), stream.length());
 
+	onImportClientEntityDef(stream);
+
+	if (persistentInfos_)
+		persistentInfos_->onImportClientEntityDef(datas);
 }
 
 void KBEngineApp::onImportClientEntityDef(MemoryStream& stream)
 {
-
+	createDataTypeFromStreams(stream, true);
 }
 
 void KBEngineApp::onImportEntityDefCompleted()
 {
+	DEBUG_MSG("successfully!");
+	entitydefImported_ = true;
 
+	if (!loadingLocalMessages_)
+		login_baseapp(false);
 }
 
 void KBEngineApp::Client_onImportClientMessages(MemoryStream& stream)
 {
-	//byte[] datas = new byte[stream.wpos - stream.rpos];
-	//Array.Copy(stream.data(), stream.rpos, datas, 0, stream.wpos - stream.rpos);
+	TArray<uint8> datas;
+	datas.SetNumUninitialized(stream.length());
+	memcpy(datas.GetData(), stream.data() + stream.rpos(), stream.length());
 
 	onImportClientMessages(stream);
 
-	//if (_persistentInofs != null)
-	//	_persistentInofs.onImportClientMessages(currserver, datas);
+	if (persistentInfos_)
+		persistentInfos_->onImportClientMessages(currserver_, datas);
 }
 
 void KBEngineApp::onImportClientMessages(MemoryStream& stream)
@@ -590,6 +809,7 @@ void KBEngineApp::onImportClientMessages(MemoryStream& stream)
 
 		if (handler)
 		{
+			FString old_cstr = handler->c_str();
 			handler->id = msgid;
 			handler->msglen = msglen;
 
@@ -597,8 +817,8 @@ void KBEngineApp::onImportClientMessages(MemoryStream& stream)
 			if (isClientMethod)
 				Messages::getSingleton().add(handler, msgid, msgname, msglen);
 
-			DEBUG_MSG("currserver[%s]: refreshed(%s)!",
-				*currserver_, *handler->c_str());
+			DEBUG_MSG("currserver[%s]: refreshed(%s => %s)!",
+				*currserver_, *old_cstr, *handler->c_str());
 		}
 		else
 		{

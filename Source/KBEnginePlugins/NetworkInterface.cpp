@@ -14,7 +14,8 @@ NetworkInterface::NetworkInterface():
 	connectIP_(TEXT("")),
 	connectPort_(0),
 	connectUserdata_(0),
-	startTime_(0.0)
+	startTime_(0.0),
+	isDestroyed_(false)
 {
 }
 
@@ -130,6 +131,12 @@ void NetworkInterface::process()
 		pPacketReceiver_ = new PacketReceiver(this);
 
 	pPacketReceiver_->process();
+
+	if (isDestroyed_)
+	{
+		delete this;
+		return;
+	}
 }
 
 void NetworkInterface::tickConnecting()

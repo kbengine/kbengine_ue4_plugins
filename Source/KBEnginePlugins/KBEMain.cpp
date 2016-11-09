@@ -26,6 +26,7 @@ UKBEMain::UKBEMain(const FObjectInitializer& ObjectInitializer) : Super(ObjectIn
 	clientType = EKCLIENT_TYPE::CLIENT_TYPE_WIN;
 	SEND_BUFFER_MAX = TCP_PACKET_MAX;
 	RECV_BUFFER_MAX = TCP_PACKET_MAX;
+	persistentDataPath = TEXT("");
 }
 
 void UKBEMain::InitializeComponent()
@@ -52,7 +53,7 @@ void UKBEMain::BeginPlay()
 	pArgs->clientType = clientType;
 	pArgs->SEND_BUFFER_MAX = SEND_BUFFER_MAX;
 	pArgs->RECV_BUFFER_MAX = RECV_BUFFER_MAX;
-
+	pArgs->persistentDataPath = persistentDataPath;
 	KBEngineApp::getSingleton().initialize(pArgs);
 }
 

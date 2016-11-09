@@ -38,6 +38,10 @@ public:
 	bool connectTo(FString ip, uint16 port, InterfaceLogin* callback, int userdata);
 	bool send(MemoryStream* pMemoryStream);
 
+	void destroy() {
+		isDestroyed_ = true;
+	}
+
 private:
 	void tickConnecting();
 
@@ -51,4 +55,6 @@ protected:
 	uint16 connectPort_;
 	int connectUserdata_;
 	double startTime_;
+
+	bool isDestroyed_;
 };

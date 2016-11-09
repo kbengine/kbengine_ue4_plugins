@@ -42,9 +42,7 @@ public:
 
 	FString c_str();
 
-	virtual void handle(MemoryStream& s) {
-
-	}
+	virtual void handle(MemoryStream& s);
 
 public:
 	MessageID id;

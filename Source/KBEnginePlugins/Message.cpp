@@ -25,6 +25,12 @@ FString Message::c_str()
 	return FString::Printf(TEXT("%s id:%u, len : %d"), *name, id, msglen);
 }
 
+void Message::handle(MemoryStream& s) 
+{
+	ERROR_MSG("interface(%s), handleMethod no implement!",
+		*c_str());
+}
+
 Messages::Messages() :
 	loginappMessages(),
 	baseappMessages(),
@@ -124,3 +130,4 @@ Message* Messages::findMessage(const FString& mname)
 {
 	return messages.FindRef(mname);
 }
+

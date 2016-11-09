@@ -8,6 +8,7 @@ class KBEngineArgs;
 class Entity;
 class NetworkInterface;
 class MemoryStream;
+class PersistentInfos;
 
 /*
 	这是KBEngine插件的核心模块
@@ -40,12 +41,29 @@ public:
 		return pNetworkInterface_;
 	}
 
+	const TArray<uint8>& serverdatas() const
+	{
+		return serverdatas_;
+	}
+
 	KBEngineArgs* getInitArgs() const
 	{
 		return pArgs_;
 	}
 
+	void installEvents();
+
 	void resetMessages();
+
+	static bool validEmail(FString strEmail);
+
+	/*
+		通过错误id得到错误描述
+	*/
+	FString serverErr(uint16 id);
+
+	Entity* player();
+	Entity* findEntity(int32 entityID);
 
 	/**
 		插件的主循环处理函数
@@ -62,6 +80,37 @@ public:
 	*/
 	bool login(FString& username, FString& password, TArray<uint8>& datas);
 	virtual void onLoginCallback(FString ip, uint16 port, bool success, int userdata) override;
+
+	/*
+	重登录到网关(baseapp)
+	一些移动类应用容易掉线，可以使用该功能快速的重新与服务端建立通信
+	*/
+	void reLoginBaseapp();
+
+	/*
+		登录loginapp失败了
+	*/
+	void Client_onLoginFailed(MemoryStream& stream);
+
+	/*
+		登录loginapp成功了
+	*/
+	void Client_onLoginSuccessfully(MemoryStream& stream);
+
+	/*
+		登录baseapp失败了
+	*/
+	void Client_onLoginBaseappFailed(uint16 failedcode);
+
+	/*
+		重登录baseapp失败了
+	*/
+	void Client_onReLoginBaseappFailed(uint16 failedcode);
+
+	/*
+		登录baseapp成功了
+	*/
+	void Client_onReLoginBaseappSuccessfully(MemoryStream& stream);
 
 	void hello();
 	void Client_onHelloCB(MemoryStream& stream);
@@ -83,6 +132,23 @@ public:
 		服务端错误描述导入了
 	*/
 	void Client_onImportServerErrorsDescr(MemoryStream& stream);
+
+	void Client_onImportClientEntityDef(MemoryStream& stream);
+
+	/*
+		服务器心跳回调
+	*/
+	void Client_onAppActiveTickCB();
+
+	/*
+		服务端通知创建一个角色
+	*/
+	void Client_onCreatedProxies(uint64 rndUUID, int32 eid, FString& entityType);
+
+	/*
+		服务端通知强制销毁一个实体
+	*/
+	void Client_onEntityDestroyed(int32 eid);
 
 private:
 	bool initNetwork();
@@ -114,7 +180,6 @@ private:
 
 	void createDataTypeFromStreams(MemoryStream& stream, bool canprint);
 	void createDataTypeFromStream(MemoryStream& stream, bool canprint);
-	void Client_onImportClientEntityDef(MemoryStream& stream);
 	void onImportClientEntityDef(MemoryStream& stream);
 
 	void resetpassword_loginapp(bool noconnect);
@@ -160,6 +225,10 @@ protected:
 	FString clientScriptVersion_;
 	FString serverProtocolMD5_;
 	FString serverEntitydefMD5_;
+
+	// 持久化插件信息， 例如：从服务端导入的协议可以持久化到本地，下次登录版本不发生改变
+	// 可以直接从本地加载来提供登录速度
+	PersistentInfos* persistentInfos_;
 
 	// 当前玩家的实体id与实体类别
 	uint64 entity_uuid_;
