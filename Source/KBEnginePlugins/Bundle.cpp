@@ -212,8 +212,7 @@ Bundle &Bundle::operator<<(bool value)
 
 Bundle &Bundle::operator<<(const FString &value)
 {
-	const TCHAR *serializedChar = value.GetCharArray().GetData();
-	uint32 len = FCString::Strlen(serializedChar);
+	uint32 len = value.Len();
 
 	// +1为字符串尾部的0位置
 	checkStream(len + 1);
@@ -238,4 +237,13 @@ void Bundle::appendBlob(const TArray<uint8>& datas)
 	checkStream(len);
 
 	(*pCurrPacket_).appendBlob(datas);
+}
+
+void Bundle::appendUTF8String(const FString& str)
+{
+	uint32 len = (uint32)str.Len() + 4/*len size*/;
+
+	checkStream(len);
+
+	(*pCurrPacket_).appendUTF8String(str);
 }

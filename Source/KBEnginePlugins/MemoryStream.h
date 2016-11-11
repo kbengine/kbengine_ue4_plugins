@@ -517,6 +517,15 @@ public:
 			append(datas.GetData(), len);
 	}
 
+	void appendUTF8String(const FString& str)
+	{
+		uint32 len = (uint32)str.Len();
+		(*this) << len;
+
+		if (len > 0)
+			append(TCHAR_TO_UTF8(*str), len);
+	}
+
 	void appendPackAnyXYZ(float x, float y, float z, const float epsilon = 0.5f)
 	{
 		if (epsilon > 0.f)

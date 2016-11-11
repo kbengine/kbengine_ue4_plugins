@@ -17,38 +17,283 @@ public:
 		{
 		}
 
-		/*
-		static bool isNumeric(object v)
+		static bool isNumeric(FVariant& v)
 		{
-		return v is sbyte || v is byte ||
-		v is short || v is ushort ||
-		v is int || v is uint ||
-		v is long || v is ulong ||
-		v is char || v is decimal || v is float ||
-		v is double || v is Int16 || v is Int64 ||
-		v is UInt16 || v is UInt64 ||
-		v is Boolean || v is bool;
+			return v.GetType() == EVariantTypes::Bool || 
+				v.GetType() == EVariantTypes::Double ||
+				v.GetType() == EVariantTypes::Float ||
+				v.GetType() == EVariantTypes::Int8 ||
+				v.GetType() == EVariantTypes::Int16 ||
+				v.GetType() == EVariantTypes::Int32 ||
+				v.GetType() == EVariantTypes::Int64 ||
+				v.GetType() == EVariantTypes::UInt8 ||
+				v.GetType() == EVariantTypes::UInt16 ||
+				v.GetType() == EVariantTypes::UInt32 ||
+				v.GetType() == EVariantTypes::UInt64;
 		}
 
-		virtual object createFromStream(MemoryStream stream)
+		virtual FVariant* createFromStream(MemoryStream& stream)
 		{
-			return null;
+			return NULL;
 		}
 		
-		virtual void addToStream(Bundle stream, object v)
+		virtual void addToStream(Bundle& stream, FVariant& v)
 		{
 		}
 		
-		virtual object parseDefaultValStr(string v)
+		virtual FVariant* parseDefaultValStr(FString& v)
 		{
-			return null;
+			return NULL;
 		}
 		
-		virtual bool isSameType(object v)
+		virtual bool isSameType(FVariant& v)
 		{
-			return v == null;
+			return v == NULL;
 		}
-		*/
+		
 protected:
 
 };
+
+class KBENGINEPLUGINS_API KBEDATATYPE_INT8 : public KBEDATATYPE_BASE
+{
+public:
+	virtual FVariant* createFromStream(MemoryStream& stream) override;
+	virtual void addToStream(Bundle& stream, FVariant& v) override;
+
+	virtual FVariant* parseDefaultValStr(FString& v) override;
+
+	virtual bool isSameType(FVariant& v) override;
+};
+
+class KBENGINEPLUGINS_API KBEDATATYPE_INT16 : public KBEDATATYPE_BASE
+{
+public:
+	virtual FVariant* createFromStream(MemoryStream& stream) override;
+	virtual void addToStream(Bundle& stream, FVariant& v) override;
+
+	virtual FVariant* parseDefaultValStr(FString& v) override;
+
+	virtual bool isSameType(FVariant& v) override;
+};
+
+class KBENGINEPLUGINS_API KBEDATATYPE_INT32 : public KBEDATATYPE_BASE
+{
+public:
+	virtual FVariant* createFromStream(MemoryStream& stream) override;
+	virtual void addToStream(Bundle& stream, FVariant& v) override;
+
+	virtual FVariant* parseDefaultValStr(FString& v) override;
+
+	virtual bool isSameType(FVariant& v) override;
+};
+
+class KBENGINEPLUGINS_API KBEDATATYPE_INT64 : public KBEDATATYPE_BASE
+{
+public:
+	virtual FVariant* createFromStream(MemoryStream& stream) override;
+	virtual void addToStream(Bundle& stream, FVariant& v) override;
+
+	virtual FVariant* parseDefaultValStr(FString& v) override;
+
+	virtual bool isSameType(FVariant& v) override;
+};
+
+class KBENGINEPLUGINS_API KBEDATATYPE_UINT8 : public KBEDATATYPE_BASE
+{
+public:
+	virtual FVariant* createFromStream(MemoryStream& stream) override;
+	virtual void addToStream(Bundle& stream, FVariant& v) override;
+
+	virtual FVariant* parseDefaultValStr(FString& v) override;
+
+	virtual bool isSameType(FVariant& v) override;
+};
+
+class KBENGINEPLUGINS_API KBEDATATYPE_UINT16 : public KBEDATATYPE_BASE
+{
+public:
+	virtual FVariant* createFromStream(MemoryStream& stream) override;
+	virtual void addToStream(Bundle& stream, FVariant& v) override;
+
+	virtual FVariant* parseDefaultValStr(FString& v) override;
+
+	virtual bool isSameType(FVariant& v) override;
+};
+
+class KBENGINEPLUGINS_API KBEDATATYPE_UINT32 : public KBEDATATYPE_BASE
+{
+public:
+	virtual FVariant* createFromStream(MemoryStream& stream) override;
+	virtual void addToStream(Bundle& stream, FVariant& v) override;
+
+	virtual FVariant* parseDefaultValStr(FString& v) override;
+
+	virtual bool isSameType(FVariant& v) override;
+};
+
+class KBENGINEPLUGINS_API KBEDATATYPE_UINT64 : public KBEDATATYPE_BASE
+{
+public:
+	virtual FVariant* createFromStream(MemoryStream& stream) override;
+	virtual void addToStream(Bundle& stream, FVariant& v) override;
+
+	virtual FVariant* parseDefaultValStr(FString& v) override;
+
+	virtual bool isSameType(FVariant& v) override;
+};
+
+class KBENGINEPLUGINS_API KBEDATATYPE_FLOAT : public KBEDATATYPE_BASE
+{
+public:
+	virtual FVariant* createFromStream(MemoryStream& stream) override;
+	virtual void addToStream(Bundle& stream, FVariant& v) override;
+
+	virtual FVariant* parseDefaultValStr(FString& v) override;
+
+	virtual bool isSameType(FVariant& v) override;
+};
+
+class KBENGINEPLUGINS_API KBEDATATYPE_DOUBLE : public KBEDATATYPE_BASE
+{
+public:
+	virtual FVariant* createFromStream(MemoryStream& stream) override;
+	virtual void addToStream(Bundle& stream, FVariant& v) override;
+
+	virtual FVariant* parseDefaultValStr(FString& v) override;
+
+	virtual bool isSameType(FVariant& v) override;
+};
+
+class KBENGINEPLUGINS_API KBEDATATYPE_STRING : public KBEDATATYPE_BASE
+{
+public:
+	virtual FVariant* createFromStream(MemoryStream& stream) override;
+	virtual void addToStream(Bundle& stream, FVariant& v) override;
+
+	virtual FVariant* parseDefaultValStr(FString& v) override;
+
+	virtual bool isSameType(FVariant& v) override;
+};
+
+class KBENGINEPLUGINS_API KBEDATATYPE_VECTOR2 : public KBEDATATYPE_BASE
+{
+public:
+	virtual FVariant* createFromStream(MemoryStream& stream) override;
+	virtual void addToStream(Bundle& stream, FVariant& v) override;
+
+	virtual FVariant* parseDefaultValStr(FString& v) override;
+
+	virtual bool isSameType(FVariant& v) override;
+};
+
+class KBENGINEPLUGINS_API KBEDATATYPE_VECTOR3 : public KBEDATATYPE_BASE
+{
+public:
+	virtual FVariant* createFromStream(MemoryStream& stream) override;
+	virtual void addToStream(Bundle& stream, FVariant& v) override;
+
+	virtual FVariant* parseDefaultValStr(FString& v) override;
+
+	virtual bool isSameType(FVariant& v) override;
+};
+
+class KBENGINEPLUGINS_API KBEDATATYPE_VECTOR4 : public KBEDATATYPE_BASE
+{
+public:
+	virtual FVariant* createFromStream(MemoryStream& stream) override;
+	virtual void addToStream(Bundle& stream, FVariant& v) override;
+
+	virtual FVariant* parseDefaultValStr(FString& v) override;
+
+	virtual bool isSameType(FVariant& v) override;
+};
+
+class KBENGINEPLUGINS_API KBEDATATYPE_PYTHON : public KBEDATATYPE_BASE
+{
+public:
+	virtual FVariant* createFromStream(MemoryStream& stream) override;
+	virtual void addToStream(Bundle& stream, FVariant& v) override;
+
+	virtual FVariant* parseDefaultValStr(FString& v) override;
+
+	virtual bool isSameType(FVariant& v) override;
+};
+
+class KBENGINEPLUGINS_API KBEDATATYPE_UNICODE : public KBEDATATYPE_BASE
+{
+public:
+	virtual FVariant* createFromStream(MemoryStream& stream) override;
+	virtual void addToStream(Bundle& stream, FVariant& v) override;
+
+	virtual FVariant* parseDefaultValStr(FString& v) override;
+
+	virtual bool isSameType(FVariant& v) override;
+};
+
+class KBENGINEPLUGINS_API KBEDATATYPE_MAILBOX : public KBEDATATYPE_BASE
+{
+public:
+	virtual FVariant* createFromStream(MemoryStream& stream) override;
+	virtual void addToStream(Bundle& stream, FVariant& v) override;
+
+	virtual FVariant* parseDefaultValStr(FString& v) override;
+
+	virtual bool isSameType(FVariant& v) override;
+};
+
+class KBENGINEPLUGINS_API KBEDATATYPE_BLOB : public KBEDATATYPE_BASE
+{
+public:
+	virtual FVariant* createFromStream(MemoryStream& stream) override;
+	virtual void addToStream(Bundle& stream, FVariant& v) override;
+
+	virtual FVariant* parseDefaultValStr(FString& v) override;
+
+	virtual bool isSameType(FVariant& v) override;
+};
+
+class KBENGINEPLUGINS_API KBEDATATYPE_ARRAY : public KBEDATATYPE_BASE
+{
+public:
+	virtual void bind() override;
+
+	virtual FVariant* createFromStream(MemoryStream& stream) override;
+	virtual void addToStream(Bundle& stream, FVariant& v) override;
+
+	virtual FVariant* parseDefaultValStr(FString& v) override;
+
+	virtual bool isSameType(FVariant& v) override;
+
+public:
+	KBEDATATYPE_BASE* vtype;
+};
+
+class KBENGINEPLUGINS_API KBEDATATYPE_FIXED_DICT : public KBEDATATYPE_BASE
+{
+public:
+	virtual void bind() override;
+
+	virtual FVariant* createFromStream(MemoryStream& stream) override;
+	virtual void addToStream(Bundle& stream, FVariant& v) override;
+
+	virtual FVariant* parseDefaultValStr(FString& v) override;
+
+	virtual bool isSameType(FVariant& v) override;
+
+public:
+	KBEDATATYPE_BASE* vtype;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+

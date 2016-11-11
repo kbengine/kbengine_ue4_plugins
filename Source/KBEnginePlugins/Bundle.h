@@ -48,6 +48,7 @@ public:
 	Bundle &operator<<(const char *str);
 
 	void appendBlob(const TArray<uint8>& datas);
+	void appendUTF8String(const FString& str);
 
 protected:
 	MemoryStream* pCurrPacket_;
