@@ -26,6 +26,8 @@ public:
 	static TMap<FString, ScriptModule*> moduledefs;
 	static TMap<uint16, ScriptModule*> idmoduledefs;
 
+	static void initialize();
+
 	static void clear();
 	static void initDataType();
 	static void bindMessageDataType();

@@ -2,6 +2,7 @@
 #include "KBEnginePluginsPrivatePCH.h"
 #include "EntityDef.h"
 #include "ScriptModule.h"
+#include "DataTypes.h"
 
 TMap<FString, uint16> EntityDef::datatype2id;
 TMap<FString, KBEDATATYPE_BASE*> EntityDef::datatypes;
@@ -11,6 +12,12 @@ TMap<FString, int32> EntityDef::entityclass;
 
 TMap<FString, ScriptModule*> EntityDef::moduledefs;
 TMap<uint16, ScriptModule*> EntityDef::idmoduledefs;
+
+void EntityDef::initialize()
+{
+	initDataType();
+	bindMessageDataType();
+}
 
 void EntityDef::clear()
 {
@@ -27,7 +34,9 @@ void EntityDef::clear()
 
 void EntityDef::initDataType()
 {
-	/*
+	if (datatypes.Num() > 0)
+		return;
+
 	datatypes.Add(TEXT("UINT8"), new KBEDATATYPE_UINT8());
 	datatypes.Add(TEXT("UINT16"), new KBEDATATYPE_UINT16());
 	datatypes.Add(TEXT("UINT32"), new KBEDATATYPE_UINT32());
@@ -49,7 +58,6 @@ void EntityDef::initDataType()
 	datatypes.Add(TEXT("UNICODE"), new KBEDATATYPE_UNICODE());
 	datatypes.Add(TEXT("MAILBOX"), new KBEDATATYPE_MAILBOX());
 	datatypes.Add(TEXT("BLOB"), new KBEDATATYPE_BLOB());
-	*/
 }
 
 void EntityDef::bindMessageDataType()

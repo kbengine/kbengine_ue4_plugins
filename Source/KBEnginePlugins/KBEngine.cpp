@@ -7,6 +7,7 @@
 #include "Bundle.h"
 #include "MemoryStream.h"
 #include "PersistentInfos.h"
+#include "DataTypes.h"
 
 TMap<uint16, FKServerErr> KBEngineApp::serverErrs_;
 
@@ -110,6 +111,8 @@ bool KBEngineApp::initialize(KBEngineArgs* pArgs)
 	if (isInitialized())
 		return false;
 
+	EntityDef::initialize();
+
 	// 允许持久化KBE(例如:协议，entitydef等)
 	if (pArgs->persistentDataPath != TEXT(""))
 	{
@@ -159,7 +162,7 @@ void KBEngineApp::resetMessages()
 	isImportServerErrorsDescr_ = false;
 	serverErrs_.Empty();
 	Messages::getSingleton().clear();
-	//EntityDef.clear();
+	EntityDef::clear();
 	//Entity.clear();
 	INFO_MSG("done!");
 }
@@ -366,7 +369,7 @@ void KBEngineApp::Client_onScriptVersionNotMatch(MemoryStream& stream)
 
 void KBEngineApp::Client_onKicked(uint16 failedcode)
 {
-	DEBUG_MSG("failedcode=%d", failedcode);
+	DEBUG_MSG("failedcode=%d, %s", failedcode, *serverErr(failedcode));
 	//Event.fireAll("onKicked", new object[]{ failedcode });
 }
 
@@ -490,7 +493,7 @@ void KBEngineApp::Client_onLoginFailed(MemoryStream& stream)
 	uint16 failedcode = 0;
 	stream >> failedcode;
 	stream.readBlob(serverdatas_);
-	ERROR_MSG("failedcode(%d), datas(%d)!", failedcode, serverdatas_.Num());
+	ERROR_MSG("failedcode(%d:%s), datas(%d)!", failedcode, *serverErr(failedcode), serverdatas_.Num());
 	//Event.fireAll("onLoginFailed", new object[]{ failedcode });
 }
 
@@ -684,11 +687,11 @@ void KBEngineApp::createDataTypeFromStreams(MemoryStream& stream, bool canprint)
 		createDataTypeFromStream(stream, canprint);
 	};
 
-	//foreach(string datatype in EntityDef.datatypes.Keys)
+	for (auto& item : EntityDef::datatypes)
 	{
-	//	if (EntityDef.datatypes[datatype] != null)
+		if (item.Value)
 		{
-	//		EntityDef.datatypes[datatype].bind();
+			item.Value->bind();
 		}
 	}
 }
@@ -705,16 +708,63 @@ void KBEngineApp::createDataTypeFromStream(MemoryStream& stream, bool canprint)
 	stream >> valname;
 
 	/* 有一些匿名类型，我们需要提供一个唯一名称放到datatypes中
-	如：
-	<onRemoveAvatar>
-	<Arg>	ARRAY <of> INT8 </of>		</Arg>
-	</onRemoveAvatar>
+		如：
+		<onRemoveAvatar>
+		<Arg>	ARRAY <of> INT8 </of>		</Arg>
+		</onRemoveAvatar>
 	*/
-	if (valname == "")
-		valname = FString::Printf(TEXT("Null_%d"), utype);
+	if (valname.Len() == 0)
+		valname = FString::Printf(TEXT("Null_%d"), (int)utype);
 
 	if (canprint)
 		DEBUG_MSG("importAlias(%s:%s:%d)!", *name, *valname, utype);
+
+	if (name == TEXT("FIXED_DICT"))
+	{
+		KBEDATATYPE_FIXED_DICT* datatype = new KBEDATATYPE_FIXED_DICT();
+		uint8 keysize;
+		stream >> keysize;
+
+		stream >> datatype->implementedBy;
+
+		while (keysize > 0)
+		{
+			keysize--;
+
+			FString keyname;
+			stream >> keyname;
+
+			uint16 keyutype;
+			stream >> keyutype;
+
+			datatype->dicttype_map.Add(keyname, keyutype);
+		};
+
+		EntityDef::datatypes.Add(valname, datatype);
+	}
+	else if (name == TEXT("ARRAY"))
+	{
+		uint16 uitemtype;
+		stream >> uitemtype;
+
+		KBEDATATYPE_ARRAY* datatype = new KBEDATATYPE_ARRAY();
+		datatype->tmpset_uitemtype = (int)uitemtype;
+		EntityDef::datatypes.Add(valname, datatype);
+	}
+	else
+	{
+		KBEDATATYPE_BASE* val = NULL;
+		if (EntityDef::datatypes.Contains(name))
+			val = EntityDef::datatypes[name];
+
+		EntityDef::datatypes.Add(valname, val);
+	}
+
+	EntityDef::id2datatypes.Add(utype, EntityDef::datatypes[valname]);
+
+	// 将用户自定义的类型补充到映射表中
+	EntityDef::datatype2id.Add(valname, utype);
+
 }
 
 void KBEngineApp::Client_onImportClientEntityDef(MemoryStream& stream)
@@ -817,8 +867,11 @@ void KBEngineApp::onImportClientMessages(MemoryStream& stream)
 			if (isClientMethod)
 				Messages::getSingleton().add(handler, msgid, msgname, msglen);
 
-			DEBUG_MSG("currserver[%s]: refreshed(%s => %s)!",
-				*currserver_, *old_cstr, *handler->c_str());
+			if (handler->id <= 0)
+			{
+				DEBUG_MSG("currserver[%s]: refreshed(%s => %s)!",
+					*currserver_, *old_cstr, *handler->c_str());
+			}
 		}
 		else
 		{
