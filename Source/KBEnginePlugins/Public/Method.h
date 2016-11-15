@@ -1,8 +1,10 @@
 // Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 
 #pragma once
-
+#include "KBVar.h"
 #include "KBECommon.h"
+
+class KBEDATATYPE_BASE;
 
 /*
 	实体定义的方法模块
@@ -20,6 +22,6 @@ public:
 	uint16 methodUtype;
 	int16 aliasID;
 
-	// List<KBEDATATYPE_BASE> args = new List<KBEDATATYPE_BASE>();
+	TArray<KBEDATATYPE_BASE*> args;
 	// System.Reflection.MethodInfo handler = null;
 };

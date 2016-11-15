@@ -21,6 +21,12 @@ void EntityDef::initialize()
 
 void EntityDef::clear()
 {
+	for (auto& item : EntityDef::datatypes)
+		delete item.Value;
+
+	for (auto& item : EntityDef::moduledefs)
+		delete item.Value;
+
 	datatype2id.Empty();
 	datatypes.Empty();
 	id2datatypes.Empty();
@@ -55,6 +61,9 @@ void EntityDef::initDataType()
 	datatypes.Add(TEXT("VECTOR3"), new KBEDATATYPE_VECTOR3());
 	datatypes.Add(TEXT("VECTOR4"), new KBEDATATYPE_VECTOR4());
 	datatypes.Add(TEXT("PYTHON"), new KBEDATATYPE_PYTHON());
+	datatypes.Add(TEXT("PY_DICT"), new KBEDATATYPE_PYTHON());
+	datatypes.Add(TEXT("PY_TUPLE"), new KBEDATATYPE_PYTHON());
+	datatypes.Add(TEXT("PY_LIST"), new KBEDATATYPE_PYTHON());
 	datatypes.Add(TEXT("UNICODE"), new KBEDATATYPE_UNICODE());
 	datatypes.Add(TEXT("MAILBOX"), new KBEDATATYPE_MAILBOX());
 	datatypes.Add(TEXT("BLOB"), new KBEDATATYPE_BLOB());

@@ -8,10 +8,12 @@ Property::Property():
 	properUtype(0),
 	properFlags(0),
 	aliasID(-1),
-	defaultValStr(TEXT(""))
+	defaultValStr(TEXT("")),
+	pVal(NULL)
 {
 }
 
 Property::~Property()
 {
+	SAFE_RELEASE(pVal);
 }

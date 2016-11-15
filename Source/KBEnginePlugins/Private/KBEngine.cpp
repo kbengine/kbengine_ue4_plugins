@@ -8,6 +8,9 @@
 #include "MemoryStream.h"
 #include "PersistentInfos.h"
 #include "DataTypes.h"
+#include "ScriptModule.h"
+#include "Property.h"
+#include "Method.h"
 
 TMap<uint16, FKServerErr> KBEngineApp::serverErrs_;
 
@@ -753,6 +756,10 @@ void KBEngineApp::createDataTypeFromStream(MemoryStream& stream, bool canprint)
 	}
 	else
 	{
+		// 可能会重复向map添加基本类型， 此时需要过滤掉
+		if (EntityDef::datatypes.Contains(valname))
+			return;
+
 		KBEDATATYPE_BASE* val = NULL;
 		if (EntityDef::datatypes.Contains(name))
 			val = EntityDef::datatypes[name];
@@ -782,6 +789,255 @@ void KBEngineApp::Client_onImportClientEntityDef(MemoryStream& stream)
 void KBEngineApp::onImportClientEntityDef(MemoryStream& stream)
 {
 	createDataTypeFromStreams(stream, true);
+
+	while (stream.length() > 0)
+	{
+		FString scriptmethod_name;
+		stream >> scriptmethod_name;
+
+		uint16 scriptUtype;
+		stream >> scriptUtype;
+
+		uint16 propertysize;
+		stream >> propertysize;
+
+		uint16 methodsize;
+		stream >> methodsize;
+
+		uint16 base_methodsize;
+		stream >> base_methodsize;
+
+		uint16 cell_methodsize;
+		stream >> cell_methodsize;
+
+		DEBUG_MSG("import(%s), propertys(%d), "
+			"clientMethods(%d), baseMethods(%d), cellMethods(%d)!", *scriptmethod_name,
+			propertysize, methodsize, base_methodsize, cell_methodsize);
+
+		ScriptModule* module = new ScriptModule(scriptmethod_name);
+		EntityDef::moduledefs.Add(scriptmethod_name, module);
+		EntityDef::idmoduledefs.Add(scriptUtype, module);
+
+		//Type Class = module.script;
+
+		while (propertysize > 0)
+		{
+			propertysize--;
+
+			uint16 properUtype;
+			stream >> properUtype;
+
+			uint32 properFlags;
+			stream >> properFlags;
+
+			int16 paliasID;
+			stream >> paliasID;
+
+			FString pname;
+			stream >> pname;
+
+			FString defaultValStr;
+			stream >> defaultValStr;
+
+			uint16 iutype;
+			stream >> iutype;
+			KBEDATATYPE_BASE* utype = EntityDef::id2datatypes[iutype];
+
+			//System.Reflection.MethodInfo setmethod = null;
+
+			//if (Class != null)
+			//{
+			//	try {
+			//		setmethod = Class.GetMethod("set_" + name);
+			//	}
+			//	catch (Exception e)
+			//	{
+			//		string err = "KBEngine::Client_onImportClientEntityDef: " +
+			//			scriptmethod_name + ".set_" + name + ", error=" + e.ToString();
+			//
+			//		throw new Exception(err);
+			//	}
+			//}
+
+			Property* savedata = new Property();
+			savedata->name = pname;
+			savedata->pUtype = utype;
+			savedata->properUtype = properUtype;
+			savedata->properFlags = properFlags;
+			savedata->aliasID = paliasID;
+			savedata->defaultValStr = defaultValStr;
+//			savedata->setmethod = setmethod;
+			savedata->pVal = savedata->pUtype->parseDefaultValStr(savedata->defaultValStr);
+
+			module->propertys.Add(pname, savedata);
+
+			if (paliasID >= 0)
+			{
+				module->usePropertyDescrAlias = true;
+				module->idpropertys.Add(paliasID, savedata);
+			}
+			else
+			{
+				module->usePropertyDescrAlias = false;
+				module->idpropertys.Add(properUtype, savedata);
+			}
+
+			DEBUG_MSG("add(%s), property(%s/%d).", *scriptmethod_name, *pname, properUtype);
+		};
+
+		while (methodsize > 0)
+		{
+			methodsize--;
+
+			uint16 methodUtype;
+			stream >> methodUtype;
+
+			int16 ialiasID;
+			stream >> ialiasID;
+
+			FString name;
+			stream >> name;
+
+			uint8 argssize;
+			stream >> argssize;
+
+			TArray<KBEDATATYPE_BASE*> args;
+
+			while (argssize > 0)
+			{
+				argssize--;
+				uint16 tmpType;
+				stream >> tmpType;
+				args.Add(EntityDef::id2datatypes[tmpType]);
+			};
+
+			Method* savedata = new Method();
+			savedata->name = name;
+			savedata->methodUtype = methodUtype;
+			savedata->aliasID = ialiasID;
+			savedata->args = args;
+
+			//if (Class != null)
+			//{
+			//	try {
+			//		savedata.handler = Class.GetMethod(name);
+			//	}
+			//	catch (Exception e)
+			//	{
+			//		string err = "KBEngine::Client_onImportClientEntityDef: " + scriptmethod_name + "." + name + ", error=" + e.ToString();
+			//		throw new Exception(err);
+			//	}
+			//}
+
+			module->methods.Add(name, savedata);
+
+			if (ialiasID >= 0)
+			{
+				module->useMethodDescrAlias = true;
+				module->idmethods.Add(ialiasID, savedata);
+			}
+			else
+			{
+				module->useMethodDescrAlias = false;
+				module->idmethods.Add(methodUtype, savedata);
+			}
+
+			DEBUG_MSG("add(%s), method(%s).", *scriptmethod_name, *name);
+		};
+
+		while (base_methodsize > 0)
+		{
+			base_methodsize--;
+
+			uint16 methodUtype;
+			stream >> methodUtype;
+
+			int16 ialiasID;
+			stream >> ialiasID;
+
+			FString name;
+			stream >> name;
+
+			uint8 argssize;
+			stream >> argssize;
+
+			TArray<KBEDATATYPE_BASE*> args;
+
+			while (argssize > 0)
+			{
+				argssize--;
+				uint16 tmpType;
+				stream >> tmpType;
+				args.Add(EntityDef::id2datatypes[tmpType]);
+			};
+
+			Method* savedata = new Method();
+			savedata->name = name;
+			savedata->methodUtype = methodUtype;
+			savedata->aliasID = ialiasID;
+			savedata->args = args;
+
+			module->base_methods.Add(name, savedata);
+			module->idbase_methods.Add(methodUtype, savedata);
+
+			DEBUG_MSG("add(%s), base_method(%s).", *scriptmethod_name, *name);
+		};
+
+		while (cell_methodsize > 0)
+		{
+			cell_methodsize--;
+
+			uint16 methodUtype;
+			stream >> methodUtype;
+
+			int16 ialiasID;
+			stream >> ialiasID;
+
+			FString name;
+			stream >> name;
+
+			uint8 argssize;
+			stream >> argssize;
+
+			TArray<KBEDATATYPE_BASE*> args;
+
+			while (argssize > 0)
+			{
+				argssize--;
+				uint16 tmpType;
+				stream >> tmpType;
+				args.Add(EntityDef::id2datatypes[tmpType]);
+			};
+
+			Method* savedata = new Method();
+			savedata->name = name;
+			savedata->methodUtype = methodUtype;
+			savedata->aliasID = ialiasID;
+			savedata->args = args;
+
+			module->cell_methods.Add(name, savedata);
+			module->idcell_methods.Add(methodUtype, savedata);
+
+			DEBUG_MSG("add(%s), cell_method(%s).", *scriptmethod_name, *name);
+		};
+
+		//if (module.script == null)
+		{
+			ERROR_MSG("module(%s) not found!", *scriptmethod_name);
+		}
+
+		for(auto& e : module->methods)
+		{
+			// Method infos = module.methods[name];
+			FString name = e.Key;
+			//if (module.script != null && module.script.GetMethod(name) == null)
+			{
+			//	WARNING_MSG(scriptmethod_name + "(" + module.script + "):: method(" + name + ") no implement!");
+			}
+		};
+	};
+
+	onImportEntityDefCompleted();
 }
 
 void KBEngineApp::onImportEntityDefCompleted()

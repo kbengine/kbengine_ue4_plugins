@@ -1,7 +1,7 @@
 // Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 
 #pragma once
-
+#include "KBVar.h"
 #include "KBECommon.h"
 
 /*
@@ -43,5 +43,5 @@ public:
 
 	//System.Reflection.MethodInfo setmethod = null;
 
-	//object val = null;
+	KBVar* pVal;
 };
