@@ -41,7 +41,7 @@ public:
 
 	FString defaultValStr;
 
-	//System.Reflection.MethodInfo setmethod = null;
+	EntitySetMethodHandle* pSetmethod;
 
 	KBVar* pVal;
 };

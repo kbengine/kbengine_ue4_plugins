@@ -792,8 +792,8 @@ void KBEngineApp::onImportClientEntityDef(MemoryStream& stream)
 
 	while (stream.length() > 0)
 	{
-		FString scriptmethod_name;
-		stream >> scriptmethod_name;
+		FString scriptmodule_name;
+		stream >> scriptmodule_name;
 
 		uint16 scriptUtype;
 		stream >> scriptUtype;
@@ -811,14 +811,14 @@ void KBEngineApp::onImportClientEntityDef(MemoryStream& stream)
 		stream >> cell_methodsize;
 
 		DEBUG_MSG("import(%s), propertys(%d), "
-			"clientMethods(%d), baseMethods(%d), cellMethods(%d)!", *scriptmethod_name,
+			"clientMethods(%d), baseMethods(%d), cellMethods(%d)!", *scriptmodule_name,
 			propertysize, methodsize, base_methodsize, cell_methodsize);
 
-		ScriptModule* module = new ScriptModule(scriptmethod_name);
-		EntityDef::moduledefs.Add(scriptmethod_name, module);
+		ScriptModule* module = new ScriptModule(scriptmodule_name);
+		EntityDef::moduledefs.Add(scriptmodule_name, module);
 		EntityDef::idmoduledefs.Add(scriptUtype, module);
 
-		//Type Class = module.script;
+		EntityCreator* pEntityCreator = module->pEntityCreator;
 
 		while (propertysize > 0)
 		{
@@ -843,21 +843,10 @@ void KBEngineApp::onImportClientEntityDef(MemoryStream& stream)
 			stream >> iutype;
 			KBEDATATYPE_BASE* utype = EntityDef::id2datatypes[iutype];
 
-			//System.Reflection.MethodInfo setmethod = null;
+			EntitySetMethodHandle* pEntitySetMethodHandle = NULL;
 
-			//if (Class != null)
-			//{
-			//	try {
-			//		setmethod = Class.GetMethod("set_" + name);
-			//	}
-			//	catch (Exception e)
-			//	{
-			//		string err = "KBEngine::Client_onImportClientEntityDef: " +
-			//			scriptmethod_name + ".set_" + name + ", error=" + e.ToString();
-			//
-			//		throw new Exception(err);
-			//	}
-			//}
+			if (pEntityCreator)
+				pEntitySetMethodHandle = EntitySetMethodHandles::find(scriptmodule_name, FString::Printf(TEXT("set_%s"), *pname));
 
 			Property* savedata = new Property();
 			savedata->name = pname;
@@ -866,7 +855,7 @@ void KBEngineApp::onImportClientEntityDef(MemoryStream& stream)
 			savedata->properFlags = properFlags;
 			savedata->aliasID = paliasID;
 			savedata->defaultValStr = defaultValStr;
-//			savedata->setmethod = setmethod;
+			savedata->pSetmethod = pEntitySetMethodHandle;
 			savedata->pVal = savedata->pUtype->parseDefaultValStr(savedata->defaultValStr);
 
 			module->propertys.Add(pname, savedata);
@@ -882,7 +871,8 @@ void KBEngineApp::onImportClientEntityDef(MemoryStream& stream)
 				module->idpropertys.Add(properUtype, savedata);
 			}
 
-			DEBUG_MSG("add(%s), property(%s/%d).", *scriptmethod_name, *pname, properUtype);
+			DEBUG_MSG("add(%s), property(%s/%d), hasSetMethod=%s.", *scriptmodule_name, *pname, 
+				properUtype, (savedata->pSetmethod ? TEXT("true") : TEXT("false")));
 		};
 
 		while (methodsize > 0)
@@ -924,7 +914,7 @@ void KBEngineApp::onImportClientEntityDef(MemoryStream& stream)
 			//	}
 			//	catch (Exception e)
 			//	{
-			//		string err = "KBEngine::Client_onImportClientEntityDef: " + scriptmethod_name + "." + name + ", error=" + e.ToString();
+			//		string err = "KBEngine::Client_onImportClientEntityDef: " + scriptmodule_name + "." + name + ", error=" + e.ToString();
 			//		throw new Exception(err);
 			//	}
 			//}
@@ -942,7 +932,7 @@ void KBEngineApp::onImportClientEntityDef(MemoryStream& stream)
 				module->idmethods.Add(methodUtype, savedata);
 			}
 
-			DEBUG_MSG("add(%s), method(%s).", *scriptmethod_name, *name);
+			DEBUG_MSG("add(%s), method(%s).", *scriptmodule_name, *name);
 		};
 
 		while (base_methodsize > 0)
@@ -980,7 +970,7 @@ void KBEngineApp::onImportClientEntityDef(MemoryStream& stream)
 			module->base_methods.Add(name, savedata);
 			module->idbase_methods.Add(methodUtype, savedata);
 
-			DEBUG_MSG("add(%s), base_method(%s).", *scriptmethod_name, *name);
+			DEBUG_MSG("add(%s), base_method(%s).", *scriptmodule_name, *name);
 		};
 
 		while (cell_methodsize > 0)
@@ -1018,21 +1008,20 @@ void KBEngineApp::onImportClientEntityDef(MemoryStream& stream)
 			module->cell_methods.Add(name, savedata);
 			module->idcell_methods.Add(methodUtype, savedata);
 
-			DEBUG_MSG("add(%s), cell_method(%s).", *scriptmethod_name, *name);
+			DEBUG_MSG("add(%s), cell_method(%s).", *scriptmodule_name, *name);
 		};
 
-		//if (module.script == null)
+		if (!pEntityCreator)
 		{
-			ERROR_MSG("module(%s) not found!", *scriptmethod_name);
+			ERROR_MSG("module(%s) not found!", *scriptmodule_name);
 		}
 
 		for(auto& e : module->methods)
 		{
-			// Method infos = module.methods[name];
 			FString name = e.Key;
-			//if (module.script != null && module.script.GetMethod(name) == null)
+			//if (pEntityCreator && module.script.GetMethod(name) == null)
 			{
-			//	WARNING_MSG(scriptmethod_name + "(" + module.script + "):: method(" + name + ") no implement!");
+			//	WARNING_MSG("%s:: method(%s) no implement!", *scriptmodule_name, *name);
 			}
 		};
 	};

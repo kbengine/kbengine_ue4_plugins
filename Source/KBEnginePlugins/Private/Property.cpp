@@ -9,6 +9,7 @@ Property::Property():
 	properFlags(0),
 	aliasID(-1),
 	defaultValStr(TEXT("")),
+	pSetmethod(NULL),
 	pVal(NULL)
 {
 }

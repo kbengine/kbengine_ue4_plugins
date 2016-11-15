@@ -3,6 +3,7 @@
 #include "ScriptModule.h"
 #include "Method.h"
 #include "Property.h"
+#include "Entity.h"
 
 ScriptModule::ScriptModule(const FString& moduleName):
 	name(moduleName),
@@ -15,24 +16,12 @@ ScriptModule::ScriptModule(const FString& moduleName):
 	cell_methods(),
 	idmethods(),
 	idbase_methods(),
-	idcell_methods()
+	idcell_methods(),
+	pEntityCreator(NULL)
 {
-	/*
-	foreach(System.Reflection.Assembly ass in AppDomain.CurrentDomain.GetAssemblies())
-	{
-		script = ass.GetType("KBEngine." + modulename);
-		if (script == null)
-		{
-			script = ass.GetType(modulename);
-		}
-
-		if (script != null)
-			break;
-	}
-
-	if (script == null)
-		Dbg.ERROR_MSG("can't load(KBEngine." + modulename + ")!");
-	*/
+	pEntityCreator = EntityFactory::findCreator(moduleName);
+	if (!pEntityCreator)
+		ERROR_MSG("can't load scriptSodule(KBEngine.%s)!", *moduleName);
 }
 
 ScriptModule::~ScriptModule()

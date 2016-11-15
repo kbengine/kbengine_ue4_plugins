@@ -6,6 +6,7 @@
 
 class Property;
 class Method;
+class EntityCreator;
 
 /*
 	一个entitydef中定义的脚本模块的描述类
@@ -33,5 +34,5 @@ public:
 	TMap<uint16, Method*> idbase_methods;
 	TMap<uint16, Method*> idcell_methods;
 
-	// Type script = null;
+	EntityCreator* pEntityCreator;
 };
