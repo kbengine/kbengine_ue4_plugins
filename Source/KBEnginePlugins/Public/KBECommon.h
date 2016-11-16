@@ -12,6 +12,8 @@ DECLARE_LOG_CATEGORY_EXTERN(LogKBEngine, Log, All);
 typedef uint16 MessageID;
 typedef uint16 MessageLength;
 typedef uint32 MessageLengthEx;
+typedef int32 ENTITY_ID;
+typedef uint32 SPACE_ID;
 
 /** 安全的释放一个指针内存 */
 #define SAFE_RELEASE(i)										\

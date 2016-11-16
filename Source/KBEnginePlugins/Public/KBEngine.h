@@ -150,6 +150,21 @@ public:
 	*/
 	void Client_onEntityDestroyed(int32 eid);
 
+	/*
+		服务端使用优化的方式更新实体属性数据
+	*/
+	void Client_onUpdatePropertysOptimized(MemoryStream& stream);
+
+	/*
+		服务端更新实体属性数据
+	*/
+	void Client_onUpdatePropertys(MemoryStream& stream);
+
+	/*
+		服务端更新实体属性数据
+	*/
+	void onUpdatePropertys_(ENTITY_ID eid, MemoryStream& stream);
+
 private:
 	bool initNetwork();
 
@@ -185,6 +200,11 @@ private:
 	void resetpassword_loginapp(bool noconnect);
 
 	void createAccount_loginapp(bool noconnect);
+
+	/*
+		通过流数据获得AOI实体的ID
+	*/
+	ENTITY_ID getAoiEntityIDFromStream(MemoryStream& stream);
 
 protected:
 	KBEngineArgs* pArgs_;
@@ -232,7 +252,7 @@ protected:
 
 	// 当前玩家的实体id与实体类别
 	uint64 entity_uuid_;
-	int32 entity_id_;
+	ENTITY_ID entity_id_;
 	FString entity_type_;
 
 	// space的数据，具体看API手册关于spaceData
@@ -241,7 +261,11 @@ protected:
 	
 	// 所有实体都保存于这里， 请参看API手册关于entities部分
 	// https://github.com/kbengine/kbengine/tree/master/docs/api
-	TMap<int32, Entity*> entities_;
+	TMap<ENTITY_ID, Entity*> entities_;
+
+	// 在玩家AOI范围小于256个实体时我们可以通过一字节索引来找到entity
+	TArray<ENTITY_ID> entityIDAliasIDList_;
+	TMap<ENTITY_ID, MemoryStream*> bufferedCreateEntityMessage_;
 
 	// 所有服务端错误码对应的错误描述
 	static TMap<uint16, FKServerErr> serverErrs_;
@@ -251,7 +275,7 @@ protected:
 	double lastUpdateToServerTime_;
 
 	// 玩家当前所在空间的id， 以及空间对应的资源
-	uint32 spaceID_;
+	SPACE_ID spaceID_;
 	FString spaceResPath_;
 	bool isLoadedGeometry_;
 

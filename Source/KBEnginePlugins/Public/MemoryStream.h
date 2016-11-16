@@ -508,6 +508,14 @@ public:
 		append(datas + offset, size);
 	}
 
+	void append(MemoryStream& stream)
+	{
+		wpos(stream.wpos());
+		rpos(stream.rpos());
+		data_resize(stream.size());
+		memcpy(data(), stream.data(), stream.size());
+	}
+
 	void appendBlob(const TArray<uint8>& datas)
 	{
 		uint32 len = (uint32)datas.Num();

@@ -43,4 +43,9 @@ NETWORK_INTERFACE_DECLARE_BEGIN(KBEngineApp)
 									uint64,												rndUUID,
 									int32,												eid,
 									FString,											entityType)
+
+	NETWORK_MESSAGE_HANDLER_STREAM(Client_onUpdatePropertysOptimized,					NETWORK_VARIABLE_MESSAGE)
+
+	NETWORK_MESSAGE_HANDLER_STREAM(Client_onUpdatePropertys,							NETWORK_VARIABLE_MESSAGE)
+
 NETWORK_INTERFACE_DECLARE_END()

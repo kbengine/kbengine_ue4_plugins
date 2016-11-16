@@ -4,6 +4,7 @@
 
 EntityFactory g_EntityFactory;
 EntityDefMethodHandles g_EntityDefMethodHandles;
+EntityDefPropertyHandles g_EntityDefPropertyHandles;
 
 EntityCreator::EntityCreator(const FString& scriptName)
 {
@@ -20,6 +21,16 @@ EntityDefMethodHandle::EntityDefMethodHandle(const FString& scriptName, const FS
 }
 
 EntityDefMethodHandle::~EntityDefMethodHandle()
+{
+
+}
+
+EntityDefPropertyHandle::EntityDefPropertyHandle(const FString& scriptName, const FString& defPropertyName)
+{
+	g_EntityDefPropertyHandles.add(scriptName, defPropertyName, this);
+}
+
+EntityDefPropertyHandle::~EntityDefPropertyHandle()
 {
 
 }
@@ -84,6 +95,37 @@ EntityDefMethodHandle* EntityDefMethodHandles::find(const FString& scriptName, c
 	return *pEntityDefMethodHandle;
 }
 
+EntityDefPropertyHandle* EntityDefPropertyHandles::add(const FString& scriptName, const FString& defPropertyName, EntityDefPropertyHandle* pEntityDefPropertyHandle)
+{
+	if (!defPropertyHandles.Contains(scriptName))
+		defPropertyHandles.Add(scriptName, TMap<FString, EntityDefPropertyHandle*>());
+
+	TMap<FString, EntityDefPropertyHandle*>* m = defPropertyHandles.Find(scriptName);
+
+	if (m->Contains(defPropertyName))
+	{
+		ERROR_MSG("%s::%s exist!", *scriptName, *defPropertyName);
+		return NULL;
+	}
+
+	DEBUG_MSG("%s::%s", *scriptName, *defPropertyName);
+	m->Add(defPropertyName, pEntityDefPropertyHandle);
+	return pEntityDefPropertyHandle;
+}
+
+EntityDefPropertyHandle* EntityDefPropertyHandles::find(const FString& scriptName, const FString& defPropertyName)
+{
+	TMap<FString, EntityDefPropertyHandle*>* m = g_EntityDefPropertyHandles.defPropertyHandles.Find(scriptName);
+	if (!m)
+		return NULL;
+
+	EntityDefPropertyHandle** pEntityDefPropertyHandle = m->Find(defPropertyName);
+	if (!pEntityDefPropertyHandle)
+		return NULL;
+
+	return *pEntityDefPropertyHandle;
+}
+
 Entity::Entity():
 	id_(0),
 	className_(TEXT("")),
@@ -92,10 +134,17 @@ Entity::Entity():
 	isOnGround_(false),
 	base_(NULL),
 	cell_(NULL),
+	inWorld_(false),
+	isControlled_(false),
 	inited_(false)
 {
 }
 
 Entity::~Entity()
 {
+}
+
+void Entity::clear()
+{
+
 }

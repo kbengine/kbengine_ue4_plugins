@@ -46,6 +46,8 @@ KBEngineApp::KBEngineApp() :
 	entity_type_(TEXT("")),
 	spacedatas_(),
 	entities_(),
+	entityIDAliasIDList_(),
+	bufferedCreateEntityMessage_(),
 	lastTickTime_(0.0),
 	lastTickCBTime_(0.0),
 	lastUpdateToServerTime_(0.0),
@@ -81,6 +83,8 @@ KBEngineApp::KBEngineApp(KBEngineArgs* pArgs):
 	entity_type_(TEXT("")),
 	spacedatas_(),
 	entities_(),
+	entityIDAliasIDList_(),
+	bufferedCreateEntityMessage_(),
 	lastTickTime_(0.0),
 	lastTickCBTime_(0.0),
 	lastUpdateToServerTime_(0.0),
@@ -166,7 +170,7 @@ void KBEngineApp::resetMessages()
 	serverErrs_.Empty();
 	Messages::getSingleton().clear();
 	EntityDef::clear();
-	//Entity.clear();
+	Entity::clear();
 	INFO_MSG("done!");
 }
 
@@ -195,6 +199,9 @@ void KBEngineApp::reset()
 	entity_uuid_ = 0;
 	entity_id_ = 0;
 	entity_type_ = TEXT("");
+
+	entityIDAliasIDList_.Empty();
+	bufferedCreateEntityMessage_.Empty();
 
 	lastTickTime_ = getTimeSeconds();
 	lastTickCBTime_ = getTimeSeconds();
@@ -605,6 +612,128 @@ void KBEngineApp::Client_onCreatedProxies(uint64 rndUUID, int32 eid, FString& en
 	{
 		// WARNING_MSG("eid(%d) has exist!", eid);
 		Client_onEntityDestroyed(eid);
+	}
+}
+
+ENTITY_ID KBEngineApp::getAoiEntityIDFromStream(MemoryStream& stream)
+{
+	ENTITY_ID id = 0;
+
+	if (!pArgs_->useAliasEntityID)
+	{
+		stream >> id;
+		return id;
+	}
+
+	if (entityIDAliasIDList_.Num()> 255)
+	{
+		stream >> id;
+	}
+	else
+	{
+		uint8 aliasID = 0;
+		stream >> aliasID;
+
+		// 如果为0且客户端上一步是重登陆或者重连操作并且服务端entity在断线期间一直处于在线状态
+		// 则可以忽略这个错误, 因为cellapp可能一直在向baseapp发送同步消息， 当客户端重连上时未等
+		// 服务端初始化步骤开始则收到同步信息, 此时这里就会出错。
+		if (entityIDAliasIDList_.Num() <= aliasID)
+			return 0;
+
+		id = entityIDAliasIDList_[aliasID];
+	}
+
+	return id;
+}
+
+void KBEngineApp::Client_onUpdatePropertysOptimized(MemoryStream& stream)
+{
+	ENTITY_ID eid = getAoiEntityIDFromStream(stream);
+	onUpdatePropertys_(eid, stream);
+}
+
+void KBEngineApp::Client_onUpdatePropertys(MemoryStream& stream)
+{
+	ENTITY_ID eid;
+	stream >> eid;
+	onUpdatePropertys_(eid, stream);
+}
+
+void KBEngineApp::onUpdatePropertys_(ENTITY_ID eid, MemoryStream& stream)
+{
+	Entity* pEntity = NULL;
+
+	Entity** pEntityFind = entities_.Find(eid);
+
+	if (!pEntityFind)
+	{
+		MemoryStream** entityMessageFind = bufferedCreateEntityMessage_.Find(eid);
+		if (entityMessageFind)
+		{
+			ERROR_MSG("entity(%d) not found!", eid);
+			return;
+		}
+
+		MemoryStream* stream1 = MemoryStream::createObject();
+		stream1->append(stream);
+		stream1->rpos(stream.rpos() - 4);
+		bufferedCreateEntityMessage_.Add(eid, stream1);
+		return;
+	}
+
+	pEntity = *pEntityFind;
+	
+	ScriptModule* sm = EntityDef::moduledefs[pEntity->className()];
+	TMap<uint16, Property*>& pdatas = sm->idpropertys;
+
+	while (stream.length() > 0)
+	{
+		uint16 utype = 0;
+
+		if (sm->usePropertyDescrAlias)
+		{
+			utype = stream.read<uint8>();
+		}
+		else
+		{
+			utype = stream.read<uint16>();
+		}
+
+		Property* propertydata = pdatas[utype];
+		utype = propertydata->properUtype;
+		EntityDefMethodHandle* pSetMethod = propertydata->pSetMethod;
+
+		KBVar* val = propertydata->pUtype->createFromStream(stream);
+		// DEBUG_MSG("entity.className + "(id=" + eid  + " " + 
+		// propertydata.name + "=" + val + "), hasSetMethod=" + setmethod + "!");
+
+		EntityDefPropertyHandle* pEntityDefPropertyHandle = EntityDefPropertyHandles::find(pEntity->className(), propertydata->name);
+		if (!pEntityDefPropertyHandle)
+		{
+			ERROR_MSG("%s not found property(%s), update error!", *pEntity->className(), *propertydata->name);
+			delete val;
+			continue;
+		}
+
+		KBVar* oldval = pEntityDefPropertyHandle->getPropertyValue(pEntity);
+		pEntityDefPropertyHandle->setPropertyValue(pEntity, val);
+
+		if (pSetMethod)
+		{
+			if (propertydata->isBase())
+			{
+				if (pEntity->inited())
+					pSetMethod->callMethod(pEntity, oldval);
+			}
+			else
+			{
+				if (pEntity->inWorld())
+					pSetMethod->callMethod(pEntity, oldval);
+			}
+		}
+
+		delete oldval;
+		delete val;
 	}
 }
 

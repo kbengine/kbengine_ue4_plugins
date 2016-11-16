@@ -20,8 +20,36 @@ public:
 	Entity();
 	virtual ~Entity();
 
+	static void clear();
+
 public:
-	
+	const FString& className() const {
+		return className_;
+	}
+
+	void className(const FString& v) {
+		className_ = v;
+	}
+
+	bool inWorld() const {
+		return inWorld_;
+	}
+
+	void inWorld(bool v) {
+		inWorld_ = v;
+	}
+
+	bool isControlled() const {
+		return isControlled_;
+	}
+
+	void isControlled(bool v) {
+		isControlled_ = v;
+	}
+
+	bool inited() const {
+		return inited_;
+	}
 
 protected:
 	int32 id_;
@@ -34,6 +62,13 @@ protected:
 
 	Mailbox* base_;
 	Mailbox* cell_;
+
+	// enterworld之后设置为true
+	bool inWorld_;
+
+	// 对于玩家自身来说，它表示是否自己被其它玩家控制了；
+	// 对于其它entity来说，表示我本机是否控制了这个entity
+	bool isControlled_;
 
 	bool inited_;
 };
@@ -67,7 +102,7 @@ public:
 };
 
 /*
-	包装实体的set_*方法
+	包装实体的defined方法
 */
 class KBENGINEPLUGINS_API EntityDefMethodHandle
 {
@@ -88,7 +123,32 @@ public:
 	TMap<FString, TMap<FString, EntityDefMethodHandle*>> defMethodHandles;
 };
 
-#define ENTITY_CLASS_REGISTER(ENTITY_SCRIPTMODULE_NAME)	\
+/*
+	包装实体的defined属性
+*/
+class KBENGINEPLUGINS_API EntityDefPropertyHandle
+{
+public:
+	EntityDefPropertyHandle(const FString& scriptName, const FString& defPropertyName);
+
+	virtual ~EntityDefPropertyHandle();
+
+	virtual void setPropertyValue(Entity* pEntity, KBVar* oldVal) = 0;
+	virtual KBVar* getPropertyValue(Entity* pEntity) = 0;
+};
+
+class KBENGINEPLUGINS_API EntityDefPropertyHandles
+{
+public:
+	EntityDefPropertyHandle* add(const FString& scriptName, const FString& defPropertyName, EntityDefPropertyHandle* pEntityDefPropertyHandle);
+	static EntityDefPropertyHandle* find(const FString& scriptName, const FString& defPropertyName);
+
+	TMap<FString, TMap<FString, EntityDefPropertyHandle*>> defPropertyHandles;
+};
+
+
+// 注册定义的实体类
+#define ENTITYDEF_CLASS_REGISTER(ENTITY_SCRIPTMODULE_NAME)	\
 	class ENTITY_SCRIPTMODULE_NAME##Creator : public EntityCreator {	\
 		public:	\
 			ENTITY_SCRIPTMODULE_NAME##Creator(const FString& scriptName):	\
@@ -106,7 +166,8 @@ public:
 	ENTITY_SCRIPTMODULE_NAME##Creator g_ENTITY_SCRIPTMODULE_NAME##Creator(FString(TEXT(#ENTITY_SCRIPTMODULE_NAME)));	\
 
 
-#define ENTITY_DEFMETHOD_REGISTER(ENTITY_SCRIPTMODULE_NAME, DEF_METHOD_NAME)	\
+// 注册定义的方法
+#define ENTITYDEF_METHOD_REGISTER(ENTITY_SCRIPTMODULE_NAME, DEF_METHOD_NAME)	\
 	class ENTITY_SCRIPTMODULE_NAME##DefMethodHandle : public EntityDefMethodHandle {	\
 		public:	\
 			ENTITY_SCRIPTMODULE_NAME##DefMethodHandle(const FString& scriptName, const FString& defMethodName):	\
@@ -124,6 +185,35 @@ public:
 	ENTITY_SCRIPTMODULE_NAME##DefMethodHandle g_ENTITY_SCRIPTMODULE_NAME##DefMethodHandle(FString(TEXT(#ENTITY_SCRIPTMODULE_NAME)), FString(TEXT(#DEF_METHOD_NAME)));	\
 
 
+// 注册定义的属性
+#define ENTITYDEF_PROPERTY_REGISTER(ENTITY_SCRIPTMODULE_NAME, DEF_PROPERTY_NAME)	\
+	class ENTITY_SCRIPTMODULE_NAME##DefPropertyHandle : public EntityDefPropertyHandle {	\
+		public:	\
+			ENTITY_SCRIPTMODULE_NAME##DefPropertyHandle(const FString& scriptName, const FString& defPropertyName):	\
+			EntityDefPropertyHandle(scriptName, defPropertyName)	\
+			{	\
+			}	\
+			virtual ~ENTITY_SCRIPTMODULE_NAME##DefPropertyHandle()	\
+			{	\
+			}	\
+			virtual void setPropertyValue(Entity* pEntity, KBVar* oldVal) override	\
+			{	\
+				static_cast<ENTITY_SCRIPTMODULE_NAME*>(pEntity)->DEF_PROPERTY_NAME = *oldVal;	\
+			}	\
+			virtual KBVar* getPropertyValue(Entity* pEntity) override	\
+			{	\
+				return new KBVar(static_cast<ENTITY_SCRIPTMODULE_NAME*>(pEntity)->DEF_PROPERTY_NAME);	\
+			}	\
+	};\
+	ENTITY_SCRIPTMODULE_NAME##DefPropertyHandle g_ENTITY_SCRIPTMODULE_NAME##DefPropertyHandle(FString(TEXT(#ENTITY_SCRIPTMODULE_NAME)), FString(TEXT(#DEF_PROPERTY_NAME)));	\
+
+
+// 注册定义的属性，并且属性包含一个set_*方法，属性被更新后改方法被调用
+#define ENTITYDEF_PROPERTY_AND_SETMETHOD_REGISTER(ENTITY_SCRIPTMODULE_NAME, DEF_PROPERTY_NAME)	\
+	ENTITYDEF_PROPERTY_REGISTER(ENTITY_SCRIPTMODULE_NAME, DEF_PROPERTY_NAME)	\
+	ENTITYDEF_METHOD_REGISTER(ENTITY_SCRIPTMODULE_NAME, set_DEF_PROPERTY_NAME)	\
+
+	
 
 
 
