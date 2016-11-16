@@ -69,26 +69,26 @@ public:
 /*
 	包装实体的set_*方法
 */
-class KBENGINEPLUGINS_API EntitySetMethodHandle
+class KBENGINEPLUGINS_API EntityDefMethodHandle
 {
 public:
-	EntitySetMethodHandle(const FString& scriptName, const FString& setMethodName);
+	EntityDefMethodHandle(const FString& scriptName, const FString& defMethodName);
 
-	virtual ~EntitySetMethodHandle();
+	virtual ~EntityDefMethodHandle();
 
 	virtual void callMethod(Entity* pEntity, KBVar* oldVal) = 0;
 };
 
-class KBENGINEPLUGINS_API EntitySetMethodHandles
+class KBENGINEPLUGINS_API EntityDefMethodHandles
 {
 public:
-	EntitySetMethodHandle* add(const FString& scriptName, const FString& setMethodName, EntitySetMethodHandle* pEntitySetMethodHandle);
-	static EntitySetMethodHandle* find(const FString& scriptName, const FString& setMethodName);
+	EntityDefMethodHandle* add(const FString& scriptName, const FString& defMethodName, EntityDefMethodHandle* pEntityDefMethodHandle);
+	static EntityDefMethodHandle* find(const FString& scriptName, const FString& defMethodName);
 
-	TMap<FString, TMap<FString, EntitySetMethodHandle*>> setMethodHandles;
+	TMap<FString, TMap<FString, EntityDefMethodHandle*>> defMethodHandles;
 };
 
-#define KBENGINE_ENTITY_CLASS_REGISTER(ENTITY_SCRIPTMODULE_NAME)	\
+#define ENTITY_CLASS_REGISTER(ENTITY_SCRIPTMODULE_NAME)	\
 	class ENTITY_SCRIPTMODULE_NAME##Creator : public EntityCreator {	\
 		public:	\
 			ENTITY_SCRIPTMODULE_NAME##Creator(const FString& scriptName):	\
@@ -106,22 +106,22 @@ public:
 	ENTITY_SCRIPTMODULE_NAME##Creator g_ENTITY_SCRIPTMODULE_NAME##Creator(FString(TEXT(#ENTITY_SCRIPTMODULE_NAME)));	\
 
 
-#define KBENGINE_ENTITY_SETMETHOD_REGISTER(ENTITY_SCRIPTMODULE_NAME, SET_METHOD_NAME)	\
-	class ENTITY_SCRIPTMODULE_NAME##SetMethodHandle : public EntitySetMethodHandle {	\
+#define ENTITY_DEFMETHOD_REGISTER(ENTITY_SCRIPTMODULE_NAME, DEF_METHOD_NAME)	\
+	class ENTITY_SCRIPTMODULE_NAME##DefMethodHandle : public EntityDefMethodHandle {	\
 		public:	\
-			ENTITY_SCRIPTMODULE_NAME##SetMethodHandle(const FString& scriptName, const FString& setMethodName):	\
-			EntitySetMethodHandle(scriptName, setMethodName)	\
+			ENTITY_SCRIPTMODULE_NAME##DefMethodHandle(const FString& scriptName, const FString& defMethodName):	\
+			EntityDefMethodHandle(scriptName, defMethodName)	\
 			{	\
 			}	\
-			virtual ~ENTITY_SCRIPTMODULE_NAME##SetMethodHandle()	\
+			virtual ~ENTITY_SCRIPTMODULE_NAME##DefMethodHandle()	\
 			{	\
 			}	\
 			virtual void callMethod(Entity* pEntity, KBVar* oldVal) override	\
 			{	\
-				static_cast<ENTITY_SCRIPTMODULE_NAME*>(pEntity)->SET_METHOD_NAME(oldVal);	\
+				static_cast<ENTITY_SCRIPTMODULE_NAME*>(pEntity)->DEF_METHOD_NAME(*oldVal);	\
 			}	\
 	};\
-	ENTITY_SCRIPTMODULE_NAME##SetMethodHandle g_ENTITY_SCRIPTMODULE_NAME##SetMethodHandle(FString(TEXT(#ENTITY_SCRIPTMODULE_NAME)), FString(TEXT(#SET_METHOD_NAME)));	\
+	ENTITY_SCRIPTMODULE_NAME##DefMethodHandle g_ENTITY_SCRIPTMODULE_NAME##DefMethodHandle(FString(TEXT(#ENTITY_SCRIPTMODULE_NAME)), FString(TEXT(#DEF_METHOD_NAME)));	\
 
 
 

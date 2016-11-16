@@ -40,8 +40,8 @@ public:
 	int16 aliasID;
 
 	FString defaultValStr;
+	KBVar* pdefaultVal;
 
-	EntitySetMethodHandle* pSetmethod;
+	EntityDefMethodHandle* pSetMethod;
 
-	KBVar* pVal;
 };

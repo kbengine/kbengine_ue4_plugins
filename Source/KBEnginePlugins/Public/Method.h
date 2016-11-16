@@ -23,5 +23,5 @@ public:
 	int16 aliasID;
 
 	TArray<KBEDATATYPE_BASE*> args;
-	// System.Reflection.MethodInfo handler = null;
+	EntityDefMethodHandle* pEntityDefMethodHandle;
 };

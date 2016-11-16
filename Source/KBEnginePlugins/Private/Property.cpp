@@ -9,12 +9,12 @@ Property::Property():
 	properFlags(0),
 	aliasID(-1),
 	defaultValStr(TEXT("")),
-	pSetmethod(NULL),
-	pVal(NULL)
+	pdefaultVal(NULL),
+	pSetMethod(NULL)
 {
 }
 
 Property::~Property()
 {
-	SAFE_RELEASE(pVal);
+	SAFE_RELEASE(pdefaultVal);
 }

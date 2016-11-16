@@ -46,6 +46,7 @@
 	const FString Msg = FString::Printf(TEXT(Format), ##__VA_ARGS__); \
 	UE_LOG(LogKBEngine, Log, TEXT("**WARNING** %s%s() : %s"), NETMODE_WORLD, FUNC_NAME, *Msg); \
 	CLEAR_WARN_COLOR(); \
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, Msg); \
 }
 
 #define ERROR_MSG(Format, ...) \
@@ -54,8 +55,8 @@
 	const FString Msg = FString::Printf(TEXT(Format), ##__VA_ARGS__); \
 	UE_LOG(LogKBEngine, Log, TEXT("**ERROR** %s%s() : %s"), NETMODE_WORLD, FUNC_NAME, *Msg); \
 	CLEAR_WARN_COLOR(); \
+	GEngine->AddOnScreenDebugMessage(-1, 60.f, FColor::Red, Msg); \
 }
-
 
 #define SCREENDEBUG(Format, ...) \
 { \

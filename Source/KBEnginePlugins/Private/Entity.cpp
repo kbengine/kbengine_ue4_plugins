@@ -3,7 +3,7 @@
 #include "Entity.h"
 
 EntityFactory g_EntityFactory;
-EntitySetMethodHandles g_EntitySetMethodHandles;
+EntityDefMethodHandles g_EntityDefMethodHandles;
 
 EntityCreator::EntityCreator(const FString& scriptName)
 {
@@ -14,12 +14,12 @@ EntityCreator::~EntityCreator()
 {
 }
 
-EntitySetMethodHandle::EntitySetMethodHandle(const FString& scriptName, const FString& setMethodName)
+EntityDefMethodHandle::EntityDefMethodHandle(const FString& scriptName, const FString& defMethodName)
 {
-	g_EntitySetMethodHandles.add(scriptName, setMethodName, this);
+	g_EntityDefMethodHandles.add(scriptName, defMethodName, this);
 }
 
-EntitySetMethodHandle::~EntitySetMethodHandle()
+EntityDefMethodHandle::~EntityDefMethodHandle()
 {
 
 }
@@ -53,35 +53,35 @@ Entity* EntityFactory::create(const FString& scriptName)
 	return (*pCreator)->create();
 }
 
-EntitySetMethodHandle* EntitySetMethodHandles::add(const FString& scriptName, const FString& setMethodName, EntitySetMethodHandle* pEntitySetMethodHandle)
+EntityDefMethodHandle* EntityDefMethodHandles::add(const FString& scriptName, const FString& defMethodName, EntityDefMethodHandle* pEntityDefMethodHandle)
 {
-	if (!setMethodHandles.Contains(scriptName))
-		setMethodHandles.Add(scriptName, TMap<FString, EntitySetMethodHandle*>());
+	if (!defMethodHandles.Contains(scriptName))
+		defMethodHandles.Add(scriptName, TMap<FString, EntityDefMethodHandle*>());
 
-	TMap<FString, EntitySetMethodHandle*>* m = setMethodHandles.Find(scriptName);
+	TMap<FString, EntityDefMethodHandle*>* m = defMethodHandles.Find(scriptName);
 
-	if (m->Contains(setMethodName))
+	if (m->Contains(defMethodName))
 	{
-		ERROR_MSG("%s::%s exist!", *scriptName, *setMethodName);
+		ERROR_MSG("%s::%s exist!", *scriptName, *defMethodName);
 		return NULL;
 	}
 
-	DEBUG_MSG("%s::%s", *scriptName, *setMethodName);
-	m->Add(setMethodName, pEntitySetMethodHandle);
-	return pEntitySetMethodHandle;
+	DEBUG_MSG("%s::%s", *scriptName, *defMethodName);
+	m->Add(defMethodName, pEntityDefMethodHandle);
+	return pEntityDefMethodHandle;
 }
 
-EntitySetMethodHandle* EntitySetMethodHandles::find(const FString& scriptName, const FString& setMethodName)
+EntityDefMethodHandle* EntityDefMethodHandles::find(const FString& scriptName, const FString& defMethodName)
 {
-	TMap<FString, EntitySetMethodHandle*>* m = g_EntitySetMethodHandles.setMethodHandles.Find(scriptName);
+	TMap<FString, EntityDefMethodHandle*>* m = g_EntityDefMethodHandles.defMethodHandles.Find(scriptName);
 	if (!m)
 		return NULL;
 
-	EntitySetMethodHandle** pEntitySetMethodHandle = m->Find(setMethodName);
-	if (!pEntitySetMethodHandle)
+	EntityDefMethodHandle** pEntityDefMethodHandle = m->Find(defMethodName);
+	if (!pEntityDefMethodHandle)
 		return NULL;
 
-	return *pEntitySetMethodHandle;
+	return *pEntityDefMethodHandle;
 }
 
 Entity::Entity():

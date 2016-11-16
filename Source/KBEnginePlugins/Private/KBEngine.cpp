@@ -843,10 +843,10 @@ void KBEngineApp::onImportClientEntityDef(MemoryStream& stream)
 			stream >> iutype;
 			KBEDATATYPE_BASE* utype = EntityDef::id2datatypes[iutype];
 
-			EntitySetMethodHandle* pEntitySetMethodHandle = NULL;
+			EntityDefMethodHandle* pEntityDefMethodHandle = NULL;
 
 			if (pEntityCreator)
-				pEntitySetMethodHandle = EntitySetMethodHandles::find(scriptmodule_name, FString::Printf(TEXT("set_%s"), *pname));
+				pEntityDefMethodHandle = EntityDefMethodHandles::find(scriptmodule_name, FString::Printf(TEXT("set_%s"), *pname));
 
 			Property* savedata = new Property();
 			savedata->name = pname;
@@ -855,8 +855,8 @@ void KBEngineApp::onImportClientEntityDef(MemoryStream& stream)
 			savedata->properFlags = properFlags;
 			savedata->aliasID = paliasID;
 			savedata->defaultValStr = defaultValStr;
-			savedata->pSetmethod = pEntitySetMethodHandle;
-			savedata->pVal = savedata->pUtype->parseDefaultValStr(savedata->defaultValStr);
+			savedata->pSetMethod = pEntityDefMethodHandle;
+			savedata->pdefaultVal = savedata->pUtype->parseDefaultValStr(savedata->defaultValStr);
 
 			module->propertys.Add(pname, savedata);
 
@@ -872,7 +872,7 @@ void KBEngineApp::onImportClientEntityDef(MemoryStream& stream)
 			}
 
 			DEBUG_MSG("add(%s), property(%s/%d), hasSetMethod=%s.", *scriptmodule_name, *pname, 
-				properUtype, (savedata->pSetmethod ? TEXT("true") : TEXT("false")));
+				properUtype, (savedata->pSetMethod ? TEXT("true") : TEXT("false")));
 		};
 
 		while (methodsize > 0)
@@ -907,17 +907,8 @@ void KBEngineApp::onImportClientEntityDef(MemoryStream& stream)
 			savedata->aliasID = ialiasID;
 			savedata->args = args;
 
-			//if (Class != null)
-			//{
-			//	try {
-			//		savedata.handler = Class.GetMethod(name);
-			//	}
-			//	catch (Exception e)
-			//	{
-			//		string err = "KBEngine::Client_onImportClientEntityDef: " + scriptmodule_name + "." + name + ", error=" + e.ToString();
-			//		throw new Exception(err);
-			//	}
-			//}
+			if (pEntityCreator)
+				savedata->pEntityDefMethodHandle = EntityDefMethodHandles::find(scriptmodule_name, name);
 
 			module->methods.Add(name, savedata);
 
@@ -1019,9 +1010,10 @@ void KBEngineApp::onImportClientEntityDef(MemoryStream& stream)
 		for(auto& e : module->methods)
 		{
 			FString name = e.Key;
-			//if (pEntityCreator && module.script.GetMethod(name) == null)
+			
+			if (pEntityCreator && !EntityDefMethodHandles::find(scriptmodule_name, name))
 			{
-			//	WARNING_MSG("%s:: method(%s) no implement!", *scriptmodule_name, *name);
+				WARNING_MSG("%s:: method(%s) no implement!", *scriptmodule_name, *name);
 			}
 		};
 	};
