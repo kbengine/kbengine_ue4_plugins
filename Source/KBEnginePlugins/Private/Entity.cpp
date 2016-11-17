@@ -1,6 +1,7 @@
 
 #include "KBEnginePluginsPrivatePCH.h"
 #include "Entity.h"
+//#include "KBEngine.h"
 
 EntityFactory g_EntityFactory;
 EntityDefMethodHandles g_EntityDefMethodHandles;
@@ -61,7 +62,9 @@ Entity* EntityFactory::create(const FString& scriptName)
 		return NULL;
 	}
 
-	return (*pCreator)->create();
+	Entity* pEntity = (*pCreator)->create();
+	pEntity->className(scriptName);
+	return pEntity;
 }
 
 EntityDefMethodHandle* EntityDefMethodHandles::add(const FString& scriptName, const FString& defMethodName, EntityDefMethodHandle* pEntityDefMethodHandle)
@@ -145,6 +148,62 @@ Entity::~Entity()
 }
 
 void Entity::clear()
+{
+
+}
+
+void Entity::__init__()
+{
+
+}
+
+bool Entity::isPlayer()
+{
+	//return id() == KBEngineApp::getSingleton().entity_id();
+	return false;
+}
+
+void Entity::callPropertysSetMethods()
+{
+
+}
+
+void Entity::enterWorld()
+{
+
+}
+
+void Entity::onEnterWorld()
+{
+
+}
+
+void Entity::leaveWorld()
+{
+
+}
+
+void Entity::onLeaveWorld()
+{
+
+}
+
+void Entity::enterSpace()
+{
+
+}
+
+void Entity::onEnterSpace()
+{
+
+}
+
+void Entity::leaveSpace()
+{
+
+}
+
+void Entity::onLeaveSpace()
 {
 
 }

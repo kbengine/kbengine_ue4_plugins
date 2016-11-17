@@ -20,6 +20,8 @@ public:
 	Entity();
 	virtual ~Entity();
 
+	virtual void __init__();
+
 	static void clear();
 
 public:
@@ -51,8 +53,65 @@ public:
 		return inited_;
 	}
 
+	void inited(bool v) {
+		inited_ = v;
+	}
+
+	ENTITY_ID id() const {
+		return id_;
+	}
+
+	void id(ENTITY_ID v) {
+		id_ = v;
+	}
+
+	Mailbox* base() const {
+		return base_;
+	}
+
+	void base(Mailbox* v) {
+		base_ = v;
+	}
+
+	Mailbox* cell() const {
+		return cell_;
+	}
+
+	void cell(Mailbox* v) {
+		cell_ = v;
+	}
+
+
+	bool isPlayer();
+
+public:
+	virtual void callPropertysSetMethods();
+
+	virtual void onDestroy()
+	{
+	}
+
+	void enterWorld();
+	virtual void onEnterWorld();
+	void leaveWorld();
+	virtual void onLeaveWorld();
+
+	virtual void enterSpace();
+	virtual void onEnterSpace();
+	virtual void leaveSpace();
+	virtual void onLeaveSpace();
+
+	// This callback method is called when the local entity control by the client has been enabled or disabled. 
+	// See the Entity.controlledBy() method in the CellApp server code for more infomation.
+	// 对于玩家自身来说，它表示是否自己被其它玩家控制了；
+	// 对于其它entity来说，表示我本机是否控制了这个entity
+	virtual void onControlled(bool isControlled)
+	{
+
+	}
+
 protected:
-	int32 id_;
+	ENTITY_ID id_;
 	FString className_;
 
 	FVector position_;

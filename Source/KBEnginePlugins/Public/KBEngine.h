@@ -206,6 +206,21 @@ private:
 	*/
 	ENTITY_ID getAoiEntityIDFromStream(MemoryStream& stream);
 
+public:
+	ENTITY_ID entity_id() const {
+		return entity_id_;
+	}
+
+	uint64 entity_uuid() const {
+		return entity_uuid_;
+	}
+
+	const FString& entity_type() const {
+		return entity_type_;
+	}
+
+
+
 protected:
 	KBEngineArgs* pArgs_;
 	NetworkInterface* pNetworkInterface_;

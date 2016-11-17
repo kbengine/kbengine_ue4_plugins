@@ -10,45 +10,24 @@ namespace EKBVarTypes
 	const int32 Empty = 0;
 	const int32 Ansichar = 1;
 	const int32 Bool = 2;
-	const int32 Box = 3;
-	const int32 BoxSphereBounds = 4;
-	const int32 ByteArray = 5;
-	const int32 Color = 6;
-	const int32 DateTime = 7;
-	const int32 Double = 8;
-	const int32 Enum = 9;
-	const int32 Float = 10;
-	const int32 Guid = 11;
-	const int32 Int8 = 12;
-	const int32 Int16 = 13;
-	const int32 Int32 = 14;
-	const int32 Int64 = 15;
-	const int32 IntRect = 16;
-	const int32 LinearColor = 17;
-	const int32 Matrix = 18;
-	const int32 Name = 19;
-	const int32 Plane = 20;
-	const int32 Quat = 21;
-	const int32 RandomStream = 22;
-	const int32 Rotator = 23;
-	const int32 String = 24;
-	const int32 Widechar = 25;
-	const int32 Timespan = 26;
-	const int32 Transform = 27;
-	const int32 TwoVectors = 28;
-	const int32 UInt8 = 29;
-	const int32 UInt16 = 30;
-	const int32 UInt32 = 31;
-	const int32 UInt64 = 32;
-	const int32 Vector = 33;
-	const int32 Vector2d = 34;
-	const int32 Vector4 = 35;
-	const int32 IntPoint = 36;
-	const int32 IntVector = 37;
-	const int32 NetworkGUID = 38;
-	const int32 KBVarArray = 39;
-	const int32 KBVarMap = 40; /*TMap<FString, KBVar>*/
-	const int32 Custom = 0x40;
+	const int32 ByteArray = 3;
+	const int32 Double = 4;
+	const int32 Float = 5;
+	const int32 Int8 = 6;
+	const int32 Int16 = 7;
+	const int32 Int32 = 8;
+	const int32 Int64 = 9;
+	const int32 String = 10;
+	const int32 Widechar = 11;
+	const int32 UInt8 = 12;
+	const int32 UInt16 = 13;
+	const int32 UInt32 = 14;
+	const int32 UInt64 = 15;
+	const int32 Vector = 16;
+	const int32 Vector2d = 17;
+	const int32 Vector4 = 18;
+	const int32 KBVarArray = 19;
+	const int32 KBVarMap = 20; /*TMap<FString, KBVar>*/
 };
 
 /**
@@ -144,6 +123,112 @@ public:
 	KBVar(const TCHAR* InString)
 	{
 		*this = FString(InString);
+	}
+
+	FString c_str()
+	{
+		
+		if (GetType() == EKBVarTypes::Empty)
+		{
+			return FString::Printf(TEXT("Empty"));
+		}
+		else if (GetType() == EKBVarTypes::Ansichar)
+		{
+			return *this;
+		}
+		else if (GetType() == EKBVarTypes::Bool)
+		{
+			bool v = (*this);
+			return FString::Printf(TEXT("%s"), (v ? "true" : "false"));
+		}
+		else if (GetType() == EKBVarTypes::ByteArray)
+		{
+			TArray<uint8> v = (*this);
+			return FString::Printf(TEXT("ByteArray(size=%s)"), v.Num());
+		}
+		else if (GetType() == EKBVarTypes::Double)
+		{
+			double v = (*this);
+			return FString::Printf(TEXT("%lf"), v);
+		}
+		else if (GetType() == EKBVarTypes::Float)
+		{
+			float v = (*this);
+			return FString::Printf(TEXT("%f"), v);
+		}
+		else if (GetType() == EKBVarTypes::Int8)
+		{
+			int8 v = (*this);
+			return FString::Printf(TEXT("%d"), (int)v);
+		}
+		else if (GetType() == EKBVarTypes::Int16)
+		{
+			int16 v = (*this);
+			return FString::Printf(TEXT("%d"), (int)v);
+		}
+		else if (GetType() == EKBVarTypes::Int32)
+		{
+			int32 v = (*this);
+			return FString::Printf(TEXT("%d"), v);
+		}
+		else if (GetType() == EKBVarTypes::Int64)
+		{
+			int64 v = (*this);
+			return FString::Printf(TEXT("%lld"), v);
+		}
+		else if (GetType() == EKBVarTypes::String)
+		{
+			return *this;
+		}
+		else if (GetType() == EKBVarTypes::Widechar)
+		{
+			return *this;
+		}
+		else if (GetType() == EKBVarTypes::UInt8)
+		{
+			uint8 v = (*this);
+			return FString::Printf(TEXT("%d"), (int)v);
+		}
+		else if (GetType() == EKBVarTypes::UInt16)
+		{
+			uint16 v = (*this);
+			return FString::Printf(TEXT("%d"), (int)v);
+		}
+		else if (GetType() == EKBVarTypes::UInt32)
+		{
+			uint32 v = (*this);
+			return FString::Printf(TEXT("%ld"), v);
+		}
+		else if (GetType() == EKBVarTypes::UInt64)
+		{
+			uint64 v = (*this);
+			return FString::Printf(TEXT("%lld"), v);
+		}
+		else if (GetType() == EKBVarTypes::Vector2d)
+		{
+			FVector2D v = (*this);
+			return FString::Printf(TEXT("Vector2d(%f, %f)"), v.X, v.Y);
+		}
+		else if (GetType() == EKBVarTypes::Vector)
+		{
+			FVector v = (*this);
+			return FString::Printf(TEXT("Vector(%f, %f, %f)"), v.X, v.Y, v.Z);
+		}
+		else if (GetType() == EKBVarTypes::Vector4)
+		{
+			FVector4 v = (*this);
+			return FString::Printf(TEXT("Vector(%f, %f, %f, %f)"), v.X, v.Y, v.Z, v.W);
+		}
+		else if (GetType() == EKBVarTypes::KBVarArray)
+		{
+			return FString::Printf(TEXT("KBVarArray"));
+		}
+		else if (GetType() == EKBVarTypes::KBVarArray)
+		{
+			return FString::Printf(TEXT("KBVarMap"));
+		}
+
+		return FString();
 	}
 
 public:
@@ -326,7 +411,7 @@ public:
 	template<typename T>
 	T GetValue() const
 	{
-		check((Type == TKBVariantTraits<T>::GetType()) || ((TKBVariantTraits<T>::GetType() == EKBVarTypes::UInt8) && (Type == EKBVarTypes::Enum)));
+		check((Type == TKBVariantTraits<T>::GetType()) || ((TKBVariantTraits<T>::GetType() == EKBVarTypes::UInt8)));
 
 		T Result;
 
@@ -414,38 +499,10 @@ template<> struct TKBVariantTraits<bool>
 };
 
 
-/** Implements variant type traits for the built-in FBox type. */
-template<> struct TKBVariantTraits<FBox>
-{
-	static int32 GetType() { return EKBVarTypes::Box; }
-};
-
-
-/** Implements variant type traits for the built-in FBoxSphereBounds type. */
-template<> struct TKBVariantTraits<FBoxSphereBounds>
-{
-	static int32 GetType() { return EKBVarTypes::BoxSphereBounds; }
-};
-
-
 /** Implements variant type traits for byte arrays. */
 template<> struct TKBVariantTraits<TArray<uint8> >
 {
 	static int32 GetType() { return EKBVarTypes::ByteArray; }
-};
-
-
-/** Implements variant type traits for the built-in FColor type. */
-template<> struct TKBVariantTraits<FColor>
-{
-	static int32 GetType() { return EKBVarTypes::Color; }
-};
-
-
-/** Implements variant type traits for the built-in FDateTime type. */
-template<> struct TKBVariantTraits<FDateTime>
-{
-	static int32 GetType() { return EKBVarTypes::DateTime; }
 };
 
 
@@ -456,24 +513,10 @@ template<> struct TKBVariantTraits<double>
 };
 
 
-/** Implements variant type traits for enumeration types. */
-template<typename EnumType> struct TKBVariantTraits<TEnumAsByte<EnumType> >
-{
-	static int32 GetType() { return EKBVarTypes::Enum; }
-};
-
-
 /** Implements variant type traits for the built-in float type. */
 template<> struct TKBVariantTraits<float>
 {
 	static int32 GetType() { return EKBVarTypes::Float; }
-};
-
-
-/** Implements variant type traits for the built-in FGuid type. */
-template<> struct TKBVariantTraits<FGuid>
-{
-	static int32 GetType() { return EKBVarTypes::Guid; }
 };
 
 
@@ -505,76 +548,6 @@ template<> struct TKBVariantTraits<int64>
 };
 
 
-/** Implements variant type traits for the built-in FIntPoint type. */
-template<> struct TKBVariantTraits<FIntPoint>
-{
-	static int32 GetType() { return EKBVarTypes::IntPoint; }
-};
-
-
-/** Implements variant type traits for the built-in FIntVector type. */
-template<> struct TKBVariantTraits<FIntVector>
-{
-	static int32 GetType() { return EKBVarTypes::IntVector; }
-};
-
-
-/** Implements variant type traits for the built-in FIntRect type. */
-template<> struct TKBVariantTraits<FIntRect>
-{
-	static int32 GetType() { return EKBVarTypes::IntRect; }
-};
-
-
-/** Implements variant type traits for the built-in FLinearColor type. */
-template<> struct TKBVariantTraits<FLinearColor>
-{
-	static int32 GetType() { return EKBVarTypes::LinearColor; }
-};
-
-
-/** Implements variant type traits for the built-in FMatrix type. */
-template<> struct TKBVariantTraits<FMatrix>
-{
-	static int32 GetType() { return EKBVarTypes::Matrix; }
-};
-
-
-/** Implements variant type traits for the built-in FPlane type. */
-template<> struct TKBVariantTraits<FPlane>
-{
-	static int32 GetType() { return EKBVarTypes::Plane; }
-};
-
-
-/** Implements variant type traits for the built-in FQuat type. */
-template<> struct TKBVariantTraits<FQuat>
-{
-	static int32 GetType() { return EKBVarTypes::Quat; }
-};
-
-
-/** Implements variant type traits for the built-in FName type. */
-template<> struct TKBVariantTraits<FName>
-{
-	static int32 GetType() { return EKBVarTypes::Name; }
-};
-
-
-/** Implements variant type traits for the built-in FRandomStream type. */
-template<> struct TKBVariantTraits<FRandomStream>
-{
-	static int32 GetType() { return EKBVarTypes::RandomStream; }
-};
-
-
-/** Implements variant type traits for the built-in FRotator type. */
-template<> struct TKBVariantTraits<FRotator>
-{
-	static int32 GetType() { return EKBVarTypes::Rotator; }
-};
-
-
 /** Implements variant type traits for the built-in FString type. */
 template<> struct TKBVariantTraits<FString>
 {
@@ -586,27 +559,6 @@ template<> struct TKBVariantTraits<FString>
 template<> struct TKBVariantTraits<WIDECHAR>
 {
 	static int32 GetType() { return EKBVarTypes::Widechar; }
-};
-
-
-/** Implements variant type traits for the built-in FTimespan type. */
-template<> struct TKBVariantTraits<FTimespan>
-{
-	static int32 GetType() { return EKBVarTypes::Timespan; }
-};
-
-
-/** Implements variant type traits for the built-in FTransform type. */
-template<> struct TKBVariantTraits<FTransform>
-{
-	static int32 GetType() { return EKBVarTypes::Transform; }
-};
-
-
-/** Implements variant type traits for the built-in FTwoVectors type. */
-template<> struct TKBVariantTraits<FTwoVectors>
-{
-	static int32 GetType() { return EKBVarTypes::TwoVectors; }
 };
 
 
@@ -659,17 +611,12 @@ template<> struct TKBVariantTraits<FVector4>
 };
 
 
-/** Implements variant type traits for the built-in NetworkGUID type. */
-template<> struct TKBVariantTraits<FNetworkGUID>
-{
-	static int32 GetType() { return EKBVarTypes::NetworkGUID; }
-};
-
 /** Implements variant type traits for KBVar arrays. */
 template<> struct TKBVariantTraits<TArray<KBVar>>
 {
 	static int32 GetType() { return EKBVarTypes::KBVarArray; }
 };
+
 
 /** Implements variant type traits for KBVar maps. */
 template<> struct TKBVariantTraits<TMap<FString, KBVar>>

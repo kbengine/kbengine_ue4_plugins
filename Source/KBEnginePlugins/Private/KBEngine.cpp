@@ -11,6 +11,7 @@
 #include "ScriptModule.h"
 #include "Property.h"
 #include "Method.h"
+#include "Mailbox.h"
 
 TMap<uint16, FKServerErr> KBEngineApp::serverErrs_;
 
@@ -613,6 +614,50 @@ void KBEngineApp::Client_onCreatedProxies(uint64 rndUUID, int32 eid, FString& en
 		// WARNING_MSG("eid(%d) has exist!", eid);
 		Client_onEntityDestroyed(eid);
 	}
+
+	entity_uuid_ = rndUUID;
+	entity_id_ = eid;
+	entity_type_ = entityType;
+
+	ScriptModule** pModuleFind = EntityDef::moduledefs.Find(entityType);
+	if (!pModuleFind)
+	{
+		ERROR_MSG("not found module(%s)!", *entityType);
+		return;
+	}
+
+	ScriptModule* pModule = *pModuleFind;
+
+	EntityCreator* pEntityCreator = pModule->pEntityCreator;
+	if (!pEntityCreator)
+		return;
+
+	Entity* pEntity = pEntityCreator->create();
+	pEntity->id(eid);
+	pEntity->className(entityType);
+
+	Mailbox* baseMB = new Mailbox();
+	pEntity->base(baseMB);
+	baseMB->id = eid;
+	baseMB->className = entityType;
+	baseMB->type = Mailbox::MAILBOX_TYPE_BASE;
+
+	entities_.Add(eid, pEntity);
+
+	MemoryStream** entityMessageFind = bufferedCreateEntityMessage_.Find(eid);
+	if (entityMessageFind)
+	{
+		MemoryStream* entityMessage = *entityMessageFind;
+		Client_onUpdatePropertys(*entityMessage);
+		bufferedCreateEntityMessage_.Remove(eid);
+		MemoryStream::reclaimObject(entityMessage);
+	}
+
+	pEntity->__init__();
+	pEntity->inited(true);
+
+	if (pArgs_->isOnInitCallPropertysSetMethods)
+		pEntity->callPropertysSetMethods();
 }
 
 ENTITY_ID KBEngineApp::getAoiEntityIDFromStream(MemoryStream& stream)
@@ -661,8 +706,6 @@ void KBEngineApp::Client_onUpdatePropertys(MemoryStream& stream)
 
 void KBEngineApp::onUpdatePropertys_(ENTITY_ID eid, MemoryStream& stream)
 {
-	Entity* pEntity = NULL;
-
 	Entity** pEntityFind = entities_.Find(eid);
 
 	if (!pEntityFind)
@@ -680,9 +723,9 @@ void KBEngineApp::onUpdatePropertys_(ENTITY_ID eid, MemoryStream& stream)
 		bufferedCreateEntityMessage_.Add(eid, stream1);
 		return;
 	}
-
-	pEntity = *pEntityFind;
 	
+	Entity* pEntity = *pEntityFind;
+
 	ScriptModule* sm = EntityDef::moduledefs[pEntity->className()];
 	TMap<uint16, Property*>& pdatas = sm->idpropertys;
 
@@ -705,7 +748,7 @@ void KBEngineApp::onUpdatePropertys_(ENTITY_ID eid, MemoryStream& stream)
 
 		KBVar* val = propertydata->pUtype->createFromStream(stream);
 		// DEBUG_MSG("entity.className + "(id=" + eid  + " " + 
-		// propertydata.name + "=" + val + "), hasSetMethod=" + setmethod + "!");
+		// propertydata.name + "=" + val->c_str() + "), hasSetMethod=" + setmethod + "!");
 
 		EntityDefPropertyHandle* pEntityDefPropertyHandle = EntityDefPropertyHandles::find(pEntity->className(), propertydata->name);
 		if (!pEntityDefPropertyHandle)

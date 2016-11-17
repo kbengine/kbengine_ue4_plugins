@@ -15,9 +15,25 @@ public:
 	Mailbox();
 	virtual ~Mailbox();
 
+	enum MAILBOX_TYPE
+	{
+		MAILBOX_TYPE_CELL = 0,		// CELL_MAILBOX
+		MAILBOX_TYPE_BASE = 1		// BASE_MAILBOX
+	};
+
 public:
-	
+	bool isBase()
+	{
+		return type == MAILBOX_TYPE_BASE;
+	}
 
-protected:
+	bool isCell()
+	{
+		return type == MAILBOX_TYPE_CELL;
+	}
 
+public:
+	ENTITY_ID id;
+	FString className;
+	MAILBOX_TYPE type;
 };
