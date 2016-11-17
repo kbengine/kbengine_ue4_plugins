@@ -726,7 +726,14 @@ void KBEngineApp::onUpdatePropertys_(ENTITY_ID eid, MemoryStream& stream)
 	
 	Entity* pEntity = *pEntityFind;
 
-	ScriptModule* sm = EntityDef::moduledefs[pEntity->className()];
+	ScriptModule** smFind = EntityDef::moduledefs.Find(pEntity->className());
+	if (!smFind)
+	{
+		ERROR_MSG("module(%s) not found!", *pEntity->className());
+		return;
+	}
+
+	ScriptModule* sm = *smFind;
 	TMap<uint16, Property*>& pdatas = sm->idpropertys;
 
 	while (stream.length() > 0)
@@ -753,7 +760,9 @@ void KBEngineApp::onUpdatePropertys_(ENTITY_ID eid, MemoryStream& stream)
 		EntityDefPropertyHandle* pEntityDefPropertyHandle = EntityDefPropertyHandles::find(pEntity->className(), propertydata->name);
 		if (!pEntityDefPropertyHandle)
 		{
-			ERROR_MSG("%s not found property(%s), update error!", *pEntity->className(), *propertydata->name);
+			ERROR_MSG("%s not found property(%s), update error! Please register with ENTITYDEF_PROPERTY_REGISTER(%s, %s) in %s.cpp", 
+				*pEntity->className(), *propertydata->name,
+				*pEntity->className(), *pEntity->className(), *propertydata->name);
 			delete val;
 			continue;
 		}

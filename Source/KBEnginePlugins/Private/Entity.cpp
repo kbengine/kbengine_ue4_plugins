@@ -1,7 +1,7 @@
 
 #include "KBEnginePluginsPrivatePCH.h"
 #include "Entity.h"
-//#include "KBEngine.h"
+#include "KBEngine.h"
 
 EntityFactory g_EntityFactory;
 EntityDefMethodHandles g_EntityDefMethodHandles;
@@ -159,8 +159,7 @@ void Entity::__init__()
 
 bool Entity::isPlayer()
 {
-	//return id() == KBEngineApp::getSingleton().entity_id();
-	return false;
+	return id() == KBEngineApp::getSingleton().entity_id();
 }
 
 void Entity::callPropertysSetMethods()

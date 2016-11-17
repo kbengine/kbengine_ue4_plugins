@@ -3,6 +3,7 @@
 #pragma once
 
 #include "KBECommon.h"
+#include "Interfaces.h"
 
 class KBEngineArgs;
 class Entity;
