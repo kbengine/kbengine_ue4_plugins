@@ -100,20 +100,79 @@ public:
 	*
 	* @param InValue- The initial value.
 	*/
-	KBVar(const TArray<uint8>& InArray)
+	KBVar(const KBVarBytes& InArray)
 		: Type(EKBVarTypes::ByteArray)
 		, Value(InArray)
 	{ }
 
-	KBVar(const TArray<KBVar>& InArray)
+	KBVar(const KBVarArray& InArray)
 		: Type(EKBVarTypes::KBVarArray)
 		, Value()
-	{ }
+	{
+		if (InArray.Num() > 0)
+		{
+			int idx = 0;
+			for (auto& item : InArray)
+			{
+				KBVar& v = const_cast<KBVar&>(item);
+				 
+				int32 v_type = v.GetType();
+				Value.SetNumUninitialized(idx + sizeof(v_type));
+				memcpy(Value.GetData() + idx, (uint8*)(&v_type), sizeof(v_type));
+				idx += sizeof(v_type);
 
-	KBVar(const TMap<FString, KBVar>& InMap)
+				int size = v.GetSize();
+
+				Value.SetNumUninitialized(idx + sizeof(size));
+				memcpy(Value.GetData() + idx, (uint8*)(&size), sizeof(size));
+				idx += sizeof(size);
+
+				Value.SetNumUninitialized(idx + size);
+				memcpy(Value.GetData() + idx, v.GetBytes().GetData(), size);
+				idx += size;
+			}
+		}
+	}
+
+	KBVar(const KBVarMap& InMap)
 		: Type(EKBVarTypes::KBVarMap)
 		, Value()
-	{ }
+	{
+		int idx = 0;
+
+		for (auto& item : InMap)
+		{
+			// FString key
+			const FString& key = item.Key;
+			int32 size = key.Len();
+
+			Value.SetNumUninitialized(idx + sizeof(size));
+			memcpy(Value.GetData() + idx, (uint8*)(&size), sizeof(size));
+			idx += sizeof(size);
+
+			Value.SetNumUninitialized(idx + size);
+			memcpy(Value.GetData() + idx, (uint8*)(TCHAR_TO_UTF8(*key)), size);
+			idx += size;
+
+			// KBVar
+			KBVar& v = const_cast<KBVar&>(item.Value);
+
+			int32 v_type = v.GetType();
+			Value.SetNumUninitialized(idx + sizeof(v_type));
+			memcpy(Value.GetData() + idx, (uint8*)(&v_type), sizeof(v_type));
+			idx += sizeof(v_type);
+
+			size = v.GetSize();
+
+			Value.SetNumUninitialized(idx + sizeof(size));
+			memcpy(Value.GetData() + idx, (uint8*)(&size), sizeof(size));
+			idx += sizeof(size);
+
+			Value.SetNumUninitialized(idx + size);
+			memcpy(Value.GetData() + idx, v.GetBytes().GetData(), size);
+			idx += size;
+		}
+	}
 
 	/**
 	* Creates and initializes a new instance from a TCHAR string.
@@ -277,7 +336,7 @@ public:
 	* @param InArray The byte array to assign.
 	* @return This instance.
 	*/
-	KBVar& operator=(const TArray<uint8> InArray)
+	KBVar& operator=(const KBVarBytes InArray)
 	{
 		Type = EKBVarTypes::ByteArray;
 		Value = MoveTemp(InArray);
@@ -371,7 +430,7 @@ public:
 	* @return Byte array.
 	* @see GetValue
 	*/
-	const TArray<uint8>& GetBytes() const
+	KBVar::KBVarBytes& GetBytes()
 	{
 		return Value;
 	}
@@ -396,6 +455,11 @@ public:
 	int32 GetType() const
 	{
 		return Type;
+	}
+
+	void SetType(int32 t) 
+	{
+		Type = t;
 	}
 
 	/**
@@ -440,8 +504,10 @@ private:
 	int32 Type;
 
 	/** Holds the serialized value. */
-	TArray<uint8> Value;
+	KBVar::KBVarBytes Value;
 };
+
+
 
 
 /**
@@ -457,7 +523,7 @@ private:
 * @see GetBytes
 */
 template<>
-FORCEINLINE TArray<uint8> KBVar::GetValue<TArray<uint8> >() const
+FORCEINLINE KBVar::KBVarBytes KBVar::GetValue<KBVar::KBVarBytes >() const
 {
 	check(Type == EKBVarTypes::ByteArray);
 
@@ -465,19 +531,71 @@ FORCEINLINE TArray<uint8> KBVar::GetValue<TArray<uint8> >() const
 }
 
 template<>
-FORCEINLINE TArray<KBVar> FVariant::GetValue<TArray<KBVar> >() const
+FORCEINLINE KBVar::KBVarArray KBVar::GetValue<KBVar::KBVarArray >() const
 {
 	check(Type == EKBVarTypes::KBVarArray);
 
-	return TArray<KBVar>();
+	KBVar::KBVarArray v_array;
+	int idx = 0;
+
+	while (idx < Value.Num())
+	{
+		int32 vtype = *((int32*)(Value.GetData() + idx));
+		idx += sizeof(vtype);
+
+		int size = *((int*)(Value.GetData() + idx));
+		idx += sizeof(size);
+
+		KBVar v;
+		v.SetType(vtype);
+
+		v.GetBytes().SetNumUninitialized(size);
+		memcpy(v.GetBytes().GetData(), Value.GetData() + idx, size);
+		idx += size;
+
+		v_array.Add(v);
+	}
+
+	return v_array;
 }
 
 template<>
-FORCEINLINE TMap<FString, KBVar> FVariant::GetValue<TMap<FString, KBVar> >() const
+FORCEINLINE KBVar::KBVarMap KBVar::GetValue<KBVar::KBVarMap >() const
 {
 	check(Type == EKBVarTypes::KBVarMap);
 
-	return TMap<FString, KBVar>();
+	KBVar::KBVarMap v_map;
+	int idx = 0;
+
+	while (idx < Value.Num())
+	{
+		int32 size = *((int*)(Value.GetData() + idx));
+		idx += sizeof(size);
+
+		TArray<uint8> key_datas;
+		key_datas.SetNumUninitialized(size);
+		memcpy(key_datas.GetData(), Value.GetData() + idx, size);
+		key_datas.Add(0);
+		FString key = FString(UTF8_TO_TCHAR(key_datas.GetData()));
+		idx += size;
+
+		int32 vtype = *((int32*)(Value.GetData() + idx));
+		idx += sizeof(vtype);
+
+		size = *((int32*)(Value.GetData() + idx));
+		idx += sizeof(size);
+
+		KBVar v;
+		v.SetType(vtype);
+
+		v.GetBytes().SetNumUninitialized(size);
+		memcpy(v.GetBytes().GetData(), Value.GetData() + idx, size);
+		idx += size;
+
+		v_map.Add(key, v);
+	}
+
+	return v_map;
 }
 
 
