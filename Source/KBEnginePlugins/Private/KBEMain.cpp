@@ -70,6 +70,7 @@ void UKBEMain::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
+	KBEvent::processOutEvents();
 
 	KBEngineApp::getSingleton().process();
 }
@@ -127,8 +128,10 @@ bool UKBEMain::login(FString username, FString password, TArray<uint8> datas)
 {
 	if (!KBEngineApp::getSingleton().isInitialized())
 	{
-		KBEngineApp::getSingleton().reset();
+		return false;
 	}
+
+	KBEngineApp::getSingleton().reset();
 
 	UKBEventData_login* pEventData = NewObject<UKBEventData_login>();
 	pEventData->username = username;
@@ -142,8 +145,10 @@ bool UKBEMain::createAccount(FString username, FString password, const TArray<ui
 {
 	if (!KBEngineApp::getSingleton().isInitialized())
 	{
-		KBEngineApp::getSingleton().reset();
+		return false;
 	}
+
+	KBEngineApp::getSingleton().reset();
 
 	UKBEventData_createAccount* pEventData = NewObject<UKBEventData_createAccount>();
 	pEventData->username = username;
