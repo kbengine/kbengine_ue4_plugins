@@ -8,6 +8,8 @@
 #include "ScriptModule.h"
 #include "Mailbox.h"
 #include "Bundle.h"
+#include "EntityDef.h"
+#include "Property.h"
 
 EntityFactory g_EntityFactory;
 EntityDefMethodHandles g_EntityDefMethodHandles;
@@ -70,6 +72,8 @@ void EntityFactory::initialize()
 	inited = true;
 
 	// 填充所有父类的def信息到子类
+
+	/* 由于所有的信息已经直接注册给了顶级Entity， 所以父类没有数据
 	for (auto& item : g_EntityFactory.creators)
 	{
 		FString scriptName = item.Key;
@@ -83,13 +87,15 @@ void EntityFactory::initialize()
 
 		for (auto& m : parentClassesArray)
 		{
-			EntityCreator* pEntityParentCreator = g_EntityFactory.creators.FindRef(m);
+			FString moduleName = m.Trim();
+			EntityCreator* pEntityParentCreator = g_EntityFactory.creators.FindRef(moduleName);
 			if (!pEntityParentCreator || pEntityParentCreator == pEntityCreator)
 				continue;
 
-			finishDefs(scriptName, m);
+			finishDefs(scriptName, moduleName);
 		}
 	}
+	*/
 }
 
 void EntityFactory::finishDefs(const FString& scriptName, const FString& parentScriptName)
@@ -200,10 +206,6 @@ EntityDefPropertyHandle* EntityDefPropertyHandles::find(const FString& scriptNam
 	return *pEntityDefPropertyHandle;
 }
 
-ENTITYDEF_CLASS_REGISTER(Entity)
-ENTITYDEF_PROPERTY_WITH_SETMETHOD_REGISTER(Entity, position)
-ENTITYDEF_PROPERTY_WITH_SETMETHOD_REGISTER(Entity, direction)
-ENTITYDEF_PROPERTY_REGISTER(Entity, spaceID)
 
 Entity::Entity():
 	id_(0),
@@ -225,6 +227,7 @@ Entity::Entity():
 
 Entity::~Entity()
 {
+	DEBUG_MSG("%s::~%s() %d", *className_, *className_, id());
 }
 
 void Entity::clear()
@@ -260,7 +263,55 @@ void Entity::cell(Mailbox* v)
 
 void Entity::callPropertysSetMethods()
 {
+	ScriptModule** pModuleFind = EntityDef::moduledefs.Find(className());
+	if (!pModuleFind)
+	{
+		SCREEN_ERROR_MSG("not found ScriptModule(%s)!", *className());
+		return;
+	}
 
+	ScriptModule* pModule = *pModuleFind;
+
+	for (auto& item : pModule->propertys)
+	{
+		Property* propertydata = item.Value;
+		EntityDefPropertyHandle* pEntityDefPropertyHandle = EntityDefPropertyHandles::find(className(), propertydata->name);
+		if (!pEntityDefPropertyHandle)
+		{
+			SCREEN_ERROR_MSG("%s(%d) not found property(%s), update error! Please register with ENTITYDEF_PROPERTY_REGISTER(XXX, %s) in (%s, %s).cpp",
+				*className(), id(), *propertydata->name,
+				*propertydata->name, *className(), *pModule->pEntityCreator->parentClasses());
+
+			continue;
+		}
+
+		EntityDefMethodHandle* pSetMethod = propertydata->pSetMethod;
+
+		KBVar* oldval = pEntityDefPropertyHandle->getPropertyValue(this);
+
+		if (pSetMethod)
+		{
+			if (propertydata->isBase())
+			{
+				if (inited())
+				{
+					//DEBUG_MSG("%s", *propertydata->name);
+					pSetMethod->callMethod(this, *oldval);
+				}
+			}
+			else
+			{
+				if (inWorld())
+					pSetMethod->callMethod(this, *oldval);
+			}
+		}
+		else
+		{
+			//DEBUG_MSG("%s not found set_*", *propertydata->name);
+		}
+
+		delete oldval;
+	}
 }
 
 void Entity::enterWorld()
