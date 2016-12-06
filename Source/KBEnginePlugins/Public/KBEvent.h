@@ -282,7 +282,7 @@ public:
 	int entityID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
-	float speed;
+	float moveSpeed;
 };
 
 UCLASS(Blueprintable, BlueprintType)
@@ -298,7 +298,7 @@ public:
 	int entityID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
-	float speed;
+	float moveSpeed;
 };
 
 UCLASS(Blueprintable, BlueprintType)
@@ -398,6 +398,9 @@ class KBENGINEPLUGINS_API UKBEventData_onEnterWorld : public UKBEventData
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
+	FString entityClassName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
 	int spaceID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
@@ -414,10 +417,13 @@ public:
 	FVector direction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
-	float speed;
+	float moveSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
 	bool isOnGround;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
+	bool isPlayer;
 };
 
 UCLASS(Blueprintable, BlueprintType)
@@ -431,6 +437,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
 	int entityID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
+	bool isPlayer;
 };
 
 UCLASS(Blueprintable, BlueprintType)
@@ -439,6 +448,9 @@ class KBENGINEPLUGINS_API UKBEventData_onEnterSpace : public UKBEventData
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
+	FString entityClassName;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
 	int spaceID;
 
@@ -456,10 +468,13 @@ public:
 	FVector direction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
-	float speed;
+	float moveSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
 	bool isOnGround;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
+	bool isPlayer;
 };
 
 UCLASS(Blueprintable, BlueprintType)
@@ -473,6 +488,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
 	int entityID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
+	bool isPlayer;
 };
 
 UCLASS(Blueprintable, BlueprintType)
