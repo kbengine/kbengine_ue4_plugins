@@ -4,11 +4,9 @@ kbengine_ue4_plugins
 Usage
 ---------------------
 
-	1: Create clientapp.cs
-		using KBEngine;
-		public class clientapp : KBEMain 
-		{
-		}
+	1: Create clientapp Blueprint
+		1: Add KBEMain Component(Reference: https://github.com/kbengine/kbengine_ue4_demo/blob/master/Content/ClientApp.uasset).
+		2: Set the parameters of the component.
 
 	2: Implment the KBE defined entity (including the client part)
 		See: kbengine\kbengine_demos_assets\scripts\entities.xml£¬hasClient="true" need to implment
@@ -17,10 +15,10 @@ Usage
 			<Gate hasClient="true"></Gate>
 			<Space/>
 
-			public class Account : KBEngine.GameObject 
+			class Account : public Entity
 			{
 				// entity initialization
-				public override void __init__()
+				virtual void __init__() override
 				{
 				}
 			}
@@ -30,25 +28,29 @@ Usage
 			entity.cellCall("cell_func", 1, "arg2", "argN")
 
 	3: Monitor KBE-plugins event
-		public class UI : MonoBehaviour
+		class KBENGINE_UE4_DEMO_API AGameModeLogin : public AGameMode
 		{
-			void Start () 
+			// Called when the game starts or when spawned
+			virtual void BeginPlay() override
 			{
-				KBEngine.Event.registerOut("onConnectStatus", this, "onConnectStatus");
+				KBENGINE_REGISTER_EVENT("onConnectStatus", onConnectStatus);
 			}
 
-			public void onConnectStatus(bool success)
-			{
-				// KBE-plugins event fired
-			}
+			// KBE-plugins event fired
+			UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "KBEngine")
+			void onConnectStatus(const UKBEventData* pEventData);
 		}
 
 	4: Fire events to the KBE-plugins
-		KBEngine.Event.fireIn("login", "stringAccount", "stringPasswd", System.Text.Encoding.UTF8.GetBytes("kbengine_unity3d_demo"));
+		UKBEventData_login* pEventData = NewObject<UKBEventData_login>();
+		pEventData->username = username;
+		pEventData->password = password;
+		pEventData->datas = datas;
+		KBENGINE_EVENT_FIRE("login", pEventData);
 
 
 
-KBE-Plugin fire-out events(KBE => Unity):
+KBE-Plugin fire-out events(KBE => UE4):
 ---------------------
 
 	Entity events:
@@ -263,7 +265,7 @@ KBE-Plugin fire-out events(KBE => Unity):
 
 
 
-KBE-Plugin fire-in events(Unity => KBE):
+KBE-Plugin fire-in events(UE4 => KBE):
 ---------------------
 
 	createAccount
