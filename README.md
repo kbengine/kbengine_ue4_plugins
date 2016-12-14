@@ -4,11 +4,15 @@ kbengine_ue4_plugins
 Usage
 ---------------------
 
-	1: Create clientapp Blueprint
+	1: add "KBEnginePlugins" to *.Build.cs
+		{ProjectName}\Source\{ProjectName}\{ProjectName}.Build.cs
+			PublicDependencyModuleNames.AddRange(new string[] { ..., "KBEnginePlugins" });
+
+	2: Create clientapp Blueprint
 		1: Add KBEMain Component(Reference: https://github.com/kbengine/kbengine_ue4_demo/blob/master/Content/ClientApp.uasset).
 		2: Set the parameters of the component.
 
-	2: Implment the KBE defined entity (including the client part)
+	3: Implment the KBE defined entity (including the client part)
 		See: kbengine\kbengine_demos_assets\scripts\entities.xml£¬hasClient="true" need to implment
 			<Account hasClient="true"></Account>
 			<Monster hasClient="true"></Monster>
@@ -27,7 +31,7 @@ Usage
 			entity.baseCall("base_func", 1, "arg2", "argN")
 			entity.cellCall("cell_func", 1, "arg2", "argN")
 
-	3: Monitor KBE-plugins event
+	4: Monitor KBE-plugins event
 		class KBENGINE_UE4_DEMO_API AGameModeLogin : public AGameMode
 		{
 			// Called when the game starts or when spawned
@@ -41,7 +45,7 @@ Usage
 			void onConnectStatus(const UKBEventData* pEventData);
 		}
 
-	4: Fire events to the KBE-plugins
+	5: Fire events to the KBE-plugins
 		UKBEventData_login* pEventData = NewObject<UKBEventData_login>();
 		pEventData->username = username;
 		pEventData->password = password;
