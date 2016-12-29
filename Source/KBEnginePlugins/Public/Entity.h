@@ -367,7 +367,7 @@ public:
 #define K_CONNECT(a, b) K_CONNECT1(a, b)
 
 // 将name与参数个数组为一个，如EXPAND_NARG(name, 5, 6, 7, 8, 9)为name5
-#define EXPAND_NARG(name, __VA_ARGS__) \
+#define EXPAND_NARG(name, ...) \
 	K_CONNECT K_BRACKET_L name, K_PP_NARG(__VA_ARGS__) K_BRACKET_R (__VA_ARGS__)
 
 #define ENTITYDEF_DECLARE_XXX2(ENTITY_SCRIPTMODULE_NAME, module1, ...)	\
