@@ -688,7 +688,7 @@ public:
 			}	\
 			virtual void callMethod(void* pEntity, const TArray<KBVar*>& args) override	\
 			{	\
-				reinterpret_cast<ENTITY_SCRIPTMODULE_NAME*>(pEntity)->DEF_METHOD_NAME##CALLMETHOD;	\
+				reinterpret_cast<ENTITY_SCRIPTMODULE_NAME*>(pEntity)->DEF_METHOD_NAME CALLMETHOD;	\
 				for(int i=0; i<args.Num(); ++i)	\
 				{	\
 					const KBVar& arg = *args[0];	\
