@@ -14,6 +14,14 @@ class MemoryStream;
 class KBENGINEPLUGINS_API KBEDATATYPE_BASE
 {
 public:
+		KBEDATATYPE_BASE()
+		{
+		}
+		
+		virtual ~KBEDATATYPE_BASE()
+		{
+		}
+
 		virtual void bind()
 		{
 		}
@@ -49,7 +57,7 @@ public:
 		
 		virtual bool isSameType(KBVar& v)
 		{
-			return v == NULL;
+			return false;
 		}
 		
 		virtual FString c_str() const {

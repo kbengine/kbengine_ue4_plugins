@@ -11,7 +11,7 @@
 #if PLATFORM_WINDOWS
 #define FUNC_NAME TEXT(__FUNCTION__)
 #else
-#define FUNC_NAME TEXT(__func__)
+#define FUNC_NAME __func__
 #endif
 
 #define INFO_MSG(Format, ...) \

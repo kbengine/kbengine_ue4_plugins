@@ -83,7 +83,7 @@ public:
 		data_resize(DEFAULT_SIZE);
 	}
 
-	~MemoryStream()
+	virtual ~MemoryStream()
 	{
 		clear(false);
 	}
