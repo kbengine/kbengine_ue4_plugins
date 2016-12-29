@@ -44,7 +44,7 @@ template<typename T> inline void EndianConvert(T& val)
 		MemoryStreamConverter::apply<T>(&val); 
 }
 
-template<typename T> inline void EndianConvertReverse(T&) 
+template<typename T> inline void EndianConvertReverse(T& val) 
 {
 	if (FGenericPlatformProperties::IsLittleEndian())
 		MemoryStreamConverter::apply<T>(&val);
