@@ -83,25 +83,15 @@ bool NetworkInterface::connectTo(FString ip, uint16 port, InterfaceConnect* call
 			(int32)ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLastErrorCode());
 	}
 
-	bool didConnect = socket_->Connect(*addr);
+	socket_->Connect(*addr);
 
-	if (didConnect)
-	{
-		connectCB_ = callback;
-		connectIP_ = ip;
-		connectPort_ = port;
-		connectUserdata_ = userdata;
-		startTime_ = getTimeSeconds();
-	}
-	else
-	{
-		ERROR_MSG("connect %s:%d error(%d)!", *ip, port,
-			(int32)ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLastErrorCode());
+	connectCB_ = callback;
+	connectIP_ = ip;
+	connectPort_ = port;
+	connectUserdata_ = userdata;
+	startTime_ = getTimeSeconds();
 
-		callback->onConnectCallback(ip, port, false, userdata);
-	}
-
-	return didConnect;
+	return true;
 }
 
 bool NetworkInterface::send(MemoryStream* pMemoryStream)
