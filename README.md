@@ -32,25 +32,27 @@ Usage
 			entity.cellCall("cell_func", 1, "arg2", "argN")
 
 	4: Monitor KBE-plugins event
-		class KBENGINE_UE4_DEMO_API AGameModeLogin : public AGameMode
-		{
-			// Called when the game starts or when spawned
-			virtual void BeginPlay() override
+		For example:
+			class KBENGINE_UE4_DEMO_API AGameModeLogin : public AGameMode
 			{
-				KBENGINE_REGISTER_EVENT("onConnectStatus", onConnectStatus);
+				// Called when the game starts or when spawned
+				virtual void BeginPlay() override
+				{
+					KBENGINE_REGISTER_EVENT("onConnectStatus", onConnectStatus);
+				}
+
+				// KBE-plugins event fired
+				UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "KBEngine")
+				void onConnectStatus(const UKBEventData* pEventData);
 			}
 
-			// KBE-plugins event fired
-			UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "KBEngine")
-			void onConnectStatus(const UKBEventData* pEventData);
-		}
-
 	5: Fire events to the KBE-plugins
-		UKBEventData_login* pEventData = NewObject<UKBEventData_login>();
-		pEventData->username = username;
-		pEventData->password = password;
-		pEventData->datas = datas;
-		KBENGINE_EVENT_FIRE("login", pEventData);
+		For example:
+			UKBEventData_login* pEventData = NewObject<UKBEventData_login>();
+			pEventData->username = username;
+			pEventData->password = password;
+			pEventData->datas = datas;
+			KBENGINE_EVENT_FIRE("login", pEventData);
 
 
 
