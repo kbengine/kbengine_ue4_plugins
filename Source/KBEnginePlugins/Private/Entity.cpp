@@ -47,7 +47,7 @@ EntityDefPropertyHandle::~EntityDefPropertyHandle()
 EntityCreator* EntityFactory::addEntityCreator(const FString& scriptName, EntityCreator* pEntityCreator)
 {
 	creators.Add(scriptName, pEntityCreator);
-	DEBUG_MSG("%s", *scriptName);
+	DEBUG_MSG("EntityFactory::addEntityCreator(): %s", *scriptName);
 	return pEntityCreator;
 }
 
@@ -153,11 +153,11 @@ EntityDefMethodHandle* EntityDefMethodHandles::add(const FString& scriptName, co
 
 	if (m->Contains(defMethodName))
 	{
-		SCREEN_ERROR_MSG("%s::%s exist!", *scriptName, *defMethodName);
+		SCREEN_ERROR_MSG("EntityDefMethodHandles::add(): %s::%s exist!", *scriptName, *defMethodName);
 		return NULL;
 	}
 
-	DEBUG_MSG("%s::%s", *scriptName, *defMethodName);
+	DEBUG_MSG("EntityDefMethodHandles::add(): %s::%s", *scriptName, *defMethodName);
 	m->Add(defMethodName, pEntityDefMethodHandle);
 	return pEntityDefMethodHandle;
 }
@@ -184,11 +184,11 @@ EntityDefPropertyHandle* EntityDefPropertyHandles::add(const FString& scriptName
 
 	if (m->Contains(defPropertyName))
 	{
-		SCREEN_ERROR_MSG("%s::%s exist!", *scriptName, *defPropertyName);
+		SCREEN_ERROR_MSG("EntityDefPropertyHandles::add(): %s::%s exist!", *scriptName, *defPropertyName);
 		return NULL;
 	}
 
-	DEBUG_MSG("%s::%s", *scriptName, *defPropertyName);
+	DEBUG_MSG("EntityDefPropertyHandles::add(): %s::%s", *scriptName, *defPropertyName);
 	m->Add(defPropertyName, pEntityDefPropertyHandle);
 	return pEntityDefPropertyHandle;
 }
@@ -266,7 +266,7 @@ void Entity::callPropertysSetMethods()
 	ScriptModule** pModuleFind = EntityDef::moduledefs.Find(className());
 	if (!pModuleFind)
 	{
-		SCREEN_ERROR_MSG("not found ScriptModule(%s)!", *className());
+		SCREEN_ERROR_MSG("Entity::callPropertysSetMethods(): not found ScriptModule(%s)!", *className());
 		return;
 	}
 
@@ -278,7 +278,7 @@ void Entity::callPropertysSetMethods()
 		EntityDefPropertyHandle* pEntityDefPropertyHandle = EntityDefPropertyHandles::find(className(), propertydata->name);
 		if (!pEntityDefPropertyHandle)
 		{
-			SCREEN_ERROR_MSG("%s(%d) not found property(%s), update error! Please register with ENTITYDEF_PROPERTY_REGISTER(XXX, %s) in (%s, %s).cpp",
+			SCREEN_ERROR_MSG("Entity::callPropertysSetMethods(): %s(%d) not found property(%s), update error! Please register with ENTITYDEF_PROPERTY_REGISTER(XXX, %s) in (%s, %s).cpp",
 				*className(), id(), *propertydata->name,
 				*propertydata->name, *className(), *pModule->pEntityCreator->parentClasses());
 
@@ -295,7 +295,7 @@ void Entity::callPropertysSetMethods()
 			{
 				if (inited())
 				{
-					//DEBUG_MSG("%s", *propertydata->name);
+					//DEBUG_MSG("Entity::callPropertysSetMethods(): %s", *propertydata->name);
 					pSetMethod->callMethod(this, *oldval);
 				}
 			}
@@ -307,7 +307,7 @@ void Entity::callPropertysSetMethods()
 		}
 		else
 		{
-			//DEBUG_MSG("%s not found set_*", *propertydata->name);
+			//DEBUG_MSG("Entity::callPropertysSetMethods(): %s not found set_*", *propertydata->name);
 		}
 
 		delete oldval;
@@ -768,7 +768,7 @@ void Entity::baseCall(FString methodName, const TArray<KBVar*>& arguments)
 {
 	if (KBEngineApp::getSingleton().currserver() == TEXT("loginapp"))
 	{
-		ERROR_MSG("className=%s, methodName=%s, currserver=(%s != baseapp)!", 
+		ERROR_MSG("Entity::baseCall(): className=%s, methodName=%s, currserver=(%s != baseapp)!", 
 			*className_, *methodName, *KBEngineApp::getSingleton().currserver());
 
 		return;
@@ -777,7 +777,7 @@ void Entity::baseCall(FString methodName, const TArray<KBVar*>& arguments)
 	ScriptModule** pScriptModuleFind = EntityDef::moduledefs.Find(className_);
 	if (!pScriptModuleFind)
 	{
-		SCREEN_ERROR_MSG("not found ScriptModule(%s)!",
+		SCREEN_ERROR_MSG("Entity::baseCall(): not found ScriptModule(%s)!",
 			*className_);
 
 		return;
@@ -786,7 +786,7 @@ void Entity::baseCall(FString methodName, const TArray<KBVar*>& arguments)
 	Method** pMethodFind = (*pScriptModuleFind)->base_methods.Find(methodName);
 	if (!pMethodFind)
 	{
-		SCREEN_ERROR_MSG("className=%s, not found methodName(%s)!",
+		SCREEN_ERROR_MSG("Entity::baseCall(): className=%s, not found methodName(%s)!",
 			*className_, *methodName);
 
 		return;
@@ -797,7 +797,7 @@ void Entity::baseCall(FString methodName, const TArray<KBVar*>& arguments)
 	TArray<KBEDATATYPE_BASE*>& args = (*pMethodFind)->args;
 	if (arguments.Num() != args.Num())
 	{
-		ERROR_MSG("className=%s, methodName=%s, args(%d != %d)!",
+		ERROR_MSG("Entity::baseCall(): className=%s, methodName=%s, args(%d != %d)!",
 			*className_, *methodName, arguments.Num(), (*pMethodFind)->args.Num());
 
 		return;
@@ -805,7 +805,7 @@ void Entity::baseCall(FString methodName, const TArray<KBVar*>& arguments)
 
 	if (!base_)
 	{
-		ERROR_MSG("%s no base! methodName=%s", *className_, *methodName);
+		ERROR_MSG("Entity::baseCall(): %s no base! methodName=%s", *className_, *methodName);
 		return;
 	}
 
@@ -820,7 +820,7 @@ void Entity::baseCall(FString methodName, const TArray<KBVar*>& arguments)
 		}
 		else
 		{
-			SCREEN_ERROR_MSG("className=%s, methodName=%s, args%d error, not is %s! curr=%s",
+			SCREEN_ERROR_MSG("Entity::baseCall(): className=%s, methodName=%s, args%d error, not is %s! curr=%s",
 				*className_, *methodName, i, *args[i]->c_str(), *arguments[i]->c_str());
 
 			Bundle::reclaimObject(base_->pBundle);
@@ -1176,7 +1176,7 @@ void Entity::cellCall(FString methodName, const TArray<KBVar*>& arguments)
 {
 	if (KBEngineApp::getSingleton().currserver() == TEXT("loginapp"))
 	{
-		ERROR_MSG("className=%s, methodName=%s, currserver=(%s != baseapp)!",
+		ERROR_MSG("Entity::cellCall(): className=%s, methodName=%s, currserver=(%s != baseapp)!",
 			*className_, *methodName, *KBEngineApp::getSingleton().currserver());
 
 		return;
@@ -1185,7 +1185,7 @@ void Entity::cellCall(FString methodName, const TArray<KBVar*>& arguments)
 	ScriptModule** pScriptModuleFind = EntityDef::moduledefs.Find(className_);
 	if (!pScriptModuleFind)
 	{
-		SCREEN_ERROR_MSG("not found ScriptModule(%s)!",
+		SCREEN_ERROR_MSG("Entity::cellCall(): not found ScriptModule(%s)!",
 			*className_);
 
 		return;
@@ -1194,7 +1194,7 @@ void Entity::cellCall(FString methodName, const TArray<KBVar*>& arguments)
 	Method** pMethodFind = (*pScriptModuleFind)->cell_methods.Find(methodName);
 	if (!pMethodFind)
 	{
-		SCREEN_ERROR_MSG("className=%s, not found methodName(%s)!",
+		SCREEN_ERROR_MSG("Entity::cellCall(): className=%s, not found methodName(%s)!",
 			*className_, *methodName);
 
 		return;
@@ -1205,7 +1205,7 @@ void Entity::cellCall(FString methodName, const TArray<KBVar*>& arguments)
 	TArray<KBEDATATYPE_BASE*>& args = (*pMethodFind)->args;
 	if (arguments.Num() != args.Num())
 	{
-		ERROR_MSG("className=%s, methodName=%s, args(%d != %d)!",
+		ERROR_MSG("Entity::cellCall(): className=%s, methodName=%s, args(%d != %d)!",
 			*className_, *methodName, arguments.Num(), (*pMethodFind)->args.Num());
 
 		return;
@@ -1213,7 +1213,7 @@ void Entity::cellCall(FString methodName, const TArray<KBVar*>& arguments)
 
 	if (!cell_)
 	{
-		ERROR_MSG("%s no cell! methodName=%s", *className_, *methodName);
+		ERROR_MSG("Entity::cellCall(): %s no cell! methodName=%s", *className_, *methodName);
 		return;
 	}
 
@@ -1228,7 +1228,7 @@ void Entity::cellCall(FString methodName, const TArray<KBVar*>& arguments)
 		}
 		else
 		{
-			SCREEN_ERROR_MSG("className=%s, methodName=%s, args%d error, not is %s! curr=%s",
+			SCREEN_ERROR_MSG("Entity::cellCall(): className=%s, methodName=%s, args%d error, not is %s! curr=%s",
 				*className_, *methodName, i, *args[i]->c_str(), *arguments[i]->c_str());
 
 			Bundle::reclaimObject(base_->pBundle);

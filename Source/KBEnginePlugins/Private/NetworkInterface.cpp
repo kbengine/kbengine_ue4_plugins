@@ -34,7 +34,7 @@ void NetworkInterface::close()
 	if (socket_)
 	{
 		socket_->Close();
-		INFO_MSG("network closed!");
+		INFO_MSG("NetworkInterface::close(): network closed!");
 		ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(socket_);
 		KBENGINE_EVENT_FIRE("onDisableConnect", NewObject<UKBEventData_onDisableConnect>());
 	}
@@ -58,7 +58,7 @@ bool NetworkInterface::valid()
 
 bool NetworkInterface::connectTo(FString ip, uint16 port, InterfaceConnect* callback, int userdata)
 {
-	INFO_MSG("will connect to %s:%d ...", *ip, port);
+	INFO_MSG("NetworkInterface::connectTo(): will connect to %s:%d ...", *ip, port);
 
 	reset();
 
@@ -73,13 +73,13 @@ bool NetworkInterface::connectTo(FString ip, uint16 port, InterfaceConnect* call
 
 	if (!valid())
 	{
-		ERROR_MSG("socket could't be created!");
+		ERROR_MSG("NetworkInterface::connectTo(): socket could't be created!");
 		return false;
 	}
 	
 	if (!socket_->SetNonBlocking(true))
 	{
-		ERROR_MSG("socket->SetNonBlocking error(%d)!", *ip, port,
+		ERROR_MSG("NetworkInterface::connectTo(): socket->SetNonBlocking error(%d)!", *ip, port,
 			(int32)ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLastErrorCode());
 	}
 
@@ -139,7 +139,7 @@ void NetworkInterface::tickConnecting()
 		TSharedRef<FInternetAddr> addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
 		socket_->GetPeerAddress(*addr);
 
-		INFO_MSG("connect to %s success!", *addr->ToString(true));
+		INFO_MSG("NetworkInterface::tickConnecting(): connect to %s success!", *addr->ToString(true));
 		connectCB_->onConnectCallback(connectIP_, connectPort_, true, connectUserdata_);
 		connectCB_ = NULL;
 
@@ -154,7 +154,7 @@ void NetworkInterface::tickConnecting()
 		float currTime = getTimeSeconds();
 		if (currTime - startTime_ > 3)
 		{
-			ERROR_MSG("connect to %s:%d timeout!", *connectIP_, connectPort_);
+			ERROR_MSG("NetworkInterface::tickConnecting(): connect to %s:%d timeout!", *connectIP_, connectPort_);
 			connectCB_->onConnectCallback(connectIP_, connectPort_, false, connectUserdata_);
 			connectCB_ = NULL;
 

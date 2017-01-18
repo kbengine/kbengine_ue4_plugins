@@ -274,7 +274,7 @@ KBVar* KBEDATATYPE_VECTOR2::createFromStream(MemoryStream& stream)
 	stream >> size;
 	if (2 != size)
 	{
-		ERROR_MSG("KBEDATATYPE_VECTOR2::createFromStream: size(%d) is error!", size);
+		ERROR_MSG("KBEDATATYPE_VECTOR2::createFromStream(): size(%d) is error!", size);
 	}
 
 	FVector2D val;
@@ -304,7 +304,7 @@ KBVar* KBEDATATYPE_VECTOR3::createFromStream(MemoryStream& stream)
 	stream >> size;
 	if (3 != size)
 	{
-		ERROR_MSG("KBEDATATYPE_VECTOR3::createFromStream: size(%d) is error!", size);
+		ERROR_MSG("KBEDATATYPE_VECTOR3::createFromStream(): size(%d) is error!", size);
 	}
 
 	FVector val;
@@ -334,7 +334,7 @@ KBVar* KBEDATATYPE_VECTOR4::createFromStream(MemoryStream& stream)
 	stream >> size;
 	if (4 != size)
 	{
-		ERROR_MSG("KBEDATATYPE_VECTOR4::createFromStream: size(%d) is error!", size);
+		ERROR_MSG("KBEDATATYPE_VECTOR4::createFromStream(): size(%d) is error!", size);
 	}
 
 	FVector4 val;

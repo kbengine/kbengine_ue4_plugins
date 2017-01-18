@@ -27,7 +27,7 @@ FString Message::c_str()
 
 void Message::handle(MemoryStream& s) 
 {
-	SCREEN_ERROR_MSG("interface(%s), handleMethod no implement!",
+	SCREEN_ERROR_MSG("Message::handle(): interface(%s), handleMethod no implement!",
 		*c_str());
 }
 
@@ -117,7 +117,7 @@ Message* Messages::add(Message* pMessage, MessageID mid, const FString& mname, i
 
 	messages.Add(pMessage->name, pMessage);
 	
-	INFO_MSG("Message::add: %s", *pMessage->c_str());
+	INFO_MSG("Message::add(): %s", *pMessage->c_str());
 	return pMessage;
 }
 

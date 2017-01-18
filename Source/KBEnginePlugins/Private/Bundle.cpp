@@ -84,7 +84,7 @@ void Bundle::send(NetworkInterface* pNetworkInterface)
 	}
 	else
 	{
-		ERROR_MSG("networkInterface invalid!");
+		ERROR_MSG("Bundle::send(): networkInterface invalid!");
 	}
 
 	// 把不用的MemoryStream放回缓冲池，以减少垃圾回收的消耗
