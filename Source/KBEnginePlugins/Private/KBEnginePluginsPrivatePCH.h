@@ -9,9 +9,9 @@
 
 
 #if PLATFORM_WINDOWS
-#define FUNC_NAME TEXT(__FUNCTION__)
+#define FUNC_NAME TEXT("")
 #else
-#define FUNC_NAME __func__
+#define FUNC_NAME TEXT("")
 #endif
 
 #define INFO_MSG(Format, ...) \
