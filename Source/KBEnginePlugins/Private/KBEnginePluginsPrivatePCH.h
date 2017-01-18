@@ -5,20 +5,12 @@
 // You should place include statements to your module's private header files here.  You only need to
 // add includes for headers that are used in most of your module's source files though.
 
-#define NETMODE_WORLD TEXT("")
-
-
-#if PLATFORM_WINDOWS
-#define FUNC_NAME TEXT("")
-#else
-#define FUNC_NAME TEXT("")
-#endif
 
 #define INFO_MSG(Format, ...) \
 { \
 	SET_WARN_COLOR(COLOR_CYAN); \
 	const FString Msg = FString::Printf(TEXT(Format), ##__VA_ARGS__); \
-	UE_LOG(LogKBEngine, Log, TEXT("%s%s()"), NETMODE_WORLD, FUNC_NAME); \
+	UE_LOG(LogKBEngine, Log, TEXT("%s"), *Msg); \
 	CLEAR_WARN_COLOR(); \
 }
 
