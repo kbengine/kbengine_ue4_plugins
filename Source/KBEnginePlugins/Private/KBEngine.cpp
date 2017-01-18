@@ -2320,7 +2320,7 @@ void KBEngineApp::Client_onUpdateData_ypr(MemoryStream& stream)
 	int8 p = stream.read<int8>();
 	int8 r = stream.read<int8>();
 
-	_updateVolatileData(eid, 0.0f, 0.0f, 0.0f, y, p, r, -1);
+	_updateVolatileData(eid, KBE_FLT_MAX, KBE_FLT_MAX, KBE_FLT_MAX, y, p, r, -1);
 }
 
 void KBEngineApp::Client_onUpdateData_yp(MemoryStream& stream)
@@ -2330,7 +2330,7 @@ void KBEngineApp::Client_onUpdateData_yp(MemoryStream& stream)
 	int8 y = stream.read<int8>();
 	int8 p = stream.read<int8>();
 
-	_updateVolatileData(eid, 0.0f, 0.0f, 0.0f, y, p, KBE_FLT_MAX, -1);
+	_updateVolatileData(eid, KBE_FLT_MAX, KBE_FLT_MAX, KBE_FLT_MAX, y, p, KBE_FLT_MAX, -1);
 }
 
 void KBEngineApp::Client_onUpdateData_yr(MemoryStream& stream)
@@ -2340,7 +2340,7 @@ void KBEngineApp::Client_onUpdateData_yr(MemoryStream& stream)
 	int8 y = stream.read<int8>();
 	int8 r = stream.read<int8>();
 
-	_updateVolatileData(eid, 0.0f, 0.0f, 0.0f, y, KBE_FLT_MAX, r, -1);
+	_updateVolatileData(eid, KBE_FLT_MAX, KBE_FLT_MAX, KBE_FLT_MAX, y, KBE_FLT_MAX, r, -1);
 }
 
 void KBEngineApp::Client_onUpdateData_pr(MemoryStream& stream)
@@ -2350,7 +2350,7 @@ void KBEngineApp::Client_onUpdateData_pr(MemoryStream& stream)
 	int8 p = stream.read<int8>();
 	int8 r = stream.read<int8>();
 
-	_updateVolatileData(eid, 0.0f, 0.0f, 0.0f, KBE_FLT_MAX, p, r, -1);
+	_updateVolatileData(eid, KBE_FLT_MAX, KBE_FLT_MAX, KBE_FLT_MAX, KBE_FLT_MAX, p, r, -1);
 }
 
 void KBEngineApp::Client_onUpdateData_y(MemoryStream& stream)
@@ -2359,7 +2359,7 @@ void KBEngineApp::Client_onUpdateData_y(MemoryStream& stream)
 
 	int8 y = stream.read<int8>();
 
-	_updateVolatileData(eid, 0.0f, 0.0f, 0.0f, y, KBE_FLT_MAX, KBE_FLT_MAX, -1);
+	_updateVolatileData(eid, KBE_FLT_MAX, KBE_FLT_MAX, KBE_FLT_MAX, y, KBE_FLT_MAX, KBE_FLT_MAX, -1);
 }
 
 void KBEngineApp::Client_onUpdateData_p(MemoryStream& stream)
@@ -2368,7 +2368,7 @@ void KBEngineApp::Client_onUpdateData_p(MemoryStream& stream)
 
 	int8 p = stream.read<int8>();
 
-	_updateVolatileData(eid, 0.0f, 0.0f, 0.0f, KBE_FLT_MAX, p, KBE_FLT_MAX, -1);
+	_updateVolatileData(eid, KBE_FLT_MAX, KBE_FLT_MAX, KBE_FLT_MAX, KBE_FLT_MAX, p, KBE_FLT_MAX, -1);
 }
 
 void KBEngineApp::Client_onUpdateData_r(MemoryStream& stream)
@@ -2377,7 +2377,7 @@ void KBEngineApp::Client_onUpdateData_r(MemoryStream& stream)
 
 	int8 r = stream.read<int8>();
 
-	_updateVolatileData(eid, 0.0f, 0.0f, 0.0f, KBE_FLT_MAX, KBE_FLT_MAX, r, -1);
+	_updateVolatileData(eid, KBE_FLT_MAX, KBE_FLT_MAX, KBE_FLT_MAX, KBE_FLT_MAX, KBE_FLT_MAX, r, -1);
 }
 
 void KBEngineApp::Client_onUpdateData_xz(MemoryStream& stream)
@@ -2387,7 +2387,7 @@ void KBEngineApp::Client_onUpdateData_xz(MemoryStream& stream)
 	FVector xz;
 	stream.readPackXZ(xz.X, xz.Z);
 
-	_updateVolatileData(eid, xz.X, 0.0f, xz.Z, KBE_FLT_MAX, KBE_FLT_MAX, KBE_FLT_MAX, 1);
+	_updateVolatileData(eid, xz.X, KBE_FLT_MAX, xz.Z, KBE_FLT_MAX, KBE_FLT_MAX, KBE_FLT_MAX, 1);
 }
 
 void KBEngineApp::Client_onUpdateData_xz_ypr(MemoryStream& stream)
@@ -2401,7 +2401,7 @@ void KBEngineApp::Client_onUpdateData_xz_ypr(MemoryStream& stream)
 	int8 p = stream.read<int8>();
 	int8 r = stream.read<int8>();
 
-	_updateVolatileData(eid, xz.X, 0.0f, xz.Z, y, p, r, 1);
+	_updateVolatileData(eid, xz.X, KBE_FLT_MAX, xz.Z, y, p, r, 1);
 }
 
 void KBEngineApp::Client_onUpdateData_xz_yp(MemoryStream& stream)
@@ -2414,7 +2414,7 @@ void KBEngineApp::Client_onUpdateData_xz_yp(MemoryStream& stream)
 	int8 y = stream.read<int8>();
 	int8 p = stream.read<int8>();
 
-	_updateVolatileData(eid, xz.X, 0.0f, xz.Z, y, p, KBE_FLT_MAX, 1);
+	_updateVolatileData(eid, xz.X, KBE_FLT_MAX, xz.Z, y, p, KBE_FLT_MAX, 1);
 }
 
 void KBEngineApp::Client_onUpdateData_xz_yr(MemoryStream& stream)
@@ -2427,7 +2427,7 @@ void KBEngineApp::Client_onUpdateData_xz_yr(MemoryStream& stream)
 	int8 y = stream.read<int8>();
 	int8 r = stream.read<int8>();
 
-	_updateVolatileData(eid, xz.X, 0.0f, xz.Z, y, KBE_FLT_MAX, r, 1);
+	_updateVolatileData(eid, xz.X, KBE_FLT_MAX, xz.Z, y, KBE_FLT_MAX, r, 1);
 }
 
 void KBEngineApp::Client_onUpdateData_xz_pr(MemoryStream& stream)
@@ -2440,7 +2440,7 @@ void KBEngineApp::Client_onUpdateData_xz_pr(MemoryStream& stream)
 	int8 p = stream.read<int8>();
 	int8 r = stream.read<int8>();
 
-	_updateVolatileData(eid, xz.X, 0.0f, xz.Z, KBE_FLT_MAX, p, r, 1);
+	_updateVolatileData(eid, xz.X, KBE_FLT_MAX, xz.Z, KBE_FLT_MAX, p, r, 1);
 }
 
 void KBEngineApp::Client_onUpdateData_xz_y(MemoryStream& stream)
@@ -2452,7 +2452,7 @@ void KBEngineApp::Client_onUpdateData_xz_y(MemoryStream& stream)
 
 	int8 y = stream.read<int8>();
 
-	_updateVolatileData(eid, xz.X, 0.0f, xz.Z, y, KBE_FLT_MAX, KBE_FLT_MAX, 1);
+	_updateVolatileData(eid, xz.X, KBE_FLT_MAX, xz.Z, y, KBE_FLT_MAX, KBE_FLT_MAX, 1);
 }
 
 void KBEngineApp::Client_onUpdateData_xz_p(MemoryStream& stream)
@@ -2464,7 +2464,7 @@ void KBEngineApp::Client_onUpdateData_xz_p(MemoryStream& stream)
 
 	int8 p = stream.read<int8>();
 
-	_updateVolatileData(eid, xz.X, 0.0f, xz.Z, KBE_FLT_MAX, p, KBE_FLT_MAX, 1);
+	_updateVolatileData(eid, xz.X, KBE_FLT_MAX, xz.Z, KBE_FLT_MAX, p, KBE_FLT_MAX, 1);
 }
 
 void KBEngineApp::Client_onUpdateData_xz_r(MemoryStream& stream)
@@ -2476,7 +2476,7 @@ void KBEngineApp::Client_onUpdateData_xz_r(MemoryStream& stream)
 
 	int8 r = stream.read<int8>();
 
-	_updateVolatileData(eid, xz.X, 0.0f, xz.Z, KBE_FLT_MAX, KBE_FLT_MAX, r, 1);
+	_updateVolatileData(eid, xz.X, KBE_FLT_MAX, xz.Z, KBE_FLT_MAX, KBE_FLT_MAX, r, 1);
 }
 
 void KBEngineApp::Client_onUpdateData_xyz(MemoryStream& stream)
@@ -2638,7 +2638,12 @@ void KBEngineApp::_updateVolatileData(ENTITY_ID entityID, float x, float y, floa
 		done = true;
 	}
 
-	if (!almostEqual(x + y + z, 0.f, 0.000001f))
+        bool positionChanged = x != KBE_FLT_MAX || y != KBE_FLT_MAX || z != KBE_FLT_MAX;
+        if (x == KBE_FLT_MAX) x = 0.0f;
+        if (y == KBE_FLT_MAX) y = 0.0f;
+        if (z == KBE_FLT_MAX) z = 0.0f;
+	            
+	if (positionChanged)
 	{
 		entity.position = FVector(x + entityServerPos_.X, y + entityServerPos_.Y, z + entityServerPos_.Z);
 		done = true;
