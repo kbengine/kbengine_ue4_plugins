@@ -11,13 +11,47 @@
 #include "EntityDef.h"
 #include "Property.h"
 
-EntityFactory g_EntityFactory;
-EntityDefMethodHandles g_EntityDefMethodHandles;
-EntityDefPropertyHandles g_EntityDefPropertyHandles;
+EntityFactory* EntityFactory::pEntityFactory = NULL;
+
+
+EntityDefMethodHandles* EntityDefMethodHandles::pEntityDefMethodHandles = NULL;
+
+EntityDefPropertyHandles* EntityDefPropertyHandles::pEntityDefPropertyHandles = NULL;
+
+
+EntityFactory::EntityFactory()
+{
+	pEntityFactory = this;
+}
+
+EntityFactory::~EntityFactory()
+{
+
+}
+
+EntityDefMethodHandles::EntityDefMethodHandles()
+{
+	pEntityDefMethodHandles = this;
+}
+
+EntityDefMethodHandles::~EntityDefMethodHandles()
+{
+
+}
+
+EntityDefPropertyHandles::EntityDefPropertyHandles()
+{
+	pEntityDefPropertyHandles = this;
+}
+
+EntityDefPropertyHandles::~EntityDefPropertyHandles()
+{
+
+}
 
 EntityCreator::EntityCreator(const FString& scriptName)
 {
-	g_EntityFactory.addEntityCreator(scriptName, this);
+	EntityFactory::getSingleton().addEntityCreator(scriptName, this);
 }
 
 EntityCreator::~EntityCreator()
@@ -26,7 +60,7 @@ EntityCreator::~EntityCreator()
 
 EntityDefMethodHandle::EntityDefMethodHandle(const FString& scriptName, const FString& defMethodName)
 {
-	g_EntityDefMethodHandles.add(scriptName, defMethodName, this);
+	EntityDefMethodHandles::getSingleton().add(scriptName, defMethodName, this);
 }
 
 EntityDefMethodHandle::~EntityDefMethodHandle()
@@ -36,7 +70,7 @@ EntityDefMethodHandle::~EntityDefMethodHandle()
 
 EntityDefPropertyHandle::EntityDefPropertyHandle(const FString& scriptName, const FString& defPropertyName)
 {
-	g_EntityDefPropertyHandles.add(scriptName, defPropertyName, this);
+	EntityDefPropertyHandles::getSingleton().add(scriptName, defPropertyName, this);
 }
 
 EntityDefPropertyHandle::~EntityDefPropertyHandle()
@@ -53,7 +87,7 @@ EntityCreator* EntityFactory::addEntityCreator(const FString& scriptName, Entity
 
 EntityCreator* EntityFactory::findCreator(const FString& scriptName)
 {
-	EntityCreator** pCreator = g_EntityFactory.creators.Find(scriptName);
+	EntityCreator** pCreator = EntityFactory::getSingleton().creators.Find(scriptName);
 	if (pCreator == NULL)
 	{
 		return NULL;
@@ -74,7 +108,7 @@ void EntityFactory::initialize()
 	// 填充所有父类的def信息到子类
 
 	/* 由于所有的信息已经直接注册给了顶级Entity， 所以父类没有数据
-	for (auto& item : g_EntityFactory.creators)
+	for (auto& item : EntityFactory::getSingleton().creators)
 	{
 		FString scriptName = item.Key;
 		EntityCreator* pEntityCreator = item.Value;
@@ -88,7 +122,7 @@ void EntityFactory::initialize()
 		for (auto& m : parentClassesArray)
 		{
 			FString moduleName = m.Trim();
-			EntityCreator* pEntityParentCreator = g_EntityFactory.creators.FindRef(moduleName);
+			EntityCreator* pEntityParentCreator = EntityFactory::getSingleton().creators.FindRef(moduleName);
 			if (!pEntityParentCreator || pEntityParentCreator == pEntityCreator)
 				continue;
 
@@ -100,19 +134,19 @@ void EntityFactory::initialize()
 
 void EntityFactory::finishDefs(const FString& scriptName, const FString& parentScriptName)
 {
-	EntityCreator* pEntityCreator = g_EntityFactory.creators.FindRef(scriptName);
-	EntityCreator* pEntityScriptParentCreator = g_EntityFactory.creators.FindRef(parentScriptName);
+	EntityCreator* pEntityCreator = EntityFactory::getSingleton().creators.FindRef(scriptName);
+	EntityCreator* pEntityScriptParentCreator = EntityFactory::getSingleton().creators.FindRef(parentScriptName);
 
-	const TMap<FString, EntityDefMethodHandle*>& EntityDefMethodHandleArray = g_EntityDefMethodHandles.defMethodHandles.FindRef(parentScriptName);
+	const TMap<FString, EntityDefMethodHandle*>& EntityDefMethodHandleArray = EntityDefMethodHandles::getSingleton().defMethodHandles.FindRef(parentScriptName);
 	for (auto& m1 : EntityDefMethodHandleArray)
 	{
-		g_EntityDefMethodHandles.add(scriptName, m1.Key, m1.Value);
+		EntityDefMethodHandles::getSingleton().add(scriptName, m1.Key, m1.Value);
 	}
 
-	const TMap<FString, EntityDefPropertyHandle*>& EntityDefPropertyHandleArray = g_EntityDefPropertyHandles.defPropertyHandles.FindRef(parentScriptName);
+	const TMap<FString, EntityDefPropertyHandle*>& EntityDefPropertyHandleArray = EntityDefPropertyHandles::getSingleton().defPropertyHandles.FindRef(parentScriptName);
 	for (auto& m2 : EntityDefPropertyHandleArray)
 	{
-		g_EntityDefPropertyHandles.add(scriptName, m2.Key, m2.Value);
+		EntityDefPropertyHandles::getSingleton().add(scriptName, m2.Key, m2.Value);
 	}
 
 	FString parentClasses = pEntityScriptParentCreator->parentClasses();
@@ -124,7 +158,7 @@ void EntityFactory::finishDefs(const FString& scriptName, const FString& parentS
 
 	for (auto& m : parentClassesArray)
 	{
-		EntityCreator* pEntityParentCreator = g_EntityFactory.creators.FindRef(m);
+		EntityCreator* pEntityParentCreator = EntityFactory::getSingleton().creators.FindRef(m);
 		if (!pEntityParentCreator || pEntityParentCreator == pEntityCreator)
 			continue;
 
@@ -134,7 +168,7 @@ void EntityFactory::finishDefs(const FString& scriptName, const FString& parentS
 
 Entity* EntityFactory::create(const FString& scriptName)
 {
-	EntityCreator** pCreator = g_EntityFactory.creators.Find(scriptName);
+	EntityCreator** pCreator = EntityFactory::getSingleton().creators.Find(scriptName);
 	if (pCreator == NULL)
 	{
 		return NULL;
@@ -164,7 +198,7 @@ EntityDefMethodHandle* EntityDefMethodHandles::add(const FString& scriptName, co
 
 EntityDefMethodHandle* EntityDefMethodHandles::find(const FString& scriptName, const FString& defMethodName)
 {
-	TMap<FString, EntityDefMethodHandle*>* m = g_EntityDefMethodHandles.defMethodHandles.Find(scriptName);
+	TMap<FString, EntityDefMethodHandle*>* m = EntityDefMethodHandles::getSingleton().defMethodHandles.Find(scriptName);
 	if (!m)
 		return NULL;
 
@@ -195,7 +229,7 @@ EntityDefPropertyHandle* EntityDefPropertyHandles::add(const FString& scriptName
 
 EntityDefPropertyHandle* EntityDefPropertyHandles::find(const FString& scriptName, const FString& defPropertyName)
 {
-	TMap<FString, EntityDefPropertyHandle*>* m = g_EntityDefPropertyHandles.defPropertyHandles.Find(scriptName);
+	TMap<FString, EntityDefPropertyHandle*>* m = EntityDefPropertyHandles::getSingleton().defPropertyHandles.Find(scriptName);
 	if (!m)
 		return NULL;
 

@@ -257,6 +257,9 @@ public:
 class KBENGINEPLUGINS_API EntityFactory
 {
 public:
+	EntityFactory();
+	~EntityFactory();
+
 	static void initialize();
 	static void finishDefs(const FString& scriptName, const FString& parentScriptName);
 
@@ -265,7 +268,15 @@ public:
 
 	static EntityCreator* findCreator(const FString& scriptName);
 
+	static EntityFactory& getSingleton() {
+		if (!pEntityFactory)
+			pEntityFactory = new EntityFactory();
+		return *pEntityFactory;
+	}
+
 	TMap<FString, EntityCreator*> creators;
+
+	static EntityFactory* pEntityFactory;
 };
 
 /*
@@ -289,8 +300,19 @@ public:
 class KBENGINEPLUGINS_API EntityDefMethodHandles
 {
 public:
+	EntityDefMethodHandles();
+	~EntityDefMethodHandles();
+
 	EntityDefMethodHandle* add(const FString& scriptName, const FString& defMethodName, EntityDefMethodHandle* pEntityDefMethodHandle);
 	static EntityDefMethodHandle* find(const FString& scriptName, const FString& defMethodName);
+
+	static EntityDefMethodHandles& getSingleton() {
+		if (!pEntityDefMethodHandles)
+			pEntityDefMethodHandles = new EntityDefMethodHandles();
+		return *pEntityDefMethodHandles;
+	}
+
+	static EntityDefMethodHandles* pEntityDefMethodHandles;
 
 	TMap<FString, TMap<FString, EntityDefMethodHandle*>> defMethodHandles;
 };
@@ -333,8 +355,19 @@ protected:
 class KBENGINEPLUGINS_API EntityDefPropertyHandles
 {
 public:
+	EntityDefPropertyHandles();
+	~EntityDefPropertyHandles();
+
 	EntityDefPropertyHandle* add(const FString& scriptName, const FString& defPropertyName, EntityDefPropertyHandle* pEntityDefPropertyHandle);
 	static EntityDefPropertyHandle* find(const FString& scriptName, const FString& defPropertyName);
+
+	static EntityDefPropertyHandles& getSingleton() {
+		if (!pEntityDefPropertyHandles)
+			pEntityDefPropertyHandles = new EntityDefPropertyHandles();
+		return *pEntityDefPropertyHandles;
+	}
+
+	static EntityDefPropertyHandles* pEntityDefPropertyHandles;
 
 	TMap<FString, TMap<FString, EntityDefPropertyHandle*>> defPropertyHandles;
 };
