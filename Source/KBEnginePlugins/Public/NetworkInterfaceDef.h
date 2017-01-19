@@ -542,7 +542,7 @@
 #ifdef KBENGINEAPP
 #define NETWORK_INTERFACE_DECLARE_BEGIN(INAME)	Messages g_Messages;	
 #else
-	#define NETWORK_INTERFACE_DECLARE_BEGIN(INAME)	extern Messages g_Messages;	
+#define NETWORK_INTERFACE_DECLARE_BEGIN(INAME)	extern Messages g_Messages;	
 #endif
 
 #define NETWORK_INTERFACE_DECLARE_END() 
