@@ -5,7 +5,7 @@
 
 DEFINE_LOG_CATEGORY(LogKBEngine);
 
-float getTimeSeconds()
+double getTimeSeconds()
 {
 	return FPlatformTime::Seconds();
 }

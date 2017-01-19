@@ -151,7 +151,7 @@ void NetworkInterface::tickConnecting()
 	else
 	{
 		// 如果连接超时则回调失败
-		float currTime = getTimeSeconds();
+		double currTime = getTimeSeconds();
 		if (currTime - startTime_ > 3)
 		{
 			ERROR_MSG("NetworkInterface::tickConnecting(): connect to %s:%d timeout!", *connectIP_, connectPort_);

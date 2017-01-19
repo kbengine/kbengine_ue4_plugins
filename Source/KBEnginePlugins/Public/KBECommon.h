@@ -143,7 +143,7 @@ typedef uint16								PacketLength;				// ×î´ó65535
 
 #define TCP_PACKET_MAX 1460
 
-float getTimeSeconds();
+double getTimeSeconds();
 
 inline float int82angle(int8 angle, bool half)
 {
