@@ -367,7 +367,7 @@ void KBEngineApp::updatePlayerToServer()
 	if (!pArgs_->syncPlayer || spaceID_ == 0)
 		return;
 
-	float tnow = getTimeSeconds();
+	double tnow = getTimeSeconds();
 	double span = tnow - lastUpdateToServerTime_;
 
 	if (span < 0.1)
