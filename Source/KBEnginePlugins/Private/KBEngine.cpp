@@ -2074,8 +2074,8 @@ void KBEngineApp::Client_onEntityEnterWorld(MemoryStream& stream)
 		entities_.Add(eid, pEntity);
 
 		Client_onUpdatePropertys(*(*entityMessageFind));
-		bufferedCreateEntityMessage_.Remove(eid);
 		MemoryStream::reclaimObject((*entityMessageFind));
+		bufferedCreateEntityMessage_.Remove(eid);
 
 		pEntity->isOnGround(isOnGround > 0);
 		pEntity->set_direction(pEntity->direction);
