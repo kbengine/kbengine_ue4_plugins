@@ -56,18 +56,28 @@ bool NetworkInterface::valid()
 	return socket_ != NULL;
 }
 
-bool NetworkInterface::connectTo(FString ip, uint16 port, InterfaceConnect* callback, int userdata)
+bool NetworkInterface::connectTo(const FString& addr, uint16 port, InterfaceConnect* callback, int userdata)
 {
-	INFO_MSG("NetworkInterface::connectTo(): will connect to %s:%d ...", *ip, port);
+	INFO_MSG("NetworkInterface::connectTo(): will connect to %s:%d ...", *addr, port);
 
 	reset();
 
-	FIPv4Address ip1;
-	FIPv4Address::Parse(ip, ip1);
+	auto resolveInfo = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetHostByName(TCHAR_TO_ANSI(*addr));
+	while (!resolveInfo->IsComplete());
 
-	TSharedRef<FInternetAddr> addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
-	addr->SetIp(ip1.Value);
-	addr->SetPort(port);
+	FIPv4Address ip;
+
+	if (resolveInfo->GetErrorCode() != 0)
+	{
+		ERROR_MSG("NetworkInterface::connectTo(): GetHostByName(%s) error, code=%d", *addr, resolveInfo->GetErrorCode());
+		return false;
+	}
+
+	TSharedRef<FInternetAddr> internetAddr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
+	uint32 OutIP = 0;
+	resolveInfo->GetResolvedAddress().GetIp(OutIP);
+	internetAddr->SetIp(OutIP);
+	internetAddr->SetPort(port);
 
 	socket_ = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("default"), false);
 
@@ -79,14 +89,14 @@ bool NetworkInterface::connectTo(FString ip, uint16 port, InterfaceConnect* call
 	
 	if (!socket_->SetNonBlocking(true))
 	{
-		ERROR_MSG("NetworkInterface::connectTo(): socket->SetNonBlocking error(%d)!", *ip, port,
+		ERROR_MSG("NetworkInterface::connectTo(): socket->SetNonBlocking error(%d)!", *addr, port,
 			(int32)ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLastErrorCode());
 	}
 
-	socket_->Connect(*addr);
+	socket_->Connect(*internetAddr);
 
 	connectCB_ = callback;
-	connectIP_ = ip;
+	connectIP_ = addr;
 	connectPort_ = port;
 	connectUserdata_ = userdata;
 	startTime_ = getTimeSeconds();

@@ -35,7 +35,7 @@ public:
 	void close();
 	bool valid();
 
-	bool connectTo(FString ip, uint16 port, InterfaceConnect* callback, int userdata);
+	bool connectTo(const FString& addr, uint16 port, InterfaceConnect* callback, int userdata);
 	bool send(MemoryStream* pMemoryStream);
 
 	void destroy() {
