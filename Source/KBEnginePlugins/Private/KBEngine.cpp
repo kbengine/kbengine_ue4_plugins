@@ -819,55 +819,63 @@ void KBEngineApp::Client_onCreatedProxies(uint64 rndUUID, int32 eid, FString& en
 {
 	DEBUG_MSG("KBEngineApp::Client_onCreatedProxies(): eid(%d), entityType(%s)!", eid, *entityType);
 
-	if (entities_.Contains(eid))
-	{
-		// WARNING_MSG("KBEngineApp::Client_onCreatedProxies(): eid(%d) has exist!", eid);
-		Client_onEntityDestroyed(eid);
-	}
-
 	entity_uuid_ = rndUUID;
 	entity_id_ = eid;
 	entity_type_ = entityType;
 
-	ScriptModule** pModuleFind = EntityDef::moduledefs.Find(entityType);
-	if (!pModuleFind)
+	if(!this.entities.ContainsKey(eid))
 	{
-		SCREEN_ERROR_MSG("KBEngineApp::Client_onCreatedProxies(): not found ScriptModule(%s)!", *entityType);
-		return;
+		ScriptModule** pModuleFind = EntityDef::moduledefs.Find(entityType);
+		if (!pModuleFind)
+		{
+			SCREEN_ERROR_MSG("KBEngineApp::Client_onCreatedProxies(): not found ScriptModule(%s)!", *entityType);
+			return;
+		}
+
+		ScriptModule* pModule = *pModuleFind;
+
+		EntityCreator* pEntityCreator = pModule->pEntityCreator;
+		if (!pEntityCreator)
+			return;
+
+		Entity* pEntity = pEntityCreator->create();
+		pEntity->id(eid);
+		pEntity->className(entityType);
+
+		Mailbox* baseMB = new Mailbox();
+		pEntity->base(baseMB);
+		baseMB->id = eid;
+		baseMB->className = entityType;
+		baseMB->type = Mailbox::MAILBOX_TYPE_BASE;
+
+		entities_.Add(eid, pEntity);
+
+		MemoryStream** entityMessageFind = bufferedCreateEntityMessage_.Find(eid);
+		if (entityMessageFind)
+		{
+			MemoryStream* entityMessage = *entityMessageFind;
+			Client_onUpdatePropertys(*entityMessage);
+			bufferedCreateEntityMessage_.Remove(eid);
+			MemoryStream::reclaimObject(entityMessage);
+		}
+
+		pEntity->__init__();
+		pEntity->inited(true);
+
+		if (pArgs_->isOnInitCallPropertysSetMethods)
+			pEntity->callPropertysSetMethods();
 	}
-
-	ScriptModule* pModule = *pModuleFind;
-
-	EntityCreator* pEntityCreator = pModule->pEntityCreator;
-	if (!pEntityCreator)
-		return;
-
-	Entity* pEntity = pEntityCreator->create();
-	pEntity->id(eid);
-	pEntity->className(entityType);
-
-	Mailbox* baseMB = new Mailbox();
-	pEntity->base(baseMB);
-	baseMB->id = eid;
-	baseMB->className = entityType;
-	baseMB->type = Mailbox::MAILBOX_TYPE_BASE;
-
-	entities_.Add(eid, pEntity);
-
-	MemoryStream** entityMessageFind = bufferedCreateEntityMessage_.Find(eid);
-	if (entityMessageFind)
+	else
 	{
-		MemoryStream* entityMessage = *entityMessageFind;
-		Client_onUpdatePropertys(*entityMessage);
-		bufferedCreateEntityMessage_.Remove(eid);
-		MemoryStream::reclaimObject(entityMessage);
+		MemoryStream** entityMessageFind = bufferedCreateEntityMessage_.Find(eid);
+		if (entityMessageFind)
+		{
+			MemoryStream* entityMessage = *entityMessageFind;
+			Client_onUpdatePropertys(*entityMessage);
+			bufferedCreateEntityMessage_.Remove(eid);
+			MemoryStream::reclaimObject(entityMessage);
+		}
 	}
-
-	pEntity->__init__();
-	pEntity->inited(true);
-
-	if (pArgs_->isOnInitCallPropertysSetMethods)
-		pEntity->callPropertysSetMethods();
 }
 
 ENTITY_ID KBEngineApp::getAoiEntityIDFromStream(MemoryStream& stream)
