@@ -823,7 +823,7 @@ void KBEngineApp::Client_onCreatedProxies(uint64 rndUUID, int32 eid, FString& en
 	entity_id_ = eid;
 	entity_type_ = entityType;
 
-	if(!this.entities.ContainsKey(eid))
+	if (!entities_.Contains(eid))
 	{
 		ScriptModule** pModuleFind = EntityDef::moduledefs.Find(entityType);
 		if (!pModuleFind)
