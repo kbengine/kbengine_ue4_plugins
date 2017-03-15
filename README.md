@@ -38,12 +38,12 @@ Usage
 				// Called when the game starts or when spawned
 				virtual void BeginPlay() override
 				{
-					KBENGINE_REGISTER_EVENT("onConnectStatus", onConnectStatus);
+					KBENGINE_REGISTER_EVENT("onConnectionState", onConnectionState);
 				}
 
 				// KBE-plugins event fired
 				UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "KBEngine")
-				void onConnectStatus(const UKBEventData* pEventData);
+				void onConnectionState(const UKBEventData* pEventData);
 			}
 
 	5: Fire events to the KBE-plugins
@@ -182,7 +182,7 @@ KBE-Plugin fire-out events(KBE => UE4):
 			Event-datas: 
 				No datas.
 
-		onReLoginBaseapp
+		onReloginBaseapp
 			Description: 
 				Relogin to baseapp.
 
@@ -213,7 +213,7 @@ KBE-Plugin fire-out events(KBE => UE4):
 				uint16: retcode
 					http://kbengine.org/docs/configuration/server_errors.html
 
-		onReLoginBaseappFailed
+		onReloginBaseappFailed
 			Description: 
 				Relogin baseapp failed.
 
@@ -221,7 +221,7 @@ KBE-Plugin fire-out events(KBE => UE4):
 				uint16: retcode
 					http://kbengine.org/docs/configuration/server_errors.html
 
-		onReLoginBaseappSuccessfully
+		onReloginBaseappSuccessfully
 			Description: 
 				Relogin baseapp success.
 
@@ -255,14 +255,14 @@ KBE-Plugin fire-out events(KBE => UE4):
 				string: key
 
 	Network events:
-		onConnectStatus
+		onConnectionState
 			Description: 
 				Status of connection server.
 
 			Event-datas: 
 				bool: success or fail
 
-		onDisableConnect
+		onDisconnected
 			Description: 
 				Status of connection server.
 
@@ -299,7 +299,7 @@ KBE-Plugin fire-in events(UE4 => KBE):
 					Data will be recorded into the KBE account database, you can access the datas through the script layer.
 					If you use third-party account system, datas will be submitted to the third-party system.
 
-	reLoginBaseapp
+	reloginBaseapp
 			Description: 
 				Relogin to baseapp.
 

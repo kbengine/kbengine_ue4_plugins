@@ -155,9 +155,9 @@ void KBEngineApp::installEvents()
 		createAccount(data.username, data.password, data.datas);
 	});
 
-	KBENGINE_REGISTER_EVENT_OVERRIDE_FUNC("reLoginBaseapp", "reLoginBaseapp", [this](const UKBEventData* pEventData)
+	KBENGINE_REGISTER_EVENT_OVERRIDE_FUNC("reloginBaseapp", "reloginBaseapp", [this](const UKBEventData* pEventData)
 	{
-		reLoginBaseapp();
+		reloginBaseapp();
 	});
 
 	KBENGINE_REGISTER_EVENT_OVERRIDE_FUNC("resetPassword", "resetPassword", [this](const UKBEventData* pEventData)
@@ -225,7 +225,7 @@ void KBEngineApp::reset()
 	serverdatas_.Empty();
 
 	serverVersion_ = TEXT("");
-	clientVersion_ = TEXT("0.9.0");
+	clientVersion_ = TEXT("0.9.12");
 	serverScriptVersion_ = TEXT("");
 	clientScriptVersion_ = TEXT("0.1.0");
 
@@ -758,10 +758,10 @@ void KBEngineApp::onLogin_baseapp()
 	}
 }
 
-void KBEngineApp::reLoginBaseapp()
+void KBEngineApp::reloginBaseapp()
 {
-	UKBEventData_onReLoginBaseapp* pEventData = NewObject<UKBEventData_onReLoginBaseapp>();
-	KBENGINE_EVENT_FIRE("KBEngineApp::reLoginBaseapp(): onReLoginBaseapp", pEventData);
+	UKBEventData_onReloginBaseapp* pEventData = NewObject<UKBEventData_onReloginBaseapp>();
+	KBENGINE_EVENT_FIRE("KBEngineApp::reloginBaseapp(): onReloginBaseapp", pEventData);
 
 	pNetworkInterface_->connectTo(baseappIP_, baseappPort_, this, 3);
 }
@@ -777,7 +777,7 @@ void KBEngineApp::onReloginTo_baseapp_callback(FString ip, uint16 port, bool suc
 	INFO_MSG("KBEngineApp::onReloginTo_baseapp_callback(): connect %s:%d is success!", *ip, port);
 
 	Bundle* pBundle = Bundle::createObject();
-	pBundle->newMessage(Messages::getSingleton().messages[TEXT("Baseapp_reLoginBaseapp"]));
+	pBundle->newMessage(Messages::getSingleton().messages[TEXT("Baseapp_reloginBaseapp"]));
 	(*pBundle) << username_;
 	(*pBundle) << password_;
 	(*pBundle) << entity_uuid_;
@@ -797,22 +797,22 @@ void KBEngineApp::Client_onLoginBaseappFailed(uint16 failedcode)
 	KBENGINE_EVENT_FIRE("onLoginBaseappFailed", pEventData);
 }
 
-void KBEngineApp::Client_onReLoginBaseappFailed(uint16 failedcode)
+void KBEngineApp::Client_onReloginBaseappFailed(uint16 failedcode)
 {
-	ERROR_MSG("KBEngineApp::Client_onReLoginBaseappFailed(): failedcode(%d:%s)!", failedcode, *serverErr(failedcode));
+	ERROR_MSG("KBEngineApp::Client_onReloginBaseappFailed(): failedcode(%d:%s)!", failedcode, *serverErr(failedcode));
 
-	UKBEventData_onReLoginBaseappFailed* pEventData = NewObject<UKBEventData_onReLoginBaseappFailed>();
+	UKBEventData_onReloginBaseappFailed* pEventData = NewObject<UKBEventData_onReloginBaseappFailed>();
 	pEventData->failedcode = failedcode;
 	pEventData->errorStr = serverErr(failedcode);
-	KBENGINE_EVENT_FIRE("onReLoginBaseappFailed", pEventData);
+	KBENGINE_EVENT_FIRE("onReloginBaseappFailed", pEventData);
 }
 
-void KBEngineApp::Client_onReLoginBaseappSuccessfully(MemoryStream& stream)
+void KBEngineApp::Client_onReloginBaseappSuccessfully(MemoryStream& stream)
 {
 	stream >> entity_uuid_;
-	ERROR_MSG("KBEngineApp::Client_onReLoginBaseappSuccessfully(): name(%s)!", *username_);
-	UKBEventData_onReLoginBaseappSuccessfully* pEventData = NewObject<UKBEventData_onReLoginBaseappSuccessfully>();
-	KBENGINE_EVENT_FIRE("onReLoginBaseappSuccessfully", pEventData);
+	ERROR_MSG("KBEngineApp::Client_onReloginBaseappSuccessfully(): name(%s)!", *username_);
+	UKBEventData_onReloginBaseappSuccessfully* pEventData = NewObject<UKBEventData_onReloginBaseappSuccessfully>();
+	KBENGINE_EVENT_FIRE("onReloginBaseappSuccessfully", pEventData);
 }
 
 void KBEngineApp::Client_onCreatedProxies(uint64 rndUUID, int32 eid, FString& entityType)

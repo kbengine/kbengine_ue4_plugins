@@ -24,10 +24,10 @@ NETWORK_INTERFACE_DECLARE_BEGIN(KBEngineApp)
 	NETWORK_MESSAGE_HANDLER_ARGS1(Client_onLoginBaseappFailed,							NETWORK_FIXED_MESSAGE,
 									uint16,												failedcode)
 
-	NETWORK_MESSAGE_HANDLER_ARGS1(Client_onReLoginBaseappFailed,						NETWORK_FIXED_MESSAGE,
+	NETWORK_MESSAGE_HANDLER_ARGS1(Client_onReloginBaseappFailed,						NETWORK_FIXED_MESSAGE,
 									uint16,												failedcode)
 
-	NETWORK_MESSAGE_HANDLER_STREAM(Client_onReLoginBaseappSuccessfully,					NETWORK_VARIABLE_MESSAGE)
+	NETWORK_MESSAGE_HANDLER_STREAM(Client_onReloginBaseappSuccessfully,					NETWORK_VARIABLE_MESSAGE)
 	
 	NETWORK_MESSAGE_HANDLER_STREAM(Client_onLoginSuccessfully,							NETWORK_VARIABLE_MESSAGE)
 

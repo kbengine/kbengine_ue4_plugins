@@ -162,7 +162,7 @@ public:
 };
 
 UCLASS(Blueprintable, BlueprintType)
-class KBENGINEPLUGINS_API UKBEventData_onReLoginBaseapp : public UKBEventData
+class KBENGINEPLUGINS_API UKBEventData_onReloginBaseapp : public UKBEventData
 {
 	GENERATED_BODY()
 
@@ -183,7 +183,7 @@ public:
 };
 
 UCLASS(Blueprintable, BlueprintType)
-class KBENGINEPLUGINS_API UKBEventData_onReLoginBaseappFailed : public UKBEventData
+class KBENGINEPLUGINS_API UKBEventData_onReloginBaseappFailed : public UKBEventData
 {
 	GENERATED_BODY()
 
@@ -197,7 +197,7 @@ public:
 };
 
 UCLASS(Blueprintable, BlueprintType)
-class KBENGINEPLUGINS_API UKBEventData_onReLoginBaseappSuccessfully : public UKBEventData
+class KBENGINEPLUGINS_API UKBEventData_onReloginBaseappSuccessfully : public UKBEventData
 {
 	GENERATED_BODY()
 
@@ -371,7 +371,7 @@ public:
 };
 
 UCLASS(Blueprintable, BlueprintType)
-class KBENGINEPLUGINS_API UKBEventData_onDisableConnect : public UKBEventData
+class KBENGINEPLUGINS_API UKBEventData_onDisconnected : public UKBEventData
 {
 	GENERATED_BODY()
 
@@ -379,7 +379,7 @@ public:
 };
 
 UCLASS(Blueprintable, BlueprintType)
-class KBENGINEPLUGINS_API UKBEventData_onConnectStatus : public UKBEventData
+class KBENGINEPLUGINS_API UKBEventData_onConnectionState : public UKBEventData
 {
 	GENERATED_BODY()
 

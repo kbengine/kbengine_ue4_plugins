@@ -123,7 +123,7 @@ public:
 	重登录到网关(baseapp)
 	一些移动类应用容易掉线，可以使用该功能快速的重新与服务端建立通信
 	*/
-	void reLoginBaseapp();
+	void reloginBaseapp();
 	void onReloginTo_baseapp_callback(FString ip, uint16 port, bool success);
 
 	/*
@@ -144,12 +144,12 @@ public:
 	/*
 		重登录baseapp失败了
 	*/
-	void Client_onReLoginBaseappFailed(uint16 failedcode);
+	void Client_onReloginBaseappFailed(uint16 failedcode);
 
 	/*
 		登录baseapp成功了
 	*/
-	void Client_onReLoginBaseappSuccessfully(MemoryStream& stream);
+	void Client_onReloginBaseappSuccessfully(MemoryStream& stream);
 
 	void hello();
 	void Client_onHelloCB(MemoryStream& stream);
