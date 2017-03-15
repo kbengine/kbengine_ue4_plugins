@@ -270,13 +270,6 @@ bool KBEDATATYPE_STRING::isSameType(KBVar& v)
 
 KBVar* KBEDATATYPE_VECTOR2::createFromStream(MemoryStream& stream)
 {
-	uint32 size = 0;
-	stream >> size;
-	if (2 != size)
-	{
-		ERROR_MSG("KBEDATATYPE_VECTOR2::createFromStream(): size(%d) is error!", size);
-	}
-
 	FVector2D val;
 	stream >> val.X >> val.Y;
 	return new KBVar(val);
@@ -300,13 +293,6 @@ bool KBEDATATYPE_VECTOR2::isSameType(KBVar& v)
 
 KBVar* KBEDATATYPE_VECTOR3::createFromStream(MemoryStream& stream)
 {
-	uint32 size = 0;
-	stream >> size;
-	if (3 != size)
-	{
-		ERROR_MSG("KBEDATATYPE_VECTOR3::createFromStream(): size(%d) is error!", size);
-	}
-
 	FVector val;
 	stream >> val.X >> val.Y >> val.Z;
 	return new KBVar(val);
@@ -330,13 +316,6 @@ bool KBEDATATYPE_VECTOR3::isSameType(KBVar& v)
 
 KBVar* KBEDATATYPE_VECTOR4::createFromStream(MemoryStream& stream)
 {
-	uint32 size = 0;
-	stream >> size;
-	if (4 != size)
-	{
-		ERROR_MSG("KBEDATATYPE_VECTOR4::createFromStream(): size(%d) is error!", size);
-	}
-
 	FVector4 val;
 	stream >> val.X >> val.Y >> val.Z >> val.W;
 	return new KBVar(val);
