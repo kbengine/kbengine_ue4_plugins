@@ -339,7 +339,7 @@ protected:
 	void setPropertyValue_(uint16* out, KBVar* val) { *out = (uint16)(*val); }
 	void setPropertyValue_(uint32* out, KBVar* val) { *out = (uint32)(*val); }
 	void setPropertyValue_(uint64* out, KBVar* val) { *out = (uint64)(*val); }
-	void setPropertyValue_(FString* out, KBVar* val) { *out = (FString)(*val); }
+	void setPropertyValue_(FString* out, KBVar* val) { *out = val->GetValue<FString>(); }
 	void setPropertyValue_(float* out, KBVar* val) { *out = (float)(*val); }
 	void setPropertyValue_(double* out, KBVar* val) { *out = (double)(*val); }
 	void setPropertyValue_(bool* out, KBVar* val) { *out = (bool)(*val); }
