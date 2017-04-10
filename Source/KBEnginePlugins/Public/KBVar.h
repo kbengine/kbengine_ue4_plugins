@@ -210,7 +210,7 @@ public:
 		else if (GetType() == EKBVarTypes::ByteArray)
 		{
 			TArray<uint8> v = (*this);
-			return FString::Printf(TEXT("ByteArray(size=%s)"), v.Num());
+			return FString::Printf(TEXT("ByteArray(size=%d)"), v.Num());
 		}
 		else if (GetType() == EKBVarTypes::Double)
 		{
