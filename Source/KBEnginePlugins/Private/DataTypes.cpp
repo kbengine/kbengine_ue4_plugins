@@ -457,14 +457,30 @@ KBVar* KBEDATATYPE_ARRAY::createFromStream(MemoryStream& stream)
 
 void KBEDATATYPE_ARRAY::addToStream(Bundle& stream, KBVar& v)
 {
-	KBVar::KBVarArray val = v;
-	uint32 size = val.Num();
-
-	stream << size;
-
-	for (uint32 i = 0; i<size; ++i)
+	if (v.GetType() == EKBVarTypes::KBVarArray)
 	{
-		vtype->addToStream(stream, val[i]);
+		KBVar::KBVarArray val = v;
+		uint32 size = val.Num();
+
+		stream << size;
+
+		for (uint32 i = 0; i<size; ++i)
+		{
+			vtype->addToStream(stream, val[i]);
+		}
+	}
+	else
+	{
+		KBVar::KBVarBytes val = v;
+		uint32 size = val.Num();
+
+		stream << size;
+
+		for (uint32 i = 0; i<size; ++i)
+		{
+			KBVar tmpv = val[i];
+			vtype->addToStream(stream, tmpv);
+		}
 	}
 }
 
@@ -475,15 +491,29 @@ KBVar* KBEDATATYPE_ARRAY::parseDefaultValStr(const FString& v)
 
 bool KBEDATATYPE_ARRAY::isSameType(KBVar& v)
 {
-	if (v.GetType() != EKBVarTypes::KBVarArray)
+	if (v.GetType() != EKBVarTypes::KBVarArray && v.GetType() != EKBVarTypes::ByteArray)
 		return false;
 
-	KBVar::KBVarArray val = v;
-
-	for (uint32 i = 0; i<(uint32)val.Num(); ++i)
+	if (v.GetType() == EKBVarTypes::KBVarArray)
 	{
-		if (!vtype->isSameType(val[i]))
-			return false;
+		KBVar::KBVarArray val = v;
+
+		for (uint32 i = 0; i < (uint32)val.Num(); ++i)
+		{
+			if (!vtype->isSameType(val[i]))
+				return false;
+		}
+	}
+	else
+	{
+		KBVar::KBVarBytes val = v;
+
+		for (uint32 i = 0; i < (uint32)val.Num(); ++i)
+		{
+			KBVar tmpv = val[i];
+			if (!vtype->isSameType(tmpv))
+				return false;
+		}
 	}
 
 	return true;

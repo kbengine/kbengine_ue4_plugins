@@ -111,12 +111,14 @@ void Bundle::writeMsgLength()
 	if (pMsgtype_->msglen != -1)
 		return;
 
+	MemoryStream* writePacket = pCurrPacket_;
+
 	if (curMsgStreamIndex_ > 0)
 	{
-		pCurrPacket_ = streams_[streams_.Num() - curMsgStreamIndex_];
+		writePacket = streams_[streams_.Num() - curMsgStreamIndex_];
 	}
 
-	uint8* data = pCurrPacket_->data();
+	uint8* data = writePacket->data();
 	data[2] = (uint8)(messageLength_ & 0xff);
 	data[3] = (uint8)(messageLength_ >> 8 & 0xff);
 }
