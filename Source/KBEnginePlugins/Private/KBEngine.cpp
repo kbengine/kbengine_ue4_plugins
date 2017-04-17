@@ -129,7 +129,7 @@ bool KBEngineApp::initialize(KBEngineArgs* pArgs)
 	// 允许持久化KBE(例如:协议，entitydef等)
 	if (pArgs->persistentDataPath != TEXT(""))
 	{
-		SAFE_RELEASE(persistentInfos_);
+		KBE_SAFE_RELEASE(persistentInfos_);
 		persistentInfos_ = new PersistentInfos(pArgs->persistentDataPath);
 	}
 
@@ -191,9 +191,9 @@ void KBEngineApp::destroy()
 	KBENGINE_DEREGISTER_ALL_EVENT();
 	resetMessages();
 
-	SAFE_RELEASE(pArgs_);
-	SAFE_RELEASE(pNetworkInterface_);
-	SAFE_RELEASE(persistentInfos_);
+	KBE_SAFE_RELEASE(pArgs_);
+	KBE_SAFE_RELEASE(pNetworkInterface_);
+	KBE_SAFE_RELEASE(persistentInfos_);
 }
 
 void KBEngineApp::resetMessages()

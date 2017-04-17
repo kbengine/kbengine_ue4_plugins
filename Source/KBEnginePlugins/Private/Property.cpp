@@ -16,5 +16,5 @@ Property::Property():
 
 Property::~Property()
 {
-	SAFE_RELEASE(pdefaultVal);
+	KBE_SAFE_RELEASE(pdefaultVal);
 }

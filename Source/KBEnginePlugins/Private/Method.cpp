@@ -14,5 +14,5 @@ Method::Method():
 
 Method::~Method()
 {
-	SAFE_RELEASE(pEntityDefMethodHandle);
+	KBE_SAFE_RELEASE(pEntityDefMethodHandle);
 }

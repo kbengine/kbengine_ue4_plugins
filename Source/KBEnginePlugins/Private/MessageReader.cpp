@@ -13,7 +13,7 @@ MessageReader::MessageReader():
 
 MessageReader::~MessageReader()
 {
-	SAFE_RELEASE(pMemoryStream_);
+	KBE_SAFE_RELEASE(pMemoryStream_);
 }
 
 void MessageReader::process(const uint8* datas, MessageLengthEx offset, MessageLengthEx length)

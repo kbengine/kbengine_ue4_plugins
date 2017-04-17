@@ -41,8 +41,8 @@ void NetworkInterface::close()
 
 	socket_ = NULL;
 
-	SAFE_RELEASE(pPacketSender_);
-	SAFE_RELEASE(pPacketReceiver_);
+	KBE_SAFE_RELEASE(pPacketSender_);
+	KBE_SAFE_RELEASE(pPacketReceiver_);
 
 	connectCB_ = NULL;
 	connectIP_ = TEXT("");

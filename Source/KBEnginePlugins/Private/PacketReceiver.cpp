@@ -14,8 +14,8 @@ PacketReceiver::PacketReceiver(NetworkInterface* pNetworkInterface):
 
 PacketReceiver::~PacketReceiver()
 {
-	SAFE_RELEASE(pMessageReader_);
-	SAFE_RELEASE(pBuffer_);
+	KBE_SAFE_RELEASE(pMessageReader_);
+	KBE_SAFE_RELEASE(pBuffer_);
 	
 	INFO_MSG("PacketReceiver::~PacketReceiver(), destroyed!");
 }
