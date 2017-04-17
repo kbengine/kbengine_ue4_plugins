@@ -79,6 +79,7 @@ void UKBEMain::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompon
 	if (kbe_player && ue4_player)
 	{
 		UE4Pos2KBPos(kbe_player->position, ue4_player->GetActorLocation());
+		UE4Dir2KBDir(kbe_player->direction, ue4_player->GetActorRotation());
 	}
 
 	KBEngineApp::getSingleton().process();

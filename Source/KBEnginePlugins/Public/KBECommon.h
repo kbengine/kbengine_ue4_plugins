@@ -181,6 +181,22 @@ inline void UE4Pos2KBPos(FVector& KBE_POSITION, const FVector& UE4_POSITION)
 	KBE_POSITION.Z = UE4_POSITION.X / UE4_SCALE_UNIT_TO_METER;
 }
 
+// 将KBE方向转换为UE4方向
+inline void KBDir2UE4Dir(FRotator& UE4_DIRECTION, const FVector& KBE_DIRECTION)
+{
+	UE4_DIRECTION.Pitch = FMath::RadiansToDegrees<float>(KBE_DIRECTION.Y);
+	UE4_DIRECTION.Yaw = FMath::RadiansToDegrees<float>(KBE_DIRECTION.Z);
+	UE4_DIRECTION.Roll = FMath::RadiansToDegrees<float>(KBE_DIRECTION.X);
+}
+
+// 将UE4方向转换为KBE方向
+inline void UE4Dir2KBDir(FVector& KBE_DIRECTION, const FRotator& UE4_DIRECTION)
+{
+	KBE_DIRECTION.Y = FMath::DegreesToRadians<float>(UE4_DIRECTION.Pitch);
+	KBE_DIRECTION.Z = FMath::DegreesToRadians<float>(UE4_DIRECTION.Yaw);
+	KBE_DIRECTION.X = FMath::DegreesToRadians<float>(UE4_DIRECTION.Roll);
+}
+
 UCLASS()
 class KBENGINEPLUGINS_API AKBECommon : public AActor
 {
