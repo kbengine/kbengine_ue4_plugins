@@ -760,6 +760,9 @@ void KBEngineApp::onLogin_baseapp()
 
 void KBEngineApp::reloginBaseapp()
 {
+	if(pNetworkInterface_->valid())
+		return;
+
 	UKBEventData_onReloginBaseapp* pEventData = NewObject<UKBEventData_onReloginBaseapp>();
 	KBENGINE_EVENT_FIRE("KBEngineApp::reloginBaseapp(): onReloginBaseapp", pEventData);
 
