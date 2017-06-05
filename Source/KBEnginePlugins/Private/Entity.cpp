@@ -443,6 +443,7 @@ void Entity::set_position(const FVector& old)
 		KBPos2UE4Pos(pEventData->position, position);
 		pEventData->entityID = id();
 		pEventData->moveSpeed = velocity_;
+		pEventData->isOnGround = isOnGround();
 		KBENGINE_EVENT_FIRE("set_position", pEventData);
 	}
 }

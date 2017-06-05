@@ -2663,6 +2663,7 @@ void KBEngineApp::_updateVolatileData(ENTITY_ID entityID, float x, float y, floa
 		KBPos2UE4Pos(pEventData->position, entity.position);
 		pEventData->entityID = entity.id();
 		pEventData->moveSpeed = entity.velocity();
+		pEventData->isOnGround = entity.isOnGround();
 		KBENGINE_EVENT_FIRE("updatePosition", pEventData);
 	}
 

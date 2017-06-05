@@ -283,6 +283,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
 	float moveSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
+	bool isOnGround;
 };
 
 UCLASS(Blueprintable, BlueprintType)
@@ -299,6 +302,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
 	float moveSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
+	bool isOnGround;
 };
 
 UCLASS(Blueprintable, BlueprintType)
