@@ -80,6 +80,8 @@ void UKBEMain::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompon
 	{
 		UE4Pos2KBPos(kbe_player->position, ue4_player->GetActorLocation());
 		UE4Dir2KBDir(kbe_player->direction, ue4_player->GetActorRotation());
+
+		kbe_player->isOnGround(ue4_player->GetMovementComponent() && ue4_player->GetMovementComponent()->IsMovingOnGround());
 	}
 
 	KBEngineApp::getSingleton().process();
