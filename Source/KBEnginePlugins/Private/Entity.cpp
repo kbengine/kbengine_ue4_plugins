@@ -407,6 +407,10 @@ void Entity::enterSpace()
 	pEventData->entityClassName = className();
 	pEventData->res = TEXT("");
 	KBENGINE_EVENT_FIRE("onEnterSpace", pEventData);
+	
+	// 要立即刷新表现层对象的位置
+	set_position(position);
+	set_direction(direction);
 }
 
 void Entity::onEnterSpace()
