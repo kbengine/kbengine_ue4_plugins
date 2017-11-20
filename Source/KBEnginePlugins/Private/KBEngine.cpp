@@ -126,14 +126,14 @@ bool KBEngineApp::initialize(KBEngineArgs* pArgs)
 
 	EntityDef::initialize();
 
-	// ÔÊÐí³Ö¾Ã»¯KBE(ÀýÈç:Ð­Òé£¬entitydefµÈ)
+	// ï¿½ï¿½ï¿½ï¿½Ö¾Ã»ï¿½KBE(ï¿½ï¿½ï¿½ï¿½:Ð­ï¿½é£¬entitydefï¿½ï¿½)
 	if (pArgs->persistentDataPath != TEXT(""))
 	{
 		KBE_SAFE_RELEASE(persistentInfos_);
 		persistentInfos_ = new PersistentInfos(pArgs->persistentDataPath);
 	}
 
-	// ×¢²áÊÂ¼þ
+	// ×¢ï¿½ï¿½ï¿½Â¼ï¿½
 	installEvents();
 
 	pArgs_ = pArgs;
@@ -178,7 +178,7 @@ void KBEngineApp::installEvents()
 		newPassword(data.old_password, data.new_password);
 	});
 
-	// ÄÚ²¿ÊÂ¼þ
+	// ï¿½Ú²ï¿½ï¿½Â¼ï¿½
 	KBENGINE_REGISTER_EVENT_OVERRIDE_FUNC("_closeNetwork", "_closeNetwork", [this](const UKBEventData* pEventData)
 	{
 		_closeNetwork();
@@ -279,14 +279,14 @@ bool KBEngineApp::validEmail(const FString& strEmail)
 
 void KBEngineApp::process()
 {
-	// ´¦ÀíÍøÂç
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	if (pNetworkInterface_)
 		pNetworkInterface_->process();
 
-	// ´¦ÀíÍâ²ãÅ×ÈëµÄÊÂ¼þ
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½
 	KBEvent::processInEvents();
 
-	// Ïò·þÎñ¶Ë·¢ËÍÐÄÌøÒÔ¼°Í¬²½½ÇÉ«ÐÅÏ¢µ½·þÎñ¶Ë
+	// ï¿½ï¿½ï¿½ï¿½ï¿½Ë·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½Í¬ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	sendTick();
 }
 
@@ -300,15 +300,15 @@ void KBEngineApp::sendTick()
 
 	double span = getTimeSeconds() - lastTickTime_;
 
-	// ¸üÐÂÍæ¼ÒµÄÎ»ÖÃÓë³¯Ïòµ½·þÎñ¶Ë
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òµï¿½Î»ï¿½ï¿½ï¿½ë³¯ï¿½òµ½·ï¿½ï¿½ï¿½ï¿½
 	updatePlayerToServer();
 
 	if (span > 15)
 	{
 		span = lastTickCBTime_ - lastTickTime_;
 
-		// Èç¹ûÐÄÌø»Øµ÷½ÓÊÕÊ±¼äÐ¡ÓÚÐÄÌø·¢ËÍÊ±¼ä£¬ËµÃ÷Ã»ÓÐÊÕµ½»Øµ÷
-		// ´ËÊ±Ó¦¸ÃÍ¨Öª¿Í»§¶ËµôÏßÁË
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ä£¬Ëµï¿½ï¿½Ã»ï¿½ï¿½ï¿½Õµï¿½ï¿½Øµï¿½
+		// ï¿½ï¿½Ê±Ó¦ï¿½ï¿½Í¨Öªï¿½Í»ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½
 		if (span < 0)
 		{
 			SCREEN_ERROR_MSG("KBEngineApp::sendTick(): Receive appTick timeout!");
@@ -405,7 +405,7 @@ void KBEngineApp::updatePlayerToServer()
 		pBundle->send(pNetworkInterface_);
 	}
 
-	// ¿ªÊ¼Í¬²½ËùÓÐ±»¿ØÖÆÁËµÄentityµÄÎ»ÖÃ
+	// ï¿½ï¿½Ê¼Í¬ï¿½ï¿½ï¿½ï¿½ï¿½Ð±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½entityï¿½ï¿½Î»ï¿½ï¿½
 	for(auto& item : controlledEntities_)
 	{
 		Entity* pEntity = item;
@@ -900,9 +900,9 @@ ENTITY_ID KBEngineApp::getAoiEntityIDFromStream(MemoryStream& stream)
 		uint8 aliasID = 0;
 		stream >> aliasID;
 
-		// Èç¹ûÎª0ÇÒ¿Í»§¶ËÉÏÒ»²½ÊÇÖØµÇÂ½»òÕßÖØÁ¬²Ù×÷²¢ÇÒ·þÎñ¶ËentityÔÚ¶ÏÏßÆÚ¼äÒ»Ö±´¦ÓÚÔÚÏß×´Ì¬
-		// Ôò¿ÉÒÔºöÂÔÕâ¸ö´íÎó, ÒòÎªcellapp¿ÉÄÜÒ»Ö±ÔÚÏòbaseapp·¢ËÍÍ¬²½ÏûÏ¢£¬ µ±¿Í»§¶ËÖØÁ¬ÉÏÊ±Î´µÈ
-		// ·þÎñ¶Ë³õÊ¼»¯²½Öè¿ªÊ¼ÔòÊÕµ½Í¬²½ÐÅÏ¢, ´ËÊ±ÕâÀï¾Í»á³ö´í¡£
+		// ï¿½ï¿½ï¿½Îª0ï¿½Ò¿Í»ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½Â½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò·ï¿½ï¿½ï¿½ï¿½entityï¿½Ú¶ï¿½ï¿½ï¿½ï¿½Ú¼ï¿½Ò»Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬
+		// ï¿½ï¿½ï¿½ï¿½Ôºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½Îªcellappï¿½ï¿½ï¿½ï¿½Ò»Ö±ï¿½ï¿½ï¿½ï¿½baseappï¿½ï¿½ï¿½ï¿½Í¬ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ ï¿½ï¿½ï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±Î´ï¿½ï¿½
+		// ï¿½ï¿½ï¿½ï¿½Ë³ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½è¿ªÊ¼ï¿½ï¿½ï¿½Õµï¿½Í¬ï¿½ï¿½ï¿½ï¿½Ï¢, ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Í»ï¿½ï¿½ï¿½ï¿½
 		if (entityIDAliasIDList_.Num() <= aliasID)
 			return 0;
 
@@ -1245,8 +1245,8 @@ void KBEngineApp::createDataTypeFromStream(MemoryStream& stream, bool canprint)
 	FString valname;
 	stream >> valname;
 
-	/* ÓÐÒ»Ð©ÄäÃûÀàÐÍ£¬ÎÒÃÇÐèÒªÌá¹©Ò»¸öÎ¨Ò»Ãû³Æ·Åµ½datatypesÖÐ
-		Èç£º
+	/* ï¿½ï¿½Ò»Ð©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½á¹©Ò»ï¿½ï¿½Î¨Ò»ï¿½ï¿½ï¿½Æ·Åµï¿½datatypesï¿½ï¿½
+		ï¿½ç£º
 		<onRemoveAvatar>
 		<Arg>	ARRAY <of> INT8 </of>		</Arg>
 		</onRemoveAvatar>
@@ -1291,7 +1291,7 @@ void KBEngineApp::createDataTypeFromStream(MemoryStream& stream, bool canprint)
 	}
 	else
 	{
-		// ¿ÉÄÜ»áÖØ¸´ÏòmapÌí¼Ó»ù±¾ÀàÐÍ£¬ ´ËÊ±ÐèÒª¹ýÂËµô
+		// ï¿½ï¿½ï¿½Ü»ï¿½ï¿½Ø¸ï¿½ï¿½ï¿½mapï¿½ï¿½Ó»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ ï¿½ï¿½Ê±ï¿½ï¿½Òªï¿½ï¿½ï¿½Ëµï¿½
 		//if (EntityDef::datatypes.Contains(valname))
 		//	return;
 
@@ -1302,13 +1302,13 @@ void KBEngineApp::createDataTypeFromStream(MemoryStream& stream, bool canprint)
 		EntityDef::datatypes.Add(valname, val);
 	}
 
-	// ¿ÉÄÜ»áÖØ¸´ÏòmapÌí¼Ó»ù±¾ÀàÐÍ£¬ ´ËÊ±ÐèÒª¹ýÂËµô
+	// ï¿½ï¿½ï¿½Ü»ï¿½ï¿½Ø¸ï¿½ï¿½ï¿½mapï¿½ï¿½Ó»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ ï¿½ï¿½Ê±ï¿½ï¿½Òªï¿½ï¿½ï¿½Ëµï¿½
 	//if (EntityDef::id2datatypes.Contains(utype))
 	//	return;
 
 	EntityDef::id2datatypes.Add(utype, EntityDef::datatypes[valname]);
 
-	// ½«ÓÃ»§×Ô¶¨ÒåµÄÀàÐÍ²¹³äµ½Ó³Éä±íÖÐ
+	// ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í²ï¿½ï¿½äµ½Ó³ï¿½ï¿½ï¿½ï¿½ï¿½
 	EntityDef::datatype2id.Add(valname, utype);
 
 }
@@ -1399,7 +1399,7 @@ void KBEngineApp::onImportClientEntityDef(MemoryStream& stream)
 
 			module->propertys.Add(pname, savedata);
 
-			if (paliasID >= 0)
+			if (paliasID != -1)
 			{
 				module->usePropertyDescrAlias = true;
 				module->idpropertys.Add(paliasID, savedata);
@@ -1451,7 +1451,7 @@ void KBEngineApp::onImportClientEntityDef(MemoryStream& stream)
 
 			module->methods.Add(name, savedata);
 
-			if (ialiasID >= 0)
+			if (ialiasID != -1)
 			{
 				module->useMethodDescrAlias = true;
 				module->idmethods.Add(ialiasID, savedata);
@@ -1639,7 +1639,7 @@ void KBEngineApp::onImportClientMessages(MemoryStream& stream)
 			handler->id = msgid;
 			handler->msglen = msglen;
 
-			// ÒòÎªÎÕÊÖÀàIDÒ»¿ªÊ¼ÁÙÊ±ÉèÖÃÎª¸ºÊý£¬ ËùÒÔÐèÒªÖØÐÂÒÔÕýÈ·µÄIDÌí¼Óµ½ÁÐ±í
+			// ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½IDÒ»ï¿½ï¿½Ê¼ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È·ï¿½ï¿½IDï¿½ï¿½Óµï¿½ï¿½Ð±ï¿½
 			if (isClientMethod)
 				Messages::getSingleton().add(handler, msgid, msgname, msglen);
 
@@ -1984,8 +1984,8 @@ void KBEngineApp::Client_onControlEntity(ENTITY_ID eid, int8 isControlled)
 
 	if (isCont)
 	{
-		// Èç¹û±»¿ØÖÆÕßÊÇÍæ¼Ò×Ô¼º£¬ÄÇ±íÊ¾Íæ¼Ò×Ô¼º±»ÆäËüÈË¿ØÖÆÁË
-		// ËùÒÔÍæ¼Ò×Ô¼º²»Ó¦¸Ã½øÈëÕâ¸ö±»¿ØÖÆÁÐ±í
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½Ç±ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë¿ï¿½ï¿½ï¿½ï¿½ï¿½
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½Ó¦ï¿½Ã½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð±ï¿½
 		if (entity_id_ != (*pEntityFind)->id())
 		{
 			controlledEntities_.Add((*pEntityFind));
@@ -2106,9 +2106,9 @@ void KBEngineApp::Client_onEntityEnterWorld(MemoryStream& stream)
 
 		if (!pEntity->inWorld())
 		{
-			// °²È«Æð¼û£¬ ÕâÀïÇå¿ÕÒ»ÏÂ
-			// Èç¹û·þÎñ¶ËÉÏÊ¹ÓÃgiveClientToÇÐ»»¿ØÖÆÈ¨
-			// Ö®Ç°µÄÊµÌåÒÑ¾­½øÈëÊÀ½ç£¬ ÇÐ»»ºóµÄÊµÌåÒ²½øÈëÊÀ½ç£¬ ÕâÀï¿ÉÄÜ»á²ÐÁôÖ®Ç°ÄÇ¸öÊµÌå½øÈëÊÀ½çµÄÐÅÏ¢
+			// ï¿½ï¿½È«ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½
+			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½giveClientToï¿½Ð»ï¿½ï¿½ï¿½ï¿½ï¿½È¨
+			// Ö®Ç°ï¿½ï¿½Êµï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ç£¬ ï¿½Ð»ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½Ò²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ç£¬ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü»ï¿½ï¿½ï¿½ï¿½Ö®Ç°ï¿½Ç¸ï¿½Êµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
 			entityIDAliasIDList_.Empty();
 			clearEntities(false);
 			entities_.Add(pEntity->id(), pEntity);
@@ -2603,16 +2603,16 @@ void KBEngineApp::_updateVolatileData(ENTITY_ID entityID, float x, float y, floa
 
 	if (!pEntityFind)
 	{
-		// Èç¹ûÎª0ÇÒ¿Í»§¶ËÉÏÒ»²½ÊÇÖØµÇÂ½»òÕßÖØÁ¬²Ù×÷²¢ÇÒ·þÎñ¶ËentityÔÚ¶ÏÏßÆÚ¼äÒ»Ö±´¦ÓÚÔÚÏß×´Ì¬
-		// Ôò¿ÉÒÔºöÂÔÕâ¸ö´íÎó, ÒòÎªcellapp¿ÉÄÜÒ»Ö±ÔÚÏòbaseapp·¢ËÍÍ¬²½ÏûÏ¢£¬ µ±¿Í»§¶ËÖØÁ¬ÉÏÊ±Î´µÈ
-		// ·þÎñ¶Ë³õÊ¼»¯²½Öè¿ªÊ¼ÔòÊÕµ½Í¬²½ÐÅÏ¢, ´ËÊ±ÕâÀï¾Í»á³ö´í¡£
+		// ï¿½ï¿½ï¿½Îª0ï¿½Ò¿Í»ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½Â½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò·ï¿½ï¿½ï¿½ï¿½entityï¿½Ú¶ï¿½ï¿½ï¿½ï¿½Ú¼ï¿½Ò»Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬
+		// ï¿½ï¿½ï¿½ï¿½Ôºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½Îªcellappï¿½ï¿½ï¿½ï¿½Ò»Ö±ï¿½ï¿½ï¿½ï¿½baseappï¿½ï¿½ï¿½ï¿½Í¬ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ ï¿½ï¿½ï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±Î´ï¿½ï¿½
+		// ï¿½ï¿½ï¿½ï¿½Ë³ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½è¿ªÊ¼ï¿½ï¿½ï¿½Õµï¿½Í¬ï¿½ï¿½ï¿½ï¿½Ï¢, ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Í»ï¿½ï¿½ï¿½ï¿½
 		ERROR_MSG("KBEngineApp::_updateVolatileData(): entity(%d) not found!", entityID);
 		return;
 	}
 
 	Entity& entity = *(*pEntityFind);
 
-	// Ð¡ÓÚ0²»ÉèÖÃ
+	// Ð¡ï¿½ï¿½0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	if (isOnGround >= 0)
 	{
 		entity.isOnGround(isOnGround > 0);
