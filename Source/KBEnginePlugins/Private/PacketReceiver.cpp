@@ -1,9 +1,9 @@
 
-#include "KBEnginePluginsPrivatePCH.h"
-#include "KBEngine.h"
 #include "PacketReceiver.h"
+#include "KBEngine.h"
 #include "NetworkInterface.h"
 #include "MessageReader.h"
+#include "KBDebug.h"
 
 PacketReceiver::PacketReceiver(NetworkInterface* pNetworkInterface):
 	pNetworkInterface_(pNetworkInterface),

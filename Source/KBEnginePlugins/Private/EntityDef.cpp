@@ -1,9 +1,8 @@
-
-#include "KBEnginePluginsPrivatePCH.h"
 #include "EntityDef.h"
 #include "ScriptModule.h"
 #include "DataTypes.h"
 #include "Entity.h"
+#include "KBDebug.h"
 
 TMap<FString, uint16> EntityDef::datatype2id;
 TMap<FString, KBEDATATYPE_BASE*> EntityDef::datatypes;

@@ -1,10 +1,10 @@
 
-#include "KBEnginePluginsPrivatePCH.h"
 #include "NetworkInterface.h"
 #include "PacketReceiver.h"
 #include "PacketSender.h"
 #include "MemoryStream.h"
 #include "KBEvent.h"
+#include "KBDebug.h"
 
 NetworkInterface::NetworkInterface():
 	socket_(NULL),

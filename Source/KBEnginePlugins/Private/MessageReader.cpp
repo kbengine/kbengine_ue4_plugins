@@ -1,6 +1,6 @@
 
-#include "KBEnginePluginsPrivatePCH.h"
 #include "MessageReader.h"
+#include "KBDebug.h"
 
 MessageReader::MessageReader():
 	msgid_(0),

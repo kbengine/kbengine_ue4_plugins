@@ -1,5 +1,4 @@
 
-#include "KBEnginePluginsPrivatePCH.h"
 #include "KBEngine.h"
 #include "KBEngineArgs.h"
 #include "Entity.h"
@@ -13,6 +12,7 @@
 #include "Method.h"
 #include "Mailbox.h"
 #include "Regex.h"
+#include "KBDebug.h"
 
 TMap<uint16, FKServerErr> KBEngineApp::serverErrs_;
 

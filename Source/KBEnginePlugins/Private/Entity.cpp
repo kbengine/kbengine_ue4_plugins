@@ -1,5 +1,3 @@
-
-#include "KBEnginePluginsPrivatePCH.h"
 #include "Entity.h"
 #include "KBEngine.h"
 #include "KBEvent.h"
@@ -10,6 +8,7 @@
 #include "Bundle.h"
 #include "EntityDef.h"
 #include "Property.h"
+#include "KBDebug.h"
 
 EntityFactory* EntityFactory::pEntityFactory = NULL;
 

@@ -1,6 +1,6 @@
 
-#include "KBEnginePluginsPrivatePCH.h"
 #include "MemoryStream.h"
+#include "KBDebug.h"
 
 MemoryStream* MemoryStream::createObject()
 {

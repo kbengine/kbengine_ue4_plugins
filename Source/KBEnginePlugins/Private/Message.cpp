@@ -1,6 +1,6 @@
 
-#include "KBEnginePluginsPrivatePCH.h"
 #include "Message.h"
+#include "KBDebug.h"
 
 Message::Message() :
 	id(0),

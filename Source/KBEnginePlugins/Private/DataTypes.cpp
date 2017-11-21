@@ -1,8 +1,8 @@
 
-#include "KBEnginePluginsPrivatePCH.h"
 #include "DataTypes.h"
 #include "MemoryStream.h"
 #include "EntityDef.h"
+#include "KBDebug.h"
 #include "Runtime/Core/Public/Misc/Variant.h"
 
 KBVar* KBEDATATYPE_INT8::createFromStream(MemoryStream& stream)

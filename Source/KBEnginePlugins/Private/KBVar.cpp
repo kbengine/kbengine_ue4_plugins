@@ -1,7 +1,6 @@
 
-#include "KBEnginePluginsPrivatePCH.h"
 #include "KBVar.h"
-
+#include "KBDebug.h"
 
 void KBVar::ErrorLog(const FString& errstr) const
 {

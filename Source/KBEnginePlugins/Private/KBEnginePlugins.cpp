@@ -1,7 +1,6 @@
 // Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 
-#include "KBEnginePluginsPrivatePCH.h"
-
+#include "KBEnginePlugins.h"
 #define LOCTEXT_NAMESPACE "FKBEnginePluginsModule"
 
 void FKBEnginePluginsModule::StartupModule()

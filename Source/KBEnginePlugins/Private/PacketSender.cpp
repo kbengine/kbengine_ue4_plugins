@@ -1,7 +1,7 @@
 
-#include "KBEnginePluginsPrivatePCH.h"
 #include "PacketSender.h"
 #include "MemoryStream.h"
+#include "KBDebug.h"
 
 PacketSender::PacketSender(NetworkInterface* pNetworkInterface) :
 	pNetworkInterface_(pNetworkInterface)

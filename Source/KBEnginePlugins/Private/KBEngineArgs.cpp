@@ -1,6 +1,6 @@
 
-#include "KBEnginePluginsPrivatePCH.h"
 #include "KBEngineArgs.h"
+#include "KBDebug.h"
 
 KBEngineArgs::KBEngineArgs():
 	ip(TEXT("127.0.0.1")),

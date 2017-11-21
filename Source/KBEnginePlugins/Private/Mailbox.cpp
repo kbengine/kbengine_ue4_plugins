@@ -1,9 +1,9 @@
 
-#include "KBEnginePluginsPrivatePCH.h"
 #include "Mailbox.h"
 #include "Bundle.h"
 #include "KBEngine.h"
 #include "Message.h"
+#include "KBDebug.h"
 
 Mailbox::Mailbox():
 	id(0),

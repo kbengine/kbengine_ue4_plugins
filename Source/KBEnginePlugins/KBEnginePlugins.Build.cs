@@ -4,10 +4,11 @@ using UnrealBuildTool;
 
 public class KBEnginePlugins : ModuleRules
 {
-	public KBEnginePlugins(TargetInfo Target)
-	{
-		
-		PublicIncludePaths.AddRange(
+	public KBEnginePlugins(ReadOnlyTargetRules Target) : base(Target)
+    {
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+
+        PublicIncludePaths.AddRange(
 			new string[] {
 				"KBEnginePlugins/Public"
 				// ... add public include paths required here ...

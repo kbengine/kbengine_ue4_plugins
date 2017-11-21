@@ -1,6 +1,6 @@
 
-#include "KBEnginePluginsPrivatePCH.h"
 #include "Property.h"
+#include "KBDebug.h"
 
 Property::Property():
 	name(TEXT("")),

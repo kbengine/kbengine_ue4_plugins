@@ -1,9 +1,9 @@
 
-#include "KBEnginePluginsPrivatePCH.h"
 #include "ScriptModule.h"
 #include "Method.h"
 #include "Property.h"
 #include "Entity.h"
+#include "KBDebug.h"
 
 ScriptModule::ScriptModule(const FString& moduleName):
 	name(moduleName),

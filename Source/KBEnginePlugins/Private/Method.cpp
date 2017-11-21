@@ -1,7 +1,7 @@
 
-#include "KBEnginePluginsPrivatePCH.h"
-#include "DataTypes.h"
 #include "Method.h"
+#include "DataTypes.h"
+#include "KBDebug.h"
 
 Method::Method():
 	name(TEXT("")),

@@ -3,6 +3,8 @@
 #pragma once
 #include "Math/RandomStream.h"
 #include "Misc/NetworkGuid.h"
+#include "Serialization/MemoryWriter.h"
+#include "Serialization/MemoryReader.h"
 
 namespace EKBVarTypes
 {
@@ -434,10 +436,10 @@ public:
 	* @param InArray The byte array to assign.
 	* @return This instance.
 	*/
-	KBVar& operator=(const KBVarBytes InArray)
+	KBVar& operator=(const KBVarBytes& InArray)
 	{
 		Type = EKBVarTypes::ByteArray;
-		Value = MoveTemp(InArray);
+		Value = MoveTemp(const_cast<KBVarBytes&>(InArray));
 
 		return *this;
 	}

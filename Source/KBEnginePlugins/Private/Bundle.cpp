@@ -1,9 +1,9 @@
 
-#include "KBEnginePluginsPrivatePCH.h"
 #include "Bundle.h"
 #include "MemoryStream.h"
 #include "Message.h"
 #include "NetworkInterface.h"
+#include "KBDebug.h"
 
 Bundle::Bundle():
 	pCurrPacket_(NULL),

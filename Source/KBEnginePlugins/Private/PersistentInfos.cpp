@@ -1,7 +1,7 @@
 
-#include "KBEnginePluginsPrivatePCH.h"
 #include "PersistentInfos.h"
 #include "KBEngine.h"
+#include "KBDebug.h"
 
 PersistentInfos::PersistentInfos():
 	_persistentDataPath(TEXT("")),
