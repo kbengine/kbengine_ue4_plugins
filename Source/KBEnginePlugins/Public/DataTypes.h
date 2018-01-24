@@ -308,7 +308,7 @@ public:
 	}
 };
 
-class KBENGINEPLUGINS_API KBEDATATYPE_MAILBOX : public KBEDATATYPE_BASE
+class KBENGINEPLUGINS_API KBEDATATYPE_ENTITYCALL : public KBEDATATYPE_BASE
 {
 public:
 	virtual KBVar* createFromStream(MemoryStream& stream) override;
@@ -319,7 +319,7 @@ public:
 	virtual bool isSameType(KBVar& v) override;
 
 	virtual FString c_str() const {
-		return TEXT("MAILBOX");
+		return TEXT("ENTITYCALL");
 	}
 };
 
