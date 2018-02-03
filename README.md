@@ -13,7 +13,7 @@ Usage
 		2: Set the parameters of the component.
 
 	3: Implment the KBE defined entity (including the client part)
-		See: kbengine\kbengine_demos_assets\scripts\entities.xml��hasClient="true" need to implment
+		See: kbengine\kbengine_demos_assets\scripts\entities.xml(hasClient="true") need to implment
 			<Account hasClient="true"></Account>
 			<Monster hasClient="true"></Monster>
 			<Gate hasClient="true"></Gate>
