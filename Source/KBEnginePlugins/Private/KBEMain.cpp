@@ -45,20 +45,10 @@ void UKBEMain::BeginPlay()
 {
 	Super::BeginPlay();
 
-	KBEngineArgs* pArgs = new KBEngineArgs();
-	pArgs->ip = ip;
-	pArgs->port = port;
-	pArgs->syncPlayer = syncPlayer;
-	pArgs->useAliasEntityID = useAliasEntityID;
-	pArgs->isOnInitCallPropertysSetMethods = isOnInitCallPropertysSetMethods;
-	pArgs->clientType = clientType;
-	pArgs->serverHeartbeatTick = serverHeartbeatTick;
-	pArgs->SEND_BUFFER_MAX = SEND_BUFFER_MAX;
-	pArgs->RECV_BUFFER_MAX = RECV_BUFFER_MAX;
-	pArgs->persistentDataPath = persistentDataPath;
-
-	if (!KBEngineApp::getSingleton().initialize(pArgs))
-		delete pArgs;
+	if (bAutoInitKBEngine)
+	{
+		InitKBEngine();
+	}
 }
 
 void UKBEMain::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -86,6 +76,29 @@ void UKBEMain::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompon
 	}
 
 	KBEngineApp::getSingleton().process();
+}
+
+bool UKBEMain::InitKBEngine()
+{
+	KBEngineArgs* pArgs = new KBEngineArgs();
+	pArgs->ip = ip;
+	pArgs->port = port;
+	pArgs->syncPlayer = syncPlayer;
+	pArgs->useAliasEntityID = useAliasEntityID;
+	pArgs->isOnInitCallPropertysSetMethods = isOnInitCallPropertysSetMethods;
+	pArgs->clientType = clientType;
+	pArgs->serverHeartbeatTick = serverHeartbeatTick;
+	pArgs->SEND_BUFFER_MAX = SEND_BUFFER_MAX;
+	pArgs->RECV_BUFFER_MAX = RECV_BUFFER_MAX;
+	pArgs->persistentDataPath = persistentDataPath;
+
+	if (!KBEngineApp::getSingleton().initialize(pArgs))
+	{
+		delete pArgs;
+		return false;
+	}
+		
+	return true;
 }
 
 FString UKBEMain::getClientVersion()
