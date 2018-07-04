@@ -29,7 +29,7 @@ public:
 	// 可以直接从本地加载来提供登录速度
 	FString persistentDataPath = "";
 
-	bool syncPlayer;
+	int syncPlayerMS;
 	bool useAliasEntityID;
 	bool isOnInitCallPropertysSetMethods;
 
