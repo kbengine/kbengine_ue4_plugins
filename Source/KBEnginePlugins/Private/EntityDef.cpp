@@ -150,7 +150,6 @@ void EntityDef::bindMessageDataType()
 	datatype2id.Add(TEXT("PY_DICT"), 10);
 	datatype2id.Add(TEXT("PY_TUPLE"), 10);
 	datatype2id.Add(TEXT("PY_LIST"), 10);
-	datatype2id.Add(TEXT("ENTITYCALL"), 10);
 
 	id2datatypes.Add(10, datatypes["PYTHON"]);
 
@@ -189,4 +188,6 @@ void EntityDef::bindMessageDataType()
 	datatype2id.Add(TEXT("ARRAY"), 19);
 	// 这里不需要绑定，ARRAY需要根据不同类型实例化动态得到id
 	//id2datatypes.Add(19, datatypes["ARRAY"]);
+
+	datatype2id.Add(TEXT("ENTITYCALL"), 20);
 }
