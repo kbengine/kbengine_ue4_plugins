@@ -387,14 +387,27 @@ bool KBEDATATYPE_UNICODE::isSameType(KBVar& v)
 KBVar* KBEDATATYPE_ENTITYCALL::createFromStream(MemoryStream& stream)
 {
 	TArray<uint8> val;
-	stream.readBlob(val);
+
+	uint64 cid = 0;
+	int32 id = 0;
+	uint16 type = 0;
+	uint16 utype = 0;
+
+	stream.readUint64(cid);
+	stream.readInt32(cid);
+	stream.readUint16(cid);
+	stream.readUint16(cid);
+
 	return new KBVar(val);
 }
 
 void KBEDATATYPE_ENTITYCALL::addToStream(Bundle& stream, KBVar& v)
 {
-	TArray<uint8> val = v;
-	stream.appendBlob(val);
+	uint64 cid = 0;
+	int32 id = 0;
+	uint16 type = 0;
+	uint16 utype = 0;
+	stream << cid << id << type << utype;
 }
 
 KBVar* KBEDATATYPE_ENTITYCALL::parseDefaultValStr(const FString& v)
