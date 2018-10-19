@@ -697,7 +697,7 @@ void KBEngineApp::Client_onLoginSuccessfully(MemoryStream& stream)
 	
 	DEBUG_MSG("KBEngineApp::Client_onLoginSuccessfully(): accountName(%s), addr("
 		 "%s:%d), datas(%d)!", *accountName, *baseappIP_, baseappPort_, serverdatas_.Num());
-
+	
 	login_baseapp(true);
 }
 
@@ -2244,6 +2244,7 @@ void KBEngineApp::Client_onUpdateBasePos(float x, float y, float z)
 
 		UKBEventData_updatePosition* pEventData = NewObject<UKBEventData_updatePosition>();
 		KBPos2UE4Pos(pEventData->position, entityServerPos_);
+		KBDir2UE4Dir(pEventData->direction, pEntity->direction);
 		pEventData->entityID = pEntity->id();
 		pEventData->moveSpeed = pEntity->velocity();
 		KBENGINE_EVENT_FIRE("updatePosition", pEventData);
@@ -2265,6 +2266,7 @@ void KBEngineApp::Client_onUpdateBasePosXZ(float x, float z)
 
 		UKBEventData_updatePosition* pEventData = NewObject<UKBEventData_updatePosition>();
 		KBPos2UE4Pos(pEventData->position, entityServerPos_);
+		KBDir2UE4Dir(pEventData->direction, pEntity->direction);
 		pEventData->entityID = pEntity->id();
 		pEventData->moveSpeed = pEntity->velocity();
 		KBENGINE_EVENT_FIRE("updatePosition", pEventData);
@@ -2284,7 +2286,7 @@ void KBEngineApp::Client_onUpdateBaseDir(MemoryStream& stream)
 		pEntity->direction.Set(roll, pitch, yaw);
 
 		UKBEventData_set_direction* pEventData = NewObject<UKBEventData_set_direction>();
-		pEventData->direction = pEntity->direction;
+		KBDir2UE4Dir(pEventData->direction, pEntity->direction);
 		pEventData->entityID = pEntity->id();
 		KBENGINE_EVENT_FIRE("set_direction", pEventData);
 
@@ -2657,7 +2659,7 @@ void KBEngineApp::_updateVolatileData(ENTITY_ID entityID, float x, float y, floa
 	if (changeDirection == true)
 	{
 		UKBEventData_set_direction* pEventData = NewObject<UKBEventData_set_direction>();
-		pEventData->direction = entity.direction;
+		KBDir2UE4Dir(pEventData->direction, entity.direction);
 		pEventData->entityID = entity.id();
 		KBENGINE_EVENT_FIRE("set_direction", pEventData);
 
@@ -2676,6 +2678,7 @@ void KBEngineApp::_updateVolatileData(ENTITY_ID entityID, float x, float y, floa
 
 		UKBEventData_updatePosition* pEventData = NewObject<UKBEventData_updatePosition>();
 		KBPos2UE4Pos(pEventData->position, entity.position);
+		KBDir2UE4Dir(pEventData->direction, entity.direction);
 		pEventData->entityID = entity.id();
 		pEventData->moveSpeed = entity.velocity();
 		pEventData->isOnGround = entity.isOnGround();
