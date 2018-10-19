@@ -456,7 +456,7 @@ void Entity::set_direction(const FVector& old)
 	if (inWorld_)
 	{
 		UKBEventData_set_direction* pEventData = NewObject<UKBEventData_set_direction>();
-		pEventData->direction = direction;
+		KBDir2UE4Dir(pEventData->direction, direction);
 		pEventData->entityID = id();
 		KBENGINE_EVENT_FIRE("set_direction", pEventData);
 	}
