@@ -363,7 +363,7 @@ void Entity::enterWorld()
 	pEventData->isPlayer = isPlayer();
 	pEventData->entityClassName = className();
 	pEventData->res = TEXT("");
-	KBENGINE_EVENT_FIRE("onEnterWorld", pEventData);
+	KBENGINE_EVENT_FIRE(KBEventTypes::onEnterWorld, pEventData);
 }
 
 void Entity::onEnterWorld()
@@ -405,7 +405,7 @@ void Entity::enterSpace()
 	pEventData->isPlayer = isPlayer();
 	pEventData->entityClassName = className();
 	pEventData->res = TEXT("");
-	KBENGINE_EVENT_FIRE("onEnterSpace", pEventData);
+	KBENGINE_EVENT_FIRE(KBEventTypes::onEnterSpace, pEventData);
 	
 	// 要立即刷新表现层对象的位置
 	set_position(position);
@@ -447,7 +447,7 @@ void Entity::set_position(const FVector& old)
 		pEventData->entityID = id();
 		pEventData->moveSpeed = velocity_;
 		pEventData->isOnGround = isOnGround();
-		KBENGINE_EVENT_FIRE("set_position", pEventData);
+		KBENGINE_EVENT_FIRE(KBEventTypes::set_position, pEventData);
 	}
 }
 
@@ -458,7 +458,7 @@ void Entity::set_direction(const FVector& old)
 		UKBEventData_set_direction* pEventData = NewObject<UKBEventData_set_direction>();
 		KBDir2UE4Dir(pEventData->direction, direction);
 		pEventData->entityID = id();
-		KBENGINE_EVENT_FIRE("set_direction", pEventData);
+		KBENGINE_EVENT_FIRE(KBEventTypes::set_direction, pEventData);
 	}
 }
 
