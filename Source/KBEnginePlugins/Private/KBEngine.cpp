@@ -143,36 +143,36 @@ bool KBEngineApp::initialize(KBEngineArgs* pArgs)
 
 void KBEngineApp::installEvents()
 {
-	KBENGINE_REGISTER_EVENT_OVERRIDE_FUNC("login", "login", [this](const UKBEventData* pEventData)
+	KBENGINE_REGISTER_EVENT_OVERRIDE_FUNC(KBEventTypes::login, KBEventTypes::login, [this](const UKBEventData* pEventData)
 	{
 		const UKBEventData_login& data = static_cast<const UKBEventData_login&>(*pEventData);
 		login(data.username, data.password, data.datas);
 	});
 
-	KBENGINE_REGISTER_EVENT_OVERRIDE_FUNC("createAccount", "createAccount", [this](const UKBEventData* pEventData)
+	KBENGINE_REGISTER_EVENT_OVERRIDE_FUNC(KBEventTypes::createAccount, KBEventTypes::createAccount, [this](const UKBEventData* pEventData)
 	{
 		const UKBEventData_createAccount& data = static_cast<const UKBEventData_createAccount&>(*pEventData);
 		createAccount(data.username, data.password, data.datas);
 	});
 
-	KBENGINE_REGISTER_EVENT_OVERRIDE_FUNC("reloginBaseapp", "reloginBaseapp", [this](const UKBEventData* pEventData)
+	KBENGINE_REGISTER_EVENT_OVERRIDE_FUNC(KBEventTypes::reloginBaseapp, KBEventTypes::reloginBaseapp, [this](const UKBEventData* pEventData)
 	{
 		reloginBaseapp();
 	});
 
-	KBENGINE_REGISTER_EVENT_OVERRIDE_FUNC("resetPassword", "resetPassword", [this](const UKBEventData* pEventData)
+	KBENGINE_REGISTER_EVENT_OVERRIDE_FUNC(KBEventTypes::resetPassword, KBEventTypes::resetPassword, [this](const UKBEventData* pEventData)
 	{
 		const UKBEventData_resetPassword& data = static_cast<const UKBEventData_resetPassword&>(*pEventData);
 		resetPassword(data.username);
 	});
 
-	KBENGINE_REGISTER_EVENT_OVERRIDE_FUNC("bindAccountEmail", "bindAccountEmail", [this](const UKBEventData* pEventData)
+	KBENGINE_REGISTER_EVENT_OVERRIDE_FUNC(KBEventTypes::bindAccountEmail, KBEventTypes::bindAccountEmail, [this](const UKBEventData* pEventData)
 	{
 		const UKBEventData_bindAccountEmail& data = static_cast<const UKBEventData_bindAccountEmail&>(*pEventData);
 		bindAccountEmail(data.email);
 	});
 
-	KBENGINE_REGISTER_EVENT_OVERRIDE_FUNC("newPassword", "newPassword", [this](const UKBEventData* pEventData)
+	KBENGINE_REGISTER_EVENT_OVERRIDE_FUNC(KBEventTypes::newPassword, KBEventTypes::newPassword, [this](const UKBEventData* pEventData)
 	{
 		const UKBEventData_newPassword& data = static_cast<const UKBEventData_newPassword&>(*pEventData);
 		newPassword(data.old_password, data.new_password);
@@ -521,7 +521,7 @@ void KBEngineApp::Client_onKicked(uint16 failedcode)
 	UKBEventData_onKicked* pEventData = NewObject<UKBEventData_onKicked>();
 	pEventData->failedcode = failedcode;
 	pEventData->errorStr = serverErr(failedcode);
-	KBENGINE_EVENT_FIRE("onKicked", pEventData);
+	KBENGINE_EVENT_FIRE(KBEventTypes::onKicked, pEventData);
 }
 
 void KBEngineApp::Client_onImportServerErrorsDescr(MemoryStream& stream)
