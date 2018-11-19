@@ -164,7 +164,7 @@ void NetworkInterface::tickConnecting()
 		UKBEventData_onConnectionState* pEventData = NewObject<UKBEventData_onConnectionState>();
 		pEventData->success = true;
 		pEventData->address = FString::Printf(TEXT("%s:%d"), *connectIP_, connectPort_);
-		KBENGINE_EVENT_FIRE("onConnectionState", pEventData);
+		KBENGINE_EVENT_FIRE(KBEventTypes::onConnectionState, pEventData);
 	}
 	else
 	{
@@ -179,7 +179,7 @@ void NetworkInterface::tickConnecting()
 			UKBEventData_onConnectionState* pEventData = NewObject<UKBEventData_onConnectionState>();
 			pEventData->success = false;
 			pEventData->address = FString::Printf(TEXT("%s:%d"), *connectIP_, connectPort_);
-			KBENGINE_EVENT_FIRE("onConnectionState", pEventData);
+			KBENGINE_EVENT_FIRE(KBEventTypes::onConnectionState, pEventData);
 		}
 	}
 }
