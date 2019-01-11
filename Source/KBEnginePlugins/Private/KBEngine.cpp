@@ -1690,6 +1690,18 @@ void KBEngineApp::onImportClientMessages(MemoryStream& stream)
 	onImportClientMessagesCompleted();
 }
 
+void KBEngineApp::Client_onImportClientSDK(MemoryStream& stream)
+{
+	UKBEventData_onImportClientSDK* pEventData = NewObject<UKBEventData_onImportClientSDK>();
+
+	pEventData->remainingFiles = stream.readInt32();
+	pEventData->fileName = stream.readString();
+	pEventData->fileSize = stream.readInt32();
+	stream.readBlob(pEventData->fileDatas);
+
+	KBENGINE_EVENT_FIRE("onImportClientSDK", pEventData);
+}
+
 void KBEngineApp::resetPassword(const FString& username)
 {
 	username_ = username;
