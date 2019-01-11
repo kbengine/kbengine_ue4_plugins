@@ -174,6 +174,8 @@ public:
 
 	void Client_onImportClientEntityDef(MemoryStream& stream);
 
+	void Client_onImportClientSDK(MemoryStream& stream);
+	
 	/*
 		服务器心跳回调
 	*/
