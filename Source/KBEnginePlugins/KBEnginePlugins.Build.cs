@@ -5,12 +5,12 @@ using UnrealBuildTool;
 public class KBEnginePlugins : ModuleRules
 {
 	public KBEnginePlugins(ReadOnlyTargetRules Target) : base(Target)
-	{
-		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+    {
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		bEnableUndefinedIdentifierWarnings = false;
-		
-		PublicIncludePaths.AddRange(
+
+        PublicIncludePaths.AddRange(
 			new string[] {
 				"KBEnginePlugins/Public"
 				// ... add public include paths required here ...
@@ -42,8 +42,8 @@ public class KBEnginePlugins : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"Networking",
-				"Sockets",
+                "Networking",
+                "Sockets",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
