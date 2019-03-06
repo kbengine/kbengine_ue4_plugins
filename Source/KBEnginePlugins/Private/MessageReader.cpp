@@ -139,6 +139,7 @@ void MessageReader::process(const uint8* datas, MessageLengthEx offset, MessageL
 				}
 
 				MessageLengthEx frpos = pMemoryStream_->rpos() + expectSize_;
+				
 				pMsg->handle(*pMemoryStream_);
 
 				if (expectSize_ > 0 && frpos != pMemoryStream_->rpos())
