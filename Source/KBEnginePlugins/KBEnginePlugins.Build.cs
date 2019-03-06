@@ -8,6 +8,8 @@ public class KBEnginePlugins : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
+		bEnableUndefinedIdentifierWarnings = false;
+
         PublicIncludePaths.AddRange(
 			new string[] {
 				"KBEnginePlugins/Public"
