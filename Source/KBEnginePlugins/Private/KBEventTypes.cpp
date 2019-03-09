@@ -1,6 +1,4 @@
-﻿#pragma once
-
-#include "KBEventTypes.h"
+﻿#include "KBEventTypes.h"
 
 const FString KBEventTypes::createAccount = "createAccount";
 const FString KBEventTypes::login = "login";
