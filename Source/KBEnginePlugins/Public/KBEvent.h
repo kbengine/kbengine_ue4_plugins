@@ -163,6 +163,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
 	FString errorStr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
+	TArray<uint8> serverdatas;
 };
 
 UCLASS(Blueprintable, BlueprintType)
