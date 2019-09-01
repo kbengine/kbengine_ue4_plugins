@@ -48,6 +48,10 @@ public:
 	// Called every frame
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
+	//Initialize KBEngine manually
+	UFUNCTION(BlueprintCallable, Category = "KBEngine")
+	bool InitKBEngine();
+	
 	UFUNCTION(BlueprintCallable, Category = "KBEngine")
 	FString getClientVersion();
 
@@ -86,6 +90,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
 	int port;
+	
+	//Should we automatic initialize KBEngine on BeginPlay?
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
+	bool bAutoInitKBEngine = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KBEngine)
 	EKCLIENT_TYPE clientType;
